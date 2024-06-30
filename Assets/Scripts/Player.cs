@@ -9,6 +9,8 @@ public class Player : NetworkBehaviour
 {
     [SerializeField] private Ball _prefabBall;
     [SerializeField] private Transform _playerCameraRootTransform;
+    [SerializeField] private Transform _modelTransform;
+    [SerializeField] private Animator _animator;
 
     private Vector3 _forward = Vector3.forward;
 
@@ -20,13 +22,32 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         _cc = GetComponent<NetworkCharacterController>();
+    }
+
+    public override void Spawned()
+    {
+        base.Spawned();
+
+        if (!HasInputAuthority)
+        {
+            return;
+        }
+        
         _playerCamera = GameObject.Find("PlayerFollowCamera").GetComponent<PlayerCamera>();
         _playerCamera.CinemachineCamera.Follow = this._playerCameraRootTransform;
         _playerCamera.transform.position = this._playerCameraRootTransform.position;
+            
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void FixedUpdate()
     {
+        if (!HasInputAuthority)
+        {
+            return;
+        }
+        
         Look(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
     }
 
@@ -38,6 +59,18 @@ public class Player : NetworkBehaviour
             {
                 Move(inputData);
                 _forward = inputData.direction;
+
+                if (HasInputAuthority)
+                {
+                    _animator.SetBool("Move", true);
+                }
+            }
+            else
+            {
+                if (HasInputAuthority)
+                {
+                    _animator.SetBool("Move", false);
+                }
             }
 
             // 슛.
@@ -66,15 +99,9 @@ public class Player : NetworkBehaviour
 
         float angle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg;
         var moveDir = Quaternion.Euler(0, -_cameraRotation.y + angle, 0) * Vector3.forward;
-        // float moveSpeed = _isSprint ? SprintSpeed : MoveSpeed;
-           
-        Debug.Log(moveDir);
-        // this.transform.position += 5 * moveDir * Runner.DeltaTime;
+        //  float moveSpeed = _isSprint ? SprintSpeed : MoveSpeed;
+        
         _cc.Move(5 * moveDir * Runner.DeltaTime);
-
-        // _rigidbody.AddForce(dir * moveSpeed, ForceMode.Force);
-        // velocity.x = dir.x * MoveSpeed;
-        // velocity.z = dir.z * MoveSpeed;
     }
     
     /// <summary>
@@ -91,7 +118,7 @@ public class Player : NetworkBehaviour
         _cameraRotation = CameraRotationClamp(_cameraRotation);
         _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation.x, -_cameraRotation.y, 0);
         
-        // _modelTransform.rotation = Quaternion.Euler(0, -_cameraRotation.y, 0);
+        _modelTransform.rotation = Quaternion.Euler(0, -_cameraRotation.y, 0);
     }
     
     private Vector3 CameraRotationClamp(Vector3 rotation)
