@@ -82,7 +82,6 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         _mouseButton0 = _mouseButton0 | Input.GetMouseButton(0);
     }
 
-    
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
@@ -98,6 +97,17 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         if (Input.GetKey(KeyCode.D))
             data.direction += Vector3.right;
+
+        data.lookDelta += new Vector2(-Input.GetAxisRaw("Mouse Y"), Input.GetAxisRaw("Mouse X"));
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            data.jump = true;
+        }
+        else
+        {
+            data.jump = false;
+        }
 
         data.buttons.Set( NetworkInputData.MOUSEBUTTON0, _mouseButton0);
         _mouseButton0 = false;

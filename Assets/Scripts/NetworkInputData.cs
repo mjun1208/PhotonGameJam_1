@@ -9,6 +9,7 @@ public struct NetworkInputData : INetworkInput
 
     public NetworkButtons buttons;
     
-    public Vector3 lookDirection;
+    public Vector2 lookDelta;
     public Vector3 direction;
+    public bool jump;
 }

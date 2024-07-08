@@ -1,9 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Fusion;
-using Unity.VisualScripting;
+using Fusion.Addons.SimpleKCC;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Player : NetworkBehaviour
 {
@@ -11,17 +10,19 @@ public class Player : NetworkBehaviour
     [SerializeField] private Transform _playerCameraRootTransform;
     [SerializeField] private Transform _modelTransform;
     [SerializeField] private Animator _animator;
+    [SerializeField] private SimpleKCC _simpleKCC;
 
     private Vector3 _forward = Vector3.forward;
+    
+    [Networked]
+    private Vector3 _networkedMoveDirection { get; set; }
 
-    private NetworkCharacterController _cc;
     private PlayerCamera _playerCamera;
     private Vector3 _cameraRotation;
     [Networked] private TickTimer delay { get; set; }
 
     private void Awake()
     {
-        _cc = GetComponent<NetworkCharacterController>();
     }
 
     public override void Spawned()
@@ -43,53 +44,67 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!HasInputAuthority)
-        {
-            return;
-        }
-        
-        Look(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput(out NetworkInputData inputData))
+        var inputData = GetInput<NetworkInputData>().GetValueOrDefault();
+
+        _simpleKCC.AddLookRotation(inputData.lookDelta);
+            
+        Look();
+        
+        _networkedMoveDirection = inputData.direction;
+        
+        if (inputData.direction.sqrMagnitude > 0)
         {
-            if (inputData.direction.sqrMagnitude > 0)
-            {
-                Move(inputData);
-                _forward = inputData.direction;
+            Move(inputData);
+            _forward = inputData.direction;
+        }
 
-                if (HasInputAuthority)
-                {
-                    _animator.SetBool("Move", true);
-                }
-            }
-            else
-            {
-                if (HasInputAuthority)
-                {
-                    _animator.SetBool("Move", false);
-                }
-            }
+        // 슛.
+        // if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
+        // {
+        //     if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        //     {
+        //         delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+        // Runner.Spawn(_prefabBall, transform.position + _forward, Quaternion.LookRotation(_forward), Object.InputAuthority);
+        //         
+        //         Runner.Spawn(_prefabBall,
+        //             transform.position+_forward, Quaternion.LookRotation(_forward),
+        //             Object.InputAuthority, (runner, o) =>
+        //             {
+        //                 // Initialize the Ball before synchronizing it
+        //                 o.GetComponent<Ball>().Init();
+        //             });
+        //     }
+        // }
+    }
 
-            // 슛.
-            // if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
-            // {
-            //     if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-            //     {
-            //         delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                       // Runner.Spawn(_prefabBall, transform.position + _forward, Quaternion.LookRotation(_forward), Object.InputAuthority);
-                       //         
-                       //         Runner.Spawn(_prefabBall,
-                       //             transform.position+_forward, Quaternion.LookRotation(_forward),
-                       //             Object.InputAuthority, (runner, o) =>
-                       //             {
-                       //                 // Initialize the Ball before synchronizing it
-                       //                 o.GetComponent<Ball>().Init();
-                       //             });
-                       //     }
-            // }
+    public override void Render()
+    {
+        base.Render();
+        SetAnimation();
+    }
+
+    private void SetAnimation()
+    {
+        if (_networkedMoveDirection.sqrMagnitude > 0)
+        {
+            _animator.SetBool("Move", true);
+                
+            var aniamtorMoveX = _animator.GetFloat("MoveX");
+            var aniamtorMoveZ = _animator.GetFloat("MoveZ");
+
+            var lerpAnimatorMoveX = Mathf.Lerp(aniamtorMoveX, _networkedMoveDirection.x, 10f * Time.fixedDeltaTime);
+            var lerpAnimatorMoveZ = Mathf.Lerp(aniamtorMoveZ, _networkedMoveDirection.z, 10f * Time.fixedDeltaTime);
+
+            _animator.SetFloat("MoveX", lerpAnimatorMoveX);
+            _animator.SetFloat("MoveZ", lerpAnimatorMoveZ);
+        }
+        else
+        {
+            _animator.SetBool("Move", false);
         }
     }
 
@@ -101,24 +116,29 @@ public class Player : NetworkBehaviour
         var moveDir = Quaternion.Euler(0, -_cameraRotation.y + angle, 0) * Vector3.forward;
         //  float moveSpeed = _isSprint ? SprintSpeed : MoveSpeed;
         
-        _cc.Move(5 * moveDir * Runner.DeltaTime);
+        Vector3 jumpImpulse  = default;
+        
+        if (networkInputData.jump == true && _simpleKCC.IsGrounded == true)
+        {
+            // Set world space jump vector.
+            jumpImpulse = Vector3.up * 10.0f;
+        }
+        
+        Vector3 inputDirection = _simpleKCC.TransformRotation * new Vector3(inputDir.x, 0f, inputDir.z);
+
+        _simpleKCC.Move(inputDirection * 2f, jumpImpulse.magnitude);
     }
     
     /// <summary>
     /// Camera Ratation
     /// </summary>
-    private void Look(Vector2 input)
+    private void Look()
     {
-        if (input == Vector2.zero)
-        {
-            return;
-        }
+        var input = _simpleKCC.GetLookRotation(true, true);
         
-        _cameraRotation += new Vector3(-input.y * 0.8f, -input.x * 5f, 0);
-        _cameraRotation = CameraRotationClamp(_cameraRotation);
-        _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation.x, -_cameraRotation.y, 0);
-        
-        _modelTransform.rotation = Quaternion.Euler(0, -_cameraRotation.y, 0);
+        _cameraRotation = new Vector3(input.x, input.y);
+        _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation);
+        _modelTransform.rotation = Quaternion.Euler(0, _cameraRotation.y, 0);
     }
     
     private Vector3 CameraRotationClamp(Vector3 rotation)
