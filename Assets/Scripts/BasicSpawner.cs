@@ -109,7 +109,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
             data.jump = false;
         }
 
-        data.buttons.Set( NetworkInputData.MOUSEBUTTON0, _mouseButton0);
+        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
         _mouseButton0 = false;
 
         input.Set(data);

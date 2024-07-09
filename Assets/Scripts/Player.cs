@@ -2,10 +2,13 @@ using System;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Player : NetworkBehaviour
 {
+    private const float InteractionRayCastDistance = 3f;
+    
+    [SerializeField] private Dirt _dirt;
+    [SerializeField] private GameObject _dirt_ghost;
     [SerializeField] private Ball _prefabBall;
     [SerializeField] private Transform _playerCameraRootTransform;
     [SerializeField] private Transform _modelTransform;
@@ -13,6 +16,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private SimpleKCC _simpleKCC;
 
     private Vector3 _forward = Vector3.forward;
+    private Vector3 _shootPosition = Vector3.zero;
+    private bool _shootAble = false;
     
     [Networked]
     private Vector3 _networkedMoveDirection { get; set; }
@@ -44,6 +49,10 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (!HasInputAuthority)
+        {
+            return;
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -54,6 +63,8 @@ public class Player : NetworkBehaviour
             
         Look();
         
+        ShootGOGO();
+
         _networkedMoveDirection = inputData.direction;
         
         if (inputData.direction.sqrMagnitude > 0)
@@ -63,22 +74,32 @@ public class Player : NetworkBehaviour
         }
 
         // 슛.
-        // if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
-        // {
-        //     if (data.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-        //     {
-        //         delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-        // Runner.Spawn(_prefabBall, transform.position + _forward, Quaternion.LookRotation(_forward), Object.InputAuthority);
-        //         
-        //         Runner.Spawn(_prefabBall,
-        //             transform.position+_forward, Quaternion.LookRotation(_forward),
-        //             Object.InputAuthority, (runner, o) =>
-        //             {
-        //                 // Initialize the Ball before synchronizing it
-        //                 o.GetComponent<Ball>().Init();
-        //             });
-        //     }
-        // }
+        if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
+        {
+            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            {
+                if (_shootAble)
+                {
+                    delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+                }
+            }
+        }
+        
+        if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
+        {
+            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            {
+                delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                Runner.Spawn(_prefabBall,
+                    transform.position+_forward, Quaternion.LookRotation(_forward),
+                    Object.InputAuthority, (runner, o) =>
+                    {
+                        // Initialize the Ball before synchronizing it
+                        o.GetComponent<Ball>().Init();
+                    });
+            }
+        }
     }
 
     public override void Render()
@@ -139,6 +160,81 @@ public class Player : NetworkBehaviour
         _cameraRotation = new Vector3(input.x, input.y);
         _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation);
         _modelTransform.rotation = Quaternion.Euler(0, _cameraRotation.y, 0);
+    }
+
+    private void ShootGOGO()
+    {
+        LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
+        
+        Debug.DrawRay(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward * InteractionRayCastDistance, Color.red);
+        
+        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
+                InteractionRayCastDistance, groundMask))
+        {
+            _shootPosition = hit.point;
+            _shootAble = true;
+
+            DirtRender();
+        }
+        else
+        {
+            _shootPosition = Vector3.zero;
+            _shootAble = false;
+            
+            if (_dirt_ghost.activeSelf)
+            {
+                _dirt_ghost.SetActive(false);
+            }
+        }
+    }
+
+    private void DirtRender()
+    {
+        if (!_dirt_ghost.activeSelf)
+        {
+            _dirt_ghost.SetActive(true);
+        }
+
+        _dirt_ghost.transform.position = _shootPosition;
+    }
+    
+    private void GetInteractionTarget()
+    {
+        RaycastHit hit;
+
+        LayerMask interactableObjectMask = 1 << LayerMask.NameToLayer("InteractableObject");
+
+        if (Physics.SphereCast(_playerCamera.transform.position, 0.25f, _playerCamera.transform.forward, out hit,
+                InteractionRayCastDistance, interactableObjectMask))
+        {
+            // var interactable = hit.transform.GetComponent<IInteractable>();
+            // 
+            // if (interactable != null && interactable.Interactable)
+            // {
+            //     if (_interactionTarget != null && interactable != _interactionTarget)
+            //     {
+            //         _interactionTarget.Looking(false);
+            //         _interactionTarget = null;
+            //     }
+            //     
+            //     _interactionTarget = interactable;
+            //     
+            //     _interactionTarget.Looking(true);
+            // 
+            //     Global.Instance.F.gameObject.SetActive(true);
+            // }
+        }
+        else
+        {
+            // if (_interactionTarget != null)
+            // {
+            //     _interactionTarget.Looking(false);
+            // }
+            // 
+            // _interactionTarget = null;
+            // 
+            // Global.Instance.F.gameObject.SetActive(false);
+        }
     }
     
     private Vector3 CameraRotationClamp(Vector3 rotation)
