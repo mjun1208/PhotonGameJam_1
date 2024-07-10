@@ -16,8 +16,12 @@ public class Player : NetworkBehaviour
     [SerializeField] private SimpleKCC _simpleKCC;
 
     private Vector3 _forward = Vector3.forward;
+    
     private Vector3 _shootPosition = Vector3.zero;
     private bool _shootAble = false;
+
+    private Dirt _plantTargetDirt = null;
+    private bool _plantAble = false;
     
     [Networked]
     private Vector3 _networkedMoveDirection { get; set; }
@@ -62,8 +66,6 @@ public class Player : NetworkBehaviour
         _simpleKCC.AddLookRotation(inputData.lookDelta);
             
         Look();
-        
-        ShootGOGO();
 
         _networkedMoveDirection = inputData.direction;
         
@@ -74,6 +76,15 @@ public class Player : NetworkBehaviour
         }
 
         // 슛.
+
+        if (HasInputAuthority)
+        {
+            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            {
+                RpcDoSomething();
+            }
+        }
+
         if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
         {
             if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
@@ -92,7 +103,7 @@ public class Player : NetworkBehaviour
             {
                 delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                 Runner.Spawn(_prefabBall,
-                    transform.position+_forward, Quaternion.LookRotation(_forward),
+                    transform.position + _forward, Quaternion.LookRotation(_forward),
                     Object.InputAuthority, (runner, o) =>
                     {
                         // Initialize the Ball before synchronizing it
@@ -106,6 +117,12 @@ public class Player : NetworkBehaviour
     {
         base.Render();
         SetAnimation();
+        
+        if (HasInputAuthority)
+        {
+            GetPlantTarget();
+            ShootGOGO();
+        }
     }
 
     private void SetAnimation()
@@ -162,15 +179,52 @@ public class Player : NetworkBehaviour
         _modelTransform.rotation = Quaternion.Euler(0, _cameraRotation.y, 0);
     }
 
+    private void GetPlantTarget()
+    {
+        LayerMask groundMask = 1 << LayerMask.NameToLayer("Dirt");
+        
+        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
+                InteractionRayCastDistance, groundMask))
+        {
+            _plantAble = true;
+
+            var dirt = hit.transform.GetComponent<Dirt>();
+            if (dirt != null)
+            {
+                if (_plantTargetDirt != null && dirt != _plantTargetDirt)
+                {
+                    _plantTargetDirt.Looking(false);
+                    _plantTargetDirt = null;
+                }
+
+                _plantTargetDirt = dirt;
+                _plantTargetDirt.Looking(true);
+            }
+        }
+        else
+        {
+            _plantAble = false;
+
+            if (_plantTargetDirt != null)
+            {
+                _plantTargetDirt.Looking(false);
+                _plantTargetDirt = null;
+            }
+        }
+    }
+
     private void ShootGOGO()
     {
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
         
         Debug.DrawRay(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward * InteractionRayCastDistance, Color.red);
-        
+
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance, groundMask))
+                InteractionRayCastDistance, groundMask) && !_plantAble)
         {
+                    
+            Debug.Log(_shootPosition);
+            
             _shootPosition = hit.point;
             _shootAble = true;
 
@@ -190,6 +244,11 @@ public class Player : NetworkBehaviour
 
     private void DirtRender()
     {
+        if (!HasInputAuthority)
+        {
+            return; 
+        }
+        
         if (!_dirt_ghost.activeSelf)
         {
             _dirt_ghost.SetActive(true);
@@ -198,6 +257,14 @@ public class Player : NetworkBehaviour
         _dirt_ghost.transform.position = _shootPosition;
     }
     
+    // RPC 함수 정의
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcDoSomething()
+    {
+        Debug.Log("RPC 호출됨!");
+        // 원하는 작업 수행
+    }
+
     private void GetInteractionTarget()
     {
         RaycastHit hit;

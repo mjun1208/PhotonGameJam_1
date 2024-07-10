@@ -15,7 +15,8 @@ GameObject:
   - component: {fileID: 9130496074385222794}
   - component: {fileID: 7733039670126009780}
   - component: {fileID: -4471890388393048046}
-  m_Layer: 0
+  - component: {fileID: 6770664842260284116}
+  m_Layer: 8
   m_Name: Dirt_Pile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -65,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1b6ad9e6ace69c2448dda1ea645d4556, type: 2}
+  - {fileID: 2100000, guid: 1b139621c1453804f99c9d3947d94a0b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -140,6 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b75dd52184cbdd4a9d3dfb1e08ee496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _outline: {fileID: 6770664842260284116}
 --- !u!114 &-4471890388393048046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,3 +158,21 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &6770664842260284116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4352402527259121384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 0.27700067, g: 1, b: 0, a: 1}
+  outlineWidth: 10
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
