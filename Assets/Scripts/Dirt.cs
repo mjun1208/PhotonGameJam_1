@@ -1,12 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
 public class Dirt : NetworkBehaviour
 {
     [SerializeField] private Outline _outline;
+    [SerializeField] private GameObject plant;
+    
+    [Networked, OnChangedRender(nameof(OnChangePlated))] 
+    public NetworkBool Planted { get; set; }
 
     private void Start()
     {
@@ -18,4 +19,15 @@ public class Dirt : NetworkBehaviour
         _outline.enabled = isLook;
     }
 
+    private void OnChangePlated()
+    {
+        plant.SetActive(Planted);
+    }
+
+    // [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void GoPlated()
+    {
+        Planted = true;
+        // OnChangePlated();
+    }
 }

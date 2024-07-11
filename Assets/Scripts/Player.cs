@@ -77,11 +77,30 @@ public class Player : NetworkBehaviour
 
         // 슛.
 
-        if (HasInputAuthority)
+        // if (HasInputAuthority && delay.ExpiredOrNotRunning(Runner))
+        // {
+        //     if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        //     {
+        //         delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+        //         RpcDoSomething();
+        //     }
+        // }
+        
+        if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
         {
             if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
-                RpcDoSomething();
+                if (_plantTargetDirt != null)
+                {
+                    // RpcDoSomething();
+                    _plantTargetDirt.Planted = true;
+                    if (HasInputAuthority)
+                    {
+                        _plantTargetDirt.Looking(false);
+                    }
+
+                    _plantTargetDirt = null;
+                }
             }
         }
 
@@ -118,11 +137,8 @@ public class Player : NetworkBehaviour
         base.Render();
         SetAnimation();
         
-        if (HasInputAuthority)
-        {
-            GetPlantTarget();
-            ShootGOGO();
-        }
+        GetPlantTarget();
+        ShootGOGO();
     }
 
     private void SetAnimation()
@@ -181,24 +197,32 @@ public class Player : NetworkBehaviour
 
     private void GetPlantTarget()
     {
-        LayerMask groundMask = 1 << LayerMask.NameToLayer("Dirt");
+        LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
         
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance, groundMask))
+                InteractionRayCastDistance, dirtMask))
         {
             _plantAble = true;
 
             var dirt = hit.transform.GetComponent<Dirt>();
-            if (dirt != null)
+            if (dirt != null && !dirt.Planted)
             {
-                if (_plantTargetDirt != null && dirt != _plantTargetDirt)
+                if (_plantTargetDirt != null && (dirt != _plantTargetDirt || _plantTargetDirt.Planted))
                 {
-                    _plantTargetDirt.Looking(false);
+                    _plantTargetDirt.GoPlated();
+                    if (HasInputAuthority)
+                    {
+                        _plantTargetDirt.Looking(false);
+                    }
+
                     _plantTargetDirt = null;
                 }
 
                 _plantTargetDirt = dirt;
-                _plantTargetDirt.Looking(true);
+                if (HasInputAuthority)
+                {
+                    _plantTargetDirt.Looking(true);
+                }
             }
         }
         else
@@ -216,14 +240,18 @@ public class Player : NetworkBehaviour
     private void ShootGOGO()
     {
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
+        LayerMask dirtMask = 1 << LayerMask.NameToLayer("Ground");
         
-        Debug.DrawRay(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward * InteractionRayCastDistance, Color.red);
+        // Debug.DrawRay(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward * InteractionRayCastDistance, Color.red);
 
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance, groundMask) && !_plantAble)
+                InteractionRayCastDistance, groundMask << dirtMask) && !_plantAble)
         {
-                    
-            Debug.Log(_shootPosition);
+            if (hit.transform.gameObject.layer == dirtMask)
+            {
+                NotShowingGround();
+                return;
+            }
             
             _shootPosition = hit.point;
             _shootAble = true;
@@ -231,6 +259,11 @@ public class Player : NetworkBehaviour
             DirtRender();
         }
         else
+        {
+            NotShowingGround();
+        }
+
+        void NotShowingGround()
         {
             _shootPosition = Vector3.zero;
             _shootAble = false;
@@ -262,6 +295,7 @@ public class Player : NetworkBehaviour
     public void RpcDoSomething()
     {
         Debug.Log("RPC 호출됨!");
+        _plantTargetDirt.Planted = true;
         // 원하는 작업 수행
     }
 
