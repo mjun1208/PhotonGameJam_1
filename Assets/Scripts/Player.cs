@@ -175,7 +175,7 @@ public class Player : NetworkBehaviour
         
         Vector3 inputDirection = _simpleKCC.TransformRotation * new Vector3(inputDir.x, 0f, inputDir.z);
 
-        _simpleKCC.Move(inputDirection * 2f, jumpImpulse.magnitude);
+        _simpleKCC.Move(inputDirection * 5f, jumpImpulse.magnitude);
     }
     
     /// <summary>
