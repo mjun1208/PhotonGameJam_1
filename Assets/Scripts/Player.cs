@@ -85,10 +85,10 @@ public class Player : NetworkBehaviour
         //         RpcDoSomething();
         //     }
         // }
-        
-        if (HasInputAuthority && delay.ExpiredOrNotRunning(Runner))
+
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
-            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            if (HasInputAuthority && delay.ExpiredOrNotRunning(Runner))
             {
                 if (_plantTargetDirt != null)
                 {
@@ -97,32 +97,28 @@ public class Player : NetworkBehaviour
                     // _plantTargetDirt = null;
                 }
             }
-        }
 
-        if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
-        {
-            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
             {
                 if (_shootAble)
                 {
                     delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                     Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+                    
+                    _animator.SetTrigger("Shovel");
                 }
-            }
-        }
-        
-        if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
-        {
-            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-            {
-                delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                Runner.Spawn(_prefabBall,
-                    transform.position + _forward, Quaternion.LookRotation(_forward),
-                    Object.InputAuthority, (runner, o) =>
-                    {
-                        // Initialize the Ball before synchronizing it
-                        o.GetComponent<Ball>().Init();
-                    });
+                
+                if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+                {
+                    delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    Runner.Spawn(_prefabBall,
+                        transform.position + _forward, Quaternion.LookRotation(_forward),
+                        Object.InputAuthority, (runner, o) =>
+                        {
+                            // Initialize the Ball before synchronizing it
+                            o.GetComponent<Ball>().Init();
+                        });
+                }
             }
         }
     }
