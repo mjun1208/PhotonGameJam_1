@@ -86,20 +86,15 @@ public class Player : NetworkBehaviour
         //     }
         // }
         
-        if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
+        if (HasInputAuthority && delay.ExpiredOrNotRunning(Runner))
         {
             if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
                 if (_plantTargetDirt != null)
                 {
-                    // RpcDoSomething();
-                    _plantTargetDirt.Planted = true;
-                    if (HasInputAuthority)
-                    {
-                        _plantTargetDirt.Looking(false);
-                    }
-
-                    _plantTargetDirt = null;
+                    RpcDoSomething(_plantTargetDirt);
+                    // _plantTargetDirt.Looking(false);
+                    // _plantTargetDirt = null;
                 }
             }
         }
@@ -204,24 +199,23 @@ public class Player : NetworkBehaviour
         {
             _plantAble = true;
 
-            var dirt = hit.transform.GetComponent<Dirt>();
-            if (dirt != null && !dirt.Planted)
+            if (HasInputAuthority)
             {
-                if (_plantTargetDirt != null && (dirt != _plantTargetDirt || _plantTargetDirt.Planted))
+                var dirt = hit.transform.GetComponent<Dirt>();
+                if (dirt != null && !dirt.Planted)
                 {
-                    _plantTargetDirt.GoPlated();
-                    if (HasInputAuthority)
+                    if (_plantTargetDirt != null && (dirt != _plantTargetDirt || _plantTargetDirt.Planted))
                     {
+                        _plantTargetDirt.GoPlated();
                         _plantTargetDirt.Looking(false);
+                        _plantTargetDirt = null;
                     }
 
-                    _plantTargetDirt = null;
-                }
-
-                _plantTargetDirt = dirt;
-                if (HasInputAuthority)
-                {
-                    _plantTargetDirt.Looking(true);
+                    _plantTargetDirt = dirt;
+                    if (HasInputAuthority)
+                    {
+                        _plantTargetDirt.Looking(true);
+                    }
                 }
             }
         }
@@ -240,7 +234,7 @@ public class Player : NetworkBehaviour
     private void ShootGOGO()
     {
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
-        LayerMask dirtMask = 1 << LayerMask.NameToLayer("Ground");
+        LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
         
         // Debug.DrawRay(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward * InteractionRayCastDistance, Color.red);
 
@@ -292,10 +286,11 @@ public class Player : NetworkBehaviour
     
     // RPC 함수 정의
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RpcDoSomething()
+    public void RpcDoSomething(Dirt dirt)
     {
         Debug.Log("RPC 호출됨!");
-        _plantTargetDirt.Planted = true;
+        dirt.Planted = true;
+        // _plantTargetDirt.Planted = true;
         // 원하는 작업 수행
     }
 

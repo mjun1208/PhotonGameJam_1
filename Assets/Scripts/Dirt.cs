@@ -9,6 +9,15 @@ public class Dirt : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnChangePlated))] 
     public NetworkBool Planted { get; set; }
 
+    public override void Spawned()
+    {
+        base.Spawned();
+        if (Planted)
+        {
+            plant.SetActive(Planted);
+        }
+    }
+
     private void Start()
     {
         _outline.enabled = false;
