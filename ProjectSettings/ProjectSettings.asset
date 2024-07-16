@@ -814,7 +814,7 @@ PlayerSettings:
     PS5: 
     QNX: 
     Stadia: 
-    Standalone: FUSION_WEAVER;FUSION2
+    Standalone: FUSION_WEAVER;FUSION2;UNITASK_DOTWEEN_SUPPORT
     VisionOS: 
     WebGL: 
     XboxOne: 

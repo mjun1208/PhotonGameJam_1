@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -22,7 +24,9 @@ public class ChatItem : MonoBehaviour
 
     private async void DestroySelf()
     {
-        await Task.Delay(5000);
+        await UniTask.Delay(10000);
+        await _text.DOFade(0f, 1f);
+        
         Destroy(this.gameObject);
     }
 }
