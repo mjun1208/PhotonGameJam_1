@@ -1,13 +1,25 @@
-using System;
+using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Chat;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ChatManager : MonoBehaviour, IChatClientListener
 {
     [SerializeField] private string appId = "4f81776a-3f71-466c-ad32-0a0e0178840e";
+    [SerializeField] private TMP_InputField _inputField;
     
-    public string UserName { get; set; }
+    [SerializeField] private Transform _chatListTransform;
+    [SerializeField] private ChatItem _chatItem;
+    
+    [SerializeField] private List<Image> _uiList;
+    [SerializeField] private GameObject _inputGameObject;
+
+    public bool IsFocus { get; set; } = false;
+
+    public string UserName { get; set; } = "name";
+    public string Server { get; set; } = "Dummy";
 
     private ChatClient _chatClient;
 
@@ -21,12 +33,38 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         _chatClient = new ChatClient(this);
         // Set your favourite region. "EU", "US", and "ASIA" are currently supported.
         _chatClient.ChatRegion = "ASIA";
-        _chatClient.Connect(this.appId, "1.0", null);
+        _chatClient.Connect(this.appId, "1.0", new Photon.Chat.AuthenticationValues(UserName));
     }
 
     private void Update()
     {
         _chatClient.Service();
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (IsFocus)
+            {
+                if (!string.IsNullOrWhiteSpace(_inputField.text))
+                {
+                    _chatClient.PublishMessage(Server, _inputField.text);
+                    _inputField.text = string.Empty;
+                }
+
+                _uiList.ForEach(x=> x.enabled = false);
+                
+                _inputGameObject.SetActive(false);
+            }
+            else
+            {
+                _uiList.ForEach(x=> x.enabled = true);
+                
+                _inputGameObject.SetActive(true);
+                
+                _inputField.ActivateInputField();
+            }
+
+            IsFocus = !IsFocus;
+        }
     }
 
     public void DebugReturn(DebugLevel level, string message)
@@ -39,9 +77,8 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void OnConnected()
     {
-        Debug.Log("Cow");
-        
-        _chatClient.Subscribe( new string[] { "channelA", "channelB" } );
+        // _chatClient.UserId = UserName;
+        _chatClient.Subscribe(new string[] {Server});
     }
 
     public void OnChatStateChange(ChatState state)
@@ -50,13 +87,12 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void OnGetMessages(string channelName, string[] senders, object[] messages)
     {
-        string msgs = "";
         for (int i = 0; i < senders.Length; i++)
         {
-            msgs += senders[i] + "=" + messages[i] + ", ";
+            var chatItem = Instantiate(_chatItem, _chatListTransform);
+            chatItem.Set(senders[i], (string)messages[i]);
+            chatItem.gameObject.SetActive(true);
         }
-
-        Debug.Log("OnGetMessages: " + channelName + "(" + senders.Length + ") > " + msgs);
     }
 
     public void OnPrivateMessage(string sender, object message, string channelName)
@@ -65,7 +101,6 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void OnSubscribed(string[] channels, bool[] results)
     {
-        _chatClient.PublishMessage( "channelA", "So Long, and Thanks for All the Fish!" );
     }
 
     public void OnUnsubscribed(string[] channels)
