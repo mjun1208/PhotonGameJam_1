@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 0
+    path: Assets/Photon/PhotonVoice/Demos/Fusion/DemoNetworkObject/Scene.unity
+    guid: 64b14236c88a0fb44adaeda9ded16a2a
   m_configObjects: {}

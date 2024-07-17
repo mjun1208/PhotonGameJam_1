@@ -806,18 +806,22 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: 
+    Android: CROSS_PLATFORM_INPUT;MOBILE_INPUT
     EmbeddedLinux: 
+    GameCoreScarlett: 
     GameCoreXboxOne: 
+    LinuxHeadlessSimulation: 
     Nintendo Switch: 
     PS4: 
     PS5: 
     QNX: 
     Stadia: 
-    Standalone: FUSION_WEAVER;FUSION2;UNITASK_DOTWEEN_SUPPORT
+    Standalone: FUSION_WEAVER;FUSION2;UNITASK_DOTWEEN_SUPPORT;CROSS_PLATFORM_INPUT
     VisionOS: 
     WebGL: 
+    Windows Store Apps: MOBILE_INPUT
     XboxOne: 
+    iPhone: CROSS_PLATFORM_INPUT;MOBILE_INPUT
     tvOS: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
