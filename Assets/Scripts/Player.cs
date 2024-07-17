@@ -1,6 +1,7 @@
 using System;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
+using Photon.Voice.Unity;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -14,6 +15,9 @@ public class Player : NetworkBehaviour
     [SerializeField] private Transform _modelTransform;
     [SerializeField] private Animator _animator;
     [SerializeField] private SimpleKCC _simpleKCC;
+    [SerializeField] private GameObject _speakingIcon;
+    [SerializeField] private Speaker _speaker;
+    [SerializeField] private AudioSource _speakerAudioSource;
 
     private Vector3 _forward = Vector3.forward;
     
@@ -130,6 +134,26 @@ public class Player : NetworkBehaviour
         
         GetPlantTarget();
         ShootGOGO();
+        ShowSpeakingIcon();
+    }
+
+    private void ShowSpeakingIcon()
+    {
+        _speakingIcon.SetActive(_speaker.IsPlaying && GetCurrentVolume() > 0.001f);
+    }
+    
+    private float GetCurrentVolume()
+    {
+        float[] samples = new float[256];
+        _speakerAudioSource.GetOutputData(samples, 0); // 오디오 샘플 데이터 가져오기
+        float sum = 0f;
+
+        foreach (float sample in samples)
+        {
+            sum += sample * sample;
+        }
+
+        return Mathf.Sqrt(sum / samples.Length); // RMS 값 계산
     }
 
     private void SetAnimation()
