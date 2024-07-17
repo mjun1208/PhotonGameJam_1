@@ -24,7 +24,7 @@ public class ChatItem : MonoBehaviour
 
     private async void DestroySelf()
     {
-        await UniTask.Delay(10000);
+        await UniTask.Delay(30000);
         await _text.DOFade(0f, 1f);
         
         Destroy(this.gameObject);

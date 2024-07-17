@@ -34,6 +34,9 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         // Set your favourite region. "EU", "US", and "ASIA" are currently supported.
         _chatClient.ChatRegion = "ASIA";
         _chatClient.Connect(this.appId, "1.0", new Photon.Chat.AuthenticationValues(UserName));
+        
+        _uiList.ForEach(x=> x.enabled = false);
+        _inputGameObject.SetActive(false);
     }
 
     private void Update()
@@ -101,6 +104,9 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void OnSubscribed(string[] channels, bool[] results)
     {
+        var chatItem = Instantiate(_chatItem, _chatListTransform);
+        chatItem.Set("SERVER", "Now You Can Enter To Send Message");
+        chatItem.gameObject.SetActive(true);
     }
 
     public void OnUnsubscribed(string[] channels)
