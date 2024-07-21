@@ -24,6 +24,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private AudioSource _speakerAudioSource;
     [SerializeField] private Transform _headPivot;
     [SerializeField] private FishingRodLine _fishingRodLine;
+    [SerializeField] private GameObject _fishingFX;
+    [SerializeField] private GameObject _fishingFIFIFIFX;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -44,7 +46,7 @@ public class Player : NetworkBehaviour
     // , OnChangedRender(nameof(OnChangePlated))
     [Networked] private NetworkBool _isFishing { get; set; } = false;
     [Networked] private int _fishingState { get; set; } = 0;
-    private Vector3 _fishingPosition;
+    private Vector3 _fishingPosition { get; set; }
 
     private Dirt _plantTargetDirt = null;
     private bool _plantAble = false;
@@ -154,6 +156,12 @@ public class Player : NetworkBehaviour
 
             if (HasStateAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
             {
+                if (_isFishing)
+                {
+                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    RpcFishNext();
+                }
+                
                 if (_shootAble)
                 {
                     if (_shootType == ShootType.Dirt)
@@ -166,10 +174,10 @@ public class Player : NetworkBehaviour
                     if (_shootType == ShootType.Fishing)
                     {
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                        RpcTriggerFishingAnime();
+                        RpcTriggerFishingAnime(_shootPosition);
                     }
                 }
-                
+
                 // if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
                 // {
                 //     delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
@@ -209,6 +217,7 @@ public class Player : NetworkBehaviour
         if (_isFishing)
         {
             _fishingRodLine.DrawBezierCurve();
+            _fishingFX.transform.position = _fishingPosition;
         }
     }
 
@@ -452,43 +461,39 @@ public class Player : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RpcTriggerFishingAnime()
+    public void RpcTriggerFishingAnime(Vector3 shootPosition)
     {
-        if (!_isFishing)
-        {
-            _isFishing = true;
-            _fishingState = 0;
+        _fishingPosition = shootPosition;
+        _isFishing = true;
+        _fishingState = 0;
 
-            _animator.SetBool("IsFishing", _isFishing);
-            _animator.SetInteger("FishingState", _fishingState);
+        _animator.SetBool("IsFishing", true);
+        _animator.SetInteger("FishingState", _fishingState);
 
-            _fishingRodLine.gameObject.SetActive(true);
+        _fishingRodLine.gameObject.SetActive(true);
 
-            _fishingRodLine.SetFinalPosition(_shootPosition);
-        }
-        else
-        {
-            if (_fishingState == 0)
-            {
-                _fishingState++;
-                _animator.SetInteger("FishingState", _fishingState);
-            }
-        }
+        _fishingRodLine.SetFinalPosition(shootPosition);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcFishNext()
+    {
+        _fishingState = 1;
+        _animator.SetInteger("FishingState", _fishingState);
+        _fishingFX.SetActive(true);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RpcStopFishing()
     {
-        if (_isFishing)
-        {
-            _isFishing = false;
-            _fishingState = 0;
+        _isFishing = false;
+        _fishingState = 0;
 
-            _animator.SetBool("IsFishing", _isFishing);
-            _animator.SetInteger("FishingState", _fishingState);
+        _animator.SetBool("IsFishing", false);
+        _animator.SetInteger("FishingState", _fishingState);
             
-            _fishingRodLine.gameObject.SetActive(false);
-        }
+        _fishingRodLine.gameObject.SetActive(false);
+        _fishingFX.SetActive(false);
     }
 
     private void GetInteractionTarget()
