@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using Photon.Voice.Unity;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 public class Player : NetworkBehaviour
 {
@@ -10,6 +13,7 @@ public class Player : NetworkBehaviour
     
     [SerializeField] private Dirt _dirt;
     [SerializeField] private GameObject _dirt_ghost;
+    [SerializeField] private GameObject _fish_ghost;
     [SerializeField] private Ball _prefabBall;
     [SerializeField] private Transform _playerCameraRootTransform;
     [SerializeField] private Transform _modelTransform;
@@ -18,30 +22,47 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject _speakingIcon;
     [SerializeField] private Speaker _speaker;
     [SerializeField] private AudioSource _speakerAudioSource;
+    [SerializeField] private Transform _headPivot;
+    [SerializeField] private FishingRodLine _fishingRodLine;
+    
+    [SerializeField] private Renderer _pants;
+    [SerializeField] private List<Renderer> _hideBody;
+    [SerializeField] private List<Renderer> _customizeRenderers;
+    
+    public enum ShootType
+    {
+        Dirt,
+        Fishing,
+    }
 
     private Vector3 _forward = Vector3.forward;
     
     private Vector3 _shootPosition = Vector3.zero;
     private bool _shootAble = false;
+    private ShootType _shootType = ShootType.Dirt;
+    
+    // , OnChangedRender(nameof(OnChangePlated))
+    [Networked] private NetworkBool _isFishing { get; set; } = false;
+    [Networked] private int _fishingState { get; set; } = 0;
+    private Vector3 _fishingPosition;
 
     private Dirt _plantTargetDirt = null;
     private bool _plantAble = false;
-    
+
     [Networked]
     private Vector3 _networkedMoveDirection { get; set; }
 
     private PlayerCamera _playerCamera;
     private Vector3 _cameraRotation;
-    [Networked] private TickTimer delay { get; set; }
-
-    private void Awake()
-    {
-    }
-
+    [Networked] private TickTimer _mouse0delay { get; set; }
+    [Networked] private TickTimer _mouse1delay { get; set; }
+    
     public override void Spawned()
     {
         base.Spawned();
 
+        SetColor();
+        
         if (!HasInputAuthority)
         {
             return;
@@ -53,6 +74,32 @@ public class Player : NetworkBehaviour
             
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        HideBody();
+    }
+
+    private void HideBody()
+    {
+        _hideBody.ForEach(x => x.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
+    }
+    
+    private void SetColor()
+    {
+        var newColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+        foreach (var renderer in _customizeRenderers)
+        {
+            var origin = renderer.material;
+            var newMaterial = new Material(origin);
+
+            newMaterial.color = newColor;
+            renderer.material = newMaterial;
+        }
+        
+        var origina = _pants.material;
+        var newMateriala = new Material(origina);
+
+        newMateriala.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+        _pants.material = newMateriala;
     }
 
     private void FixedUpdate()
@@ -68,8 +115,11 @@ public class Player : NetworkBehaviour
         var inputData = GetInput<NetworkInputData>().GetValueOrDefault();
 
         _simpleKCC.AddLookRotation(inputData.lookDelta);
-            
-        Look();
+
+        if (!_isFishing)
+        {
+            Look();
+        }
 
         _networkedMoveDirection = inputData.direction;
         
@@ -92,7 +142,7 @@ public class Player : NetworkBehaviour
 
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
-            if (HasInputAuthority && delay.ExpiredOrNotRunning(Runner))
+            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
             {
                 if (_plantTargetDirt != null)
                 {
@@ -102,26 +152,46 @@ public class Player : NetworkBehaviour
                 }
             }
 
-            if (HasStateAuthority && delay.ExpiredOrNotRunning(Runner))
+            if (HasStateAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
             {
                 if (_shootAble)
                 {
-                    delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                    Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
-                    
-                    _animator.SetTrigger("Shovel");
+                    if (_shootType == ShootType.Dirt)
+                    {
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                        Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+                        RpcTriggerShovelAnime();
+                    }
+
+                    if (_shootType == ShootType.Fishing)
+                    {
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                        RpcTriggerFishingAnime();
+                    }
                 }
                 
-                if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+                // if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+                // {
+                //     delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                //     Runner.Spawn(_prefabBall,
+                //         transform.position + _forward, Quaternion.LookRotation(_forward),
+                //         Object.InputAuthority, (runner, o) =>
+                //         {
+                //             // Initialize the Ball before synchronizing it
+                //             o.GetComponent<Ball>().Init();
+                //         });
+                // }
+            }
+        }
+
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON1))
+        {
+            if (HasStateAuthority && _mouse1delay.ExpiredOrNotRunning(Runner))
+            {
+                if (_isFishing)
                 {
-                    delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                    Runner.Spawn(_prefabBall,
-                        transform.position + _forward, Quaternion.LookRotation(_forward),
-                        Object.InputAuthority, (runner, o) =>
-                        {
-                            // Initialize the Ball before synchronizing it
-                            o.GetComponent<Ball>().Init();
-                        });
+                    _mouse1delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    RpcStopFishing();
                 }
             }
         }
@@ -135,6 +205,11 @@ public class Player : NetworkBehaviour
         GetPlantTarget();
         ShootGOGO();
         ShowSpeakingIcon();
+        
+        if (_isFishing)
+        {
+            _fishingRodLine.DrawBezierCurve();
+        }
     }
 
     private void ShowSpeakingIcon()
@@ -179,6 +254,11 @@ public class Player : NetworkBehaviour
 
     private void Move(NetworkInputData networkInputData)
     {
+        if (_isFishing)
+        {
+            return;
+        }
+        
         var inputDir = networkInputData.direction.normalized;
 
         float angle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg;
@@ -208,6 +288,8 @@ public class Player : NetworkBehaviour
         _cameraRotation = new Vector3(input.x, input.y);
         _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation);
         _modelTransform.rotation = Quaternion.Euler(0, _cameraRotation.y, 0);
+
+        _playerCameraRootTransform.transform.position = _headPivot.transform.position;
     }
 
     private void GetPlantTarget()
@@ -253,24 +335,54 @@ public class Player : NetworkBehaviour
 
     private void ShootGOGO()
     {
+        if (_isFishing)
+        {
+            NotShowingGround();
+            return;
+        }
+        
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
         LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
+        LayerMask waterMask = 1 << LayerMask.NameToLayer("Water");
         
-        // Debug.DrawRay(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward * InteractionRayCastDistance, Color.red);
-
+        int layer = groundMask | dirtMask | waterMask;
+        
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance, groundMask << dirtMask) && !_plantAble)
+                InteractionRayCastDistance, layer) && !_plantAble)
         {
-            if (hit.transform.gameObject.layer == dirtMask)
+            if (1 << hit.transform.gameObject.layer == dirtMask.value)
             {
                 NotShowingGround();
                 return;
             }
-            
-            _shootPosition = hit.point;
-            _shootAble = true;
 
-            DirtRender();
+            if (1 << hit.transform.gameObject.layer == groundMask.value)
+            {
+                _shootPosition = hit.point;
+                _shootAble = true;
+
+                DirtRender();
+                if (_fish_ghost.activeSelf)
+                {
+                    _fish_ghost.SetActive(false);
+                }
+
+                _shootType = ShootType.Dirt;
+            }
+            
+            if (1 << hit.transform.gameObject.layer == waterMask.value)
+            {
+                _shootPosition = hit.point;
+                _shootAble = true;
+
+                FishingRender();
+                if (_dirt_ghost.activeSelf)
+                {
+                    _dirt_ghost.SetActive(false);
+                }
+                
+                _shootType = ShootType.Fishing;
+            }
         }
         else
         {
@@ -285,6 +397,10 @@ public class Player : NetworkBehaviour
             if (_dirt_ghost.activeSelf)
             {
                 _dirt_ghost.SetActive(false);
+            }
+            if (_fish_ghost.activeSelf)
+            {
+                _fish_ghost.SetActive(false);
             }
         }
     }
@@ -304,6 +420,21 @@ public class Player : NetworkBehaviour
         _dirt_ghost.transform.position = _shootPosition;
     }
     
+    private void FishingRender()
+    {
+        if (!HasInputAuthority)
+        {
+            return; 
+        }
+        
+        if (!_fish_ghost.activeSelf)
+        {
+            _fish_ghost.SetActive(true);
+        }
+
+        _fish_ghost.transform.position = _shootPosition;
+    }
+    
     // RPC 함수 정의
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcDoSomething(Dirt dirt)
@@ -312,6 +443,52 @@ public class Player : NetworkBehaviour
         dirt.Planted = true;
         // _plantTargetDirt.Planted = true;
         // 원하는 작업 수행
+    }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcTriggerShovelAnime()
+    {
+        _animator.SetTrigger("Shovel");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcTriggerFishingAnime()
+    {
+        if (!_isFishing)
+        {
+            _isFishing = true;
+            _fishingState = 0;
+
+            _animator.SetBool("IsFishing", _isFishing);
+            _animator.SetInteger("FishingState", _fishingState);
+
+            _fishingRodLine.gameObject.SetActive(true);
+
+            _fishingRodLine.SetFinalPosition(_shootPosition);
+        }
+        else
+        {
+            if (_fishingState == 0)
+            {
+                _fishingState++;
+                _animator.SetInteger("FishingState", _fishingState);
+            }
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcStopFishing()
+    {
+        if (_isFishing)
+        {
+            _isFishing = false;
+            _fishingState = 0;
+
+            _animator.SetBool("IsFishing", _isFishing);
+            _animator.SetInteger("FishingState", _fishingState);
+            
+            _fishingRodLine.gameObject.SetActive(false);
+        }
     }
 
     private void GetInteractionTarget()

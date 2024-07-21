@@ -8,11 +8,14 @@ using UnityEngine;
 public class PlayerNetworkRunnerCallback : MonoBehaviour, INetworkRunnerCallbacks
 {
     private bool _mouseButton0;
+    private bool _mouseButton1;
 
-    private void Update()
-    {
-        _mouseButton0 = _mouseButton0 | Input.GetMouseButton(0);
-    }
+    // private void Update()
+    // {
+    //     _mouseButton0 = _mouseButton0 | Input.GetMouseButton(0);
+    //     
+    //     _mouseButton1 = _mouseButton1 | Input.GetMouseButton(1);
+    // }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
@@ -41,9 +44,22 @@ public class PlayerNetworkRunnerCallback : MonoBehaviour, INetworkRunnerCallback
             data.jump = false;
         }
 
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
-        _mouseButton0 = false;
-
+        if (Input.GetMouseButtonDown(0))
+        {
+            data.buttons.Set(NetworkInputData.MOUSEBUTTON0, true);
+        }
+        
+        if (Input.GetMouseButtonDown(1))
+        {
+            data.buttons.Set(NetworkInputData.MOUSEBUTTON1, true);
+        }
+        
+        // data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
+        // _mouseButton0 = false;
+        // 
+        // data.buttons.Set(NetworkInputData.MOUSEBUTTON1, _mouseButton1);
+        // _mouseButton1 = false;
+        
         input.Set(data);
     }
     
