@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
-public class Player : NetworkBehaviour
+public partial class Player : NetworkBehaviour
 {
     private const float InteractionRayCastDistance = 3f;
     
@@ -25,7 +25,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private Transform _headPivot;
     [SerializeField] private FishingRodLine _fishingRodLine;
     [SerializeField] private GameObject _fishingFX;
-    [SerializeField] private GameObject _fishingFIFIFIFX;
+    [SerializeField] private ParticleSystem _fishingFIFIFIFX;
+    [SerializeField] private FishCatchCanvas _fishCatchCanvas;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -47,6 +48,9 @@ public class Player : NetworkBehaviour
     [Networked] private NetworkBool _isFishing { get; set; } = false;
     [Networked] private int _fishingState { get; set; } = 0;
     private Vector3 _fishingPosition { get; set; }
+    private float _fishingCatchingTimer = 0;
+    private bool _fishCatchStart = false;
+    private bool _fishCatchComplete = false;
 
     private Dirt _plantTargetDirt = null;
     private bool _plantAble = false;
@@ -122,6 +126,28 @@ public class Player : NetworkBehaviour
         {
             Look();
         }
+        else
+        {
+            if (HasStateAuthority)
+            {
+                _fishingCatchingTimer -= Time.deltaTime;
+
+                if (_fishingCatchingTimer <= 0f && !_fishCatchStart)
+                {
+                    _fishCatchStart = true; 
+                    RpcFishNext();
+                    _fishCatchCanvas.gameObject.SetActive(true);
+                    _fishCatchCanvas.StartGOGO();
+                }
+
+                if (_fishCatchStart && _fishCatchComplete)
+                {
+                    RpcStopFishing(true);
+                    _fishCatchStart = false;
+                    _fishCatchComplete = false;
+                }
+            }
+        }
 
         _networkedMoveDirection = inputData.direction;
         
@@ -156,12 +182,6 @@ public class Player : NetworkBehaviour
 
             if (HasStateAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
             {
-                if (_isFishing)
-                {
-                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                    RpcFishNext();
-                }
-                
                 if (_shootAble)
                 {
                     if (_shootType == ShootType.Dirt)
@@ -175,6 +195,11 @@ public class Player : NetworkBehaviour
                     {
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                         RpcTriggerFishingAnime(_shootPosition);
+
+                        _fishingCatchingTimer = Random.Range(2f, 4f);
+                        
+                        _fishCatchStart = false;
+                        _fishCatchComplete = false;
                     }
                 }
 
@@ -199,7 +224,7 @@ public class Player : NetworkBehaviour
                 if (_isFishing)
                 {
                     _mouse1delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                    RpcStopFishing();
+                    RpcStopFishing(false);
                 }
             }
         }
@@ -218,6 +243,7 @@ public class Player : NetworkBehaviour
         {
             _fishingRodLine.DrawBezierCurve();
             _fishingFX.transform.position = _fishingPosition;
+            _fishingFIFIFIFX.transform.position = _fishingPosition;
         }
     }
 
@@ -483,8 +509,14 @@ public class Player : NetworkBehaviour
         _fishingFX.SetActive(true);
     }
 
+    public void CatchComplete()
+    {
+        _fishCatchCanvas.gameObject.SetActive(false);
+        _fishCatchComplete = true;
+    }
+
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RpcStopFishing()
+    public void RpcStopFishing(bool success)
     {
         _isFishing = false;
         _fishingState = 0;
@@ -494,6 +526,12 @@ public class Player : NetworkBehaviour
             
         _fishingRodLine.gameObject.SetActive(false);
         _fishingFX.SetActive(false);
+
+        if (success)
+        {
+            _fishingFIFIFIFX.gameObject.SetActive(true);
+            _fishingFIFIFIFX.Play();
+        }
     }
 
     private void GetInteractionTarget()
