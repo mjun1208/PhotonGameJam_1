@@ -144,7 +144,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _outline: {fileID: 6770664842260284116}
   plant: {fileID: 4840548867371587417}
-  _Planted: 0
+  FX: {fileID: 8579966591951127539, guid: afbaad5e885477641b7d006c2bf8125a, type: 3}
+  _Planted:
+    _value: 0
 --- !u!114 &-4471890388393048046
 MonoBehaviour:
   m_ObjectHideFlags: 0

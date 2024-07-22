@@ -43,7 +43,8 @@ public partial class Player : NetworkBehaviour
     private Vector3 _shootPosition = Vector3.zero;
     private bool _shootAble = false;
     private ShootType _shootType = ShootType.Dirt;
-    
+
+    private bool _isDigging = false;
     // , OnChangedRender(nameof(OnChangePlated))
     [Networked] private NetworkBool _isFishing { get; set; } = false;
     [Networked] private int _fishingState { get; set; } = 0;
@@ -136,8 +137,7 @@ public partial class Player : NetworkBehaviour
                 {
                     _fishCatchStart = true; 
                     RpcFishNext();
-                    _fishCatchCanvas.gameObject.SetActive(true);
-                    _fishCatchCanvas.StartGOGO();
+                    RpcFishCatchingGOGO();
                 }
 
                 if (_fishCatchStart && _fishCatchComplete)
@@ -175,6 +175,7 @@ public partial class Player : NetworkBehaviour
                 if (_plantTargetDirt != null)
                 {
                     RpcDoSomething(_plantTargetDirt);
+                    RpcTriggerFeedingAnimeInput();
                     // _plantTargetDirt.Looking(false);
                     // _plantTargetDirt = null;
                 }
@@ -187,8 +188,7 @@ public partial class Player : NetworkBehaviour
                     if (_shootType == ShootType.Dirt)
                     {
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                        Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
-                        RpcTriggerShovelAnime();
+                        RpcTriggerShovelAnime(_shootPosition);
                     }
 
                     if (_shootType == ShootType.Fishing)
@@ -245,6 +245,15 @@ public partial class Player : NetworkBehaviour
             _fishingFX.transform.position = _fishingPosition;
             _fishingFIFIFIFX.transform.position = _fishingPosition;
         }
+
+        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Villager@Shovel-Working01"))
+        {
+            _isDigging = true;
+        }
+        else
+        {
+            _isDigging = false;
+        }
     }
 
     private void ShowSpeakingIcon()
@@ -294,6 +303,11 @@ public partial class Player : NetworkBehaviour
             return;
         }
         
+        if (_isDigging)
+        {
+            return;
+        }
+        
         var inputDir = networkInputData.direction.normalized;
 
         float angle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg;
@@ -332,7 +346,7 @@ public partial class Player : NetworkBehaviour
         LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
         
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance, dirtMask))
+                InteractionRayCastDistance, dirtMask) && !_isDigging)
         {
             _plantAble = true;
 
@@ -383,7 +397,7 @@ public partial class Player : NetworkBehaviour
         int layer = groundMask | dirtMask | waterMask;
         
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance, layer) && !_plantAble)
+                InteractionRayCastDistance) && !_plantAble)
         {
             if (1 << hit.transform.gameObject.layer == dirtMask.value)
             {
@@ -480,10 +494,41 @@ public partial class Player : NetworkBehaviour
         // 원하는 작업 수행
     }
     
+    public void DoDig()
+    {
+        if (!HasStateAuthority)
+        {
+            return;
+        }
+        
+        if (_shootAble && _shootType == ShootType.Dirt)
+        {
+            Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+        }
+
+        _isDigging = false;
+    }
+
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RpcTriggerShovelAnime()
+    public void RpcTriggerShovelAnime(Vector3 shootPosition)
     {
         _animator.SetTrigger("Shovel");
+        _shootPosition = shootPosition;
+        _isDigging = true;
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcTriggerFeedingAnimeInput()
+    {
+        // Input -> State -> All
+        RpcTriggerFeedingAnime();
+        // _animator.SetTrigger("Feed");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcTriggerFeedingAnime()
+    {
+        _animator.SetTrigger("Feed");
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -509,9 +554,24 @@ public partial class Player : NetworkBehaviour
         _fishingFX.SetActive(true);
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    public void RpcFishCatchingGOGO()
+    {
+        _fishCatchCanvas.gameObject.SetActive(true);
+        _fishCatchCanvas.StartGOGO();
+    }
+
     public void CatchComplete()
     {
         _fishCatchCanvas.gameObject.SetActive(false);
+        _fishCatchComplete = true;
+
+        RpcFishCatchComplete();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcFishCatchComplete()
+    {
         _fishCatchComplete = true;
     }
 

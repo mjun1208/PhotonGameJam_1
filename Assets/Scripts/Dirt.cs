@@ -5,6 +5,7 @@ public class Dirt : NetworkBehaviour
 {
     [SerializeField] private Outline _outline;
     [SerializeField] private GameObject plant;
+    [SerializeField] private GameObject FX;
     
     [Networked, OnChangedRender(nameof(OnChangePlated))] 
     public NetworkBool Planted { get; set; }
@@ -16,6 +17,9 @@ public class Dirt : NetworkBehaviour
         {
             plant.SetActive(Planted);
         }
+
+        var fx = GameObject.Instantiate(FX, this.transform);
+        fx.transform.localScale *= 3;
     }
 
     private void Start()

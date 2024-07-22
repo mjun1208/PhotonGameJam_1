@@ -320,7 +320,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7147815283902734862
 RectTransform:
   m_ObjectHideFlags: 0
@@ -423,6 +423,7 @@ MonoBehaviour:
   _catcherImage: {fileID: 8481622670420870261}
   _gaugeImage: {fileID: 3596002598938499311}
   _fx: {fileID: 6706473265903594750}
+  _player: {fileID: 0}
 --- !u!1 &6706473265903594750
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +451,7 @@ RectTransform:
   m_GameObject: {fileID: 6706473265903594750}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3315435453169107315}
@@ -606,7 +607,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8297523431802887835, guid: 2d099e4ab31d8bd49a7364fd8690b2d3, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297523431802887835, guid: 2d099e4ab31d8bd49a7364fd8690b2d3, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8297523432338265841, guid: 2d099e4ab31d8bd49a7364fd8690b2d3, type: 3}
       propertyPath: m_Enabled
