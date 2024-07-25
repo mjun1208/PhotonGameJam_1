@@ -178,6 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 252211076266817995, guid: 7b8db9ba41053d747adfb6a658552a8d, type: 3}
   debugLogs: 0
+  _kingDino: {fileID: 6188222217791134213, guid: 5c3d21f6d498ccb4e9873fb632f07085, type: 3}
 --- !u!114 &4966669034011262692
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -32,6 +32,8 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private List<Renderer> _hideBody;
     [SerializeField] private List<Renderer> _customizeRenderers;
     
+    private const float Gravity = 9.81f; // 중력 가속도
+    
     public enum ShootType
     {
         Dirt,
@@ -63,18 +65,26 @@ public partial class Player : NetworkBehaviour
     private Vector3 _cameraRotation;
     [Networked] private TickTimer _mouse0delay { get; set; }
     [Networked] private TickTimer _mouse1delay { get; set; }
+
+    [Networked] public PlayerRef MyPlayerRef { get; set; }
+
+    // ServerOnly
+    public void SetPlayerRef(PlayerRef playerRef)
+    {
+        MyPlayerRef = playerRef;
+    }
     
     public override void Spawned()
     {
         base.Spawned();
 
         SetColor();
-        
+
         if (!HasInputAuthority)
         {
             return;
         }
-        
+
         _playerCamera = GameObject.Find("PlayerFollowCamera").GetComponent<PlayerCamera>();
         _playerCamera.CinemachineCamera.Follow = this._playerCameraRootTransform;
         _playerCamera.transform.position = this._playerCameraRootTransform.position;
@@ -82,9 +92,9 @@ public partial class Player : NetworkBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        HideBody();
+        // HideBody();
     }
-
+    
     private void HideBody()
     {
         _hideBody.ForEach(x => x.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
@@ -122,7 +132,7 @@ public partial class Player : NetworkBehaviour
         var inputData = GetInput<NetworkInputData>().GetValueOrDefault();
 
         _simpleKCC.AddLookRotation(inputData.lookDelta);
-
+        
         if (!_isFishing)
         {
             Look();
@@ -151,10 +161,18 @@ public partial class Player : NetworkBehaviour
 
         _networkedMoveDirection = inputData.direction;
         
-        if (inputData.direction.sqrMagnitude > 0)
+        if (inputData.direction.sqrMagnitude > 0 || inputData.jump)
         {
             Move(inputData);
             _forward = inputData.direction;
+        }
+        else
+        {
+            // 중력 적용
+            if (!_simpleKCC.IsGrounded)
+            {
+                _simpleKCC.Move(Vector3.down * Gravity * Runner.DeltaTime);
+            }
         }
 
         // 슛.
@@ -319,7 +337,7 @@ public partial class Player : NetworkBehaviour
         if (networkInputData.jump == true && _simpleKCC.IsGrounded == true)
         {
             // Set world space jump vector.
-            jumpImpulse = Vector3.up * 10.0f;
+            jumpImpulse = Vector3.up * 4.0f;
         }
         
         Vector3 inputDirection = _simpleKCC.TransformRotation * new Vector3(inputDir.x, 0f, inputDir.z);

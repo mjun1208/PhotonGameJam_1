@@ -156,6 +156,8 @@ namespace Photon.Voice.Fusion.Demo
 #endif
         #endregion
 
+        [SerializeField] private KingDino _kingDino;
+        
         private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
         {
             NetworkObject instance = runner.Spawn(this.prefab, Vector3.zero, Quaternion.identity, player);
@@ -170,7 +172,19 @@ namespace Photon.Voice.Fusion.Demo
                     Debug.Log($"Spawned NO {instance?.Id} for {player}");
                 }
             }
+            
+            instance.GetComponent<Player>().SetPlayerRef(player);
             this.spawnedPlayers[player] = instance;
+            
+            if (runner.IsServer && player.PlayerId == 1)
+            {
+                SpawnDino(runner);
+            }
+        }
+
+        private void SpawnDino(NetworkRunner runner)
+        {
+            runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
         }
 
         private bool TryDespawnPlayer(NetworkRunner runner, PlayerRef player)
