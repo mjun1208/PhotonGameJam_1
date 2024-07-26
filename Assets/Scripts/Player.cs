@@ -60,6 +60,9 @@ public partial class Player : NetworkBehaviour
 
     [Networked]
     private Vector3 _networkedMoveDirection { get; set; }
+    
+    [Networked]
+    private Quaternion _networkedLookRotation { get; set; }
 
     private PlayerCamera _playerCamera;
     private Vector3 _cameraRotation;
@@ -92,7 +95,7 @@ public partial class Player : NetworkBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        // HideBody();
+        HideBody();
     }
     
     private void HideBody()
@@ -257,6 +260,12 @@ public partial class Player : NetworkBehaviour
         ShootGOGO();
         ShowSpeakingIcon();
         
+        if (!HasInputAuthority)
+        {
+            _playerCameraRootTransform.transform.rotation = _networkedLookRotation;
+            _playerCameraRootTransform.transform.position = _headPivot.transform.position;
+        }
+        
         if (_isFishing)
         {
             _fishingRodLine.DrawBezierCurve();
@@ -351,12 +360,17 @@ public partial class Player : NetworkBehaviour
     private void Look()
     {
         var input = _simpleKCC.GetLookRotation(true, true);
-        
+
         _cameraRotation = new Vector3(input.x, input.y);
         _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation);
         _modelTransform.rotation = Quaternion.Euler(0, _cameraRotation.y, 0);
 
         _playerCameraRootTransform.transform.position = _headPivot.transform.position;
+
+        if (HasStateAuthority)
+        {
+            _networkedLookRotation = Quaternion.Euler(_cameraRotation);
+        }
     }
 
     private void GetPlantTarget()
