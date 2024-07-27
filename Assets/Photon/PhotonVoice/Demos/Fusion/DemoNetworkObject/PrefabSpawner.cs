@@ -13,7 +13,7 @@ namespace Photon.Voice.Fusion.Demo
         [SerializeField]
         private NetworkObject prefab;
 
-        private Dictionary<PlayerRef, NetworkObject> spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
+        public Dictionary<PlayerRef, NetworkObject> spawnedPlayers { get; set; } = new Dictionary<PlayerRef, NetworkObject>();
 
         [SerializeField]
         private bool debugLogs;
@@ -184,7 +184,8 @@ namespace Photon.Voice.Fusion.Demo
 
         private void SpawnDino(NetworkRunner runner)
         {
-            runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
+            var dino = runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
+            dino.SetPrefabSpawner(this);
         }
 
         private bool TryDespawnPlayer(NetworkRunner runner, PlayerRef player)
