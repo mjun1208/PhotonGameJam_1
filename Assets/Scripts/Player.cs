@@ -27,6 +27,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private GameObject _fishingFX;
     [SerializeField] private ParticleSystem _fishingFIFIFIFX;
     [SerializeField] private FishCatchCanvas _fishCatchCanvas;
+    [SerializeField] private HitCanvas _HitCanvas;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -96,6 +97,8 @@ public partial class Player : NetworkBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         HideBody();
+        
+        _HitCanvas.gameObject.SetActive(true);
     }
     
     private void HideBody()
@@ -681,5 +684,37 @@ public partial class Player : NetworkBehaviour
         rotation.x = Mathf.Clamp(rotation.x, -80f, 60f);
 
         return rotation;
+    }
+
+    private void OnDamaged(int damage)
+    {
+        if (!HasInputAuthority)
+        {
+            return;
+        }
+        
+        _HitCanvas.Hitted();
+    }
+    
+    private void OnParticleCollision(GameObject other)
+    {
+        var collParticle = other.transform.GetComponent<CollParticle>();
+        if (collParticle == null)
+        {
+            return;
+        }
+
+        OnDamaged(collParticle.Damage);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        var collParticle = other.transform.GetComponent<CollParticle>();
+        if (collParticle == null)
+        {
+            return;
+        }
+
+        OnDamaged(collParticle.Damage);
     }
 }
