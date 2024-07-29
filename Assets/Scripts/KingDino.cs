@@ -72,7 +72,7 @@ public class KingDino : NetworkBehaviour
                 DinoStateHAHAHA = (DinoState) Random.Range(1, enumCount);
             }
 
-            // DinoStateHAHAHA = DinoState.Fire;
+            DinoStateHAHAHA = DinoState.Stamp;
 
             switch (DinoStateHAHAHA)
             {
