@@ -6,6 +6,7 @@ public class Dirt : NetworkBehaviour
     [SerializeField] private Outline _outline;
     [SerializeField] private GameObject plant;
     [SerializeField] private GameObject FX;
+    [SerializeField] private GameObject FX_grow;
     
     [Networked, OnChangedRender(nameof(OnChangePlated))] 
     public NetworkBool Planted { get; set; }

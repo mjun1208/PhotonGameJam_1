@@ -50,7 +50,7 @@ public class KingDino : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.V))
         {
-            if (_targetPlayerId == 0 && HasStateAuthority)
+            if (HasStateAuthority)
             {
                 GetTarget();
             }
@@ -71,8 +71,6 @@ public class KingDino : NetworkBehaviour
                 int enumCount = Enum.GetValues(typeof(DinoState)).Length;
                 DinoStateHAHAHA = (DinoState) Random.Range(1, enumCount);
             }
-
-            DinoStateHAHAHA = DinoState.Stamp;
 
             switch (DinoStateHAHAHA)
             {

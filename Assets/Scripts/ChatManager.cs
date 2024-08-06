@@ -105,7 +105,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     public void OnSubscribed(string[] channels, bool[] results)
     {
         var chatItem = Instantiate(_chatItem, _chatListTransform);
-        chatItem.Set("SERVER", "Now You Can Enter To Send Message");
+        chatItem.Set("SERVER", "엔터를 눌러서 채팅을 치세요");
         chatItem.gameObject.SetActive(true);
     }
 

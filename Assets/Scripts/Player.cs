@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using Photon.Voice.Unity;
@@ -32,8 +32,14 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
     [SerializeField] private List<Renderer> _customizeRenderers;
+
+    [SerializeField] private List<Collider> _ragDollCollider;
+    [SerializeField] private List<Rigidbody> _ragDollRigidbody;
     
     private const float Gravity = 9.81f; // 중력 가속도
+
+    private int _hp = 1000;
+    [Networked] private NetworkBool _dead { get; set; } = false;
     
     public enum ShootType
     {
@@ -83,6 +89,8 @@ public partial class Player : NetworkBehaviour
         base.Spawned();
 
         SetColor();
+
+        SetRagDollMode(false);
 
         if (!HasInputAuthority)
         {
@@ -163,6 +171,11 @@ public partial class Player : NetworkBehaviour
                     _fishCatchComplete = false;
                 }
             }
+        }
+
+        if (_dead)
+        {
+            return;
         }
 
         _networkedMoveDirection = inputData.direction;
@@ -686,16 +699,46 @@ public partial class Player : NetworkBehaviour
         return rotation;
     }
 
+    private void Dead()
+    {
+        if (!_dead)
+        {
+            RpcInputToStateSetRagDollMode(true);
+            _HitCanvas.Dead();
+            RpcSetDead(true);
+            Respawn();
+        }
+    }
+
+    private async void Respawn()
+    {
+        await UniTask.Delay(3000);
+        
+        _hp = 1000;
+        RpcSetDead(false);
+        _HitCanvas.Respawn();
+        
+        RpcInputToStateSetRagDollMode(false);
+    }
+
     private void OnDamaged(int damage)
     {
         if (!HasInputAuthority)
         {
             return;
         }
+
+        _hp -= damage;
+
+        if (_hp <= 0)
+        {
+            _hp = 0;
+            Dead();
+        }
         
-        _HitCanvas.Hitted();
+        _HitCanvas.Hitted(_hp);
     }
-    
+
     private void OnParticleCollision(GameObject other)
     {
         var collParticle = other.transform.GetComponent<CollParticle>();
@@ -716,5 +759,30 @@ public partial class Player : NetworkBehaviour
         }
 
         OnDamaged(collParticle.Damage);
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcSetDead(bool dead)
+    {
+        _dead = dead;
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcInputToStateSetRagDollMode(bool enable)
+    {
+        RpcStateToAllSetRagDollMode(enable);
+    }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcStateToAllSetRagDollMode(bool enable)
+    {
+        SetRagDollMode(enable);
+    }
+    
+    private void SetRagDollMode(bool enable)
+    {
+        _animator.enabled = !enable;
+        _ragDollCollider.ForEach(x => x.enabled = enable);
+        _ragDollRigidbody.ForEach(x => x.isKinematic = !enable);
     }
 }
