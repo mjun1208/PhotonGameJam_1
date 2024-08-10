@@ -28,6 +28,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private ParticleSystem _fishingFIFIFIFX;
     [SerializeField] private FishCatchCanvas _fishCatchCanvas;
     [SerializeField] private HitCanvas _HitCanvas;
+    [SerializeField] private FishWeapon _spawnFish;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -35,6 +36,12 @@ public partial class Player : NetworkBehaviour
 
     [SerializeField] private List<Collider> _ragDollCollider;
     [SerializeField] private List<Rigidbody> _ragDollRigidbody;
+    
+    [Space(5)]
+    [Header("Tools")]
+    [SerializeField] private GameObject _shovel;
+    [SerializeField] private GameObject _seedBag;
+    [SerializeField] private GameObject _fishRod;
     
     private const float Gravity = 9.81f; // 중력 가속도
 
@@ -169,6 +176,12 @@ public partial class Player : NetworkBehaviour
                     RpcStopFishing(true);
                     _fishCatchStart = false;
                     _fishCatchComplete = false;
+                    
+                    if (HasStateAuthority)
+                    {
+                        var spawnedFish = Runner.Spawn(_spawnFish, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.InputAuthority);
+                        spawnedFish.Fished();
+                    }
                 }
             }
         }
@@ -405,7 +418,6 @@ public partial class Player : NetworkBehaviour
                 {
                     if (_plantTargetDirt != null && (dirt != _plantTargetDirt || _plantTargetDirt.Planted))
                     {
-                        _plantTargetDirt.GoPlated();
                         _plantTargetDirt.Looking(false);
                         _plantTargetDirt = null;
                     }
@@ -536,10 +548,7 @@ public partial class Player : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcDoSomething(Dirt dirt)
     {
-        Debug.Log("RPC 호출됨!");
         dirt.Planted = true;
-        // _plantTargetDirt.Planted = true;
-        // 원하는 작업 수행
     }
     
     public void DoDig()
@@ -561,6 +570,9 @@ public partial class Player : NetworkBehaviour
     public void RpcTriggerShovelAnime(Vector3 shootPosition)
     {
         _animator.SetTrigger("Shovel");
+        _shovel.SetActive(true);
+        _fishRod.SetActive(false);
+        _seedBag.SetActive(false);
         _shootPosition = shootPosition;
         _isDigging = true;
     }
@@ -577,6 +589,10 @@ public partial class Player : NetworkBehaviour
     public void RpcTriggerFeedingAnime()
     {
         _animator.SetTrigger("Feed");
+        
+        _shovel.SetActive(false);
+        _fishRod.SetActive(false);
+        _seedBag.SetActive(true);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -586,6 +602,10 @@ public partial class Player : NetworkBehaviour
         _isFishing = true;
         _fishingState = 0;
 
+        _shovel.SetActive(false);
+        _fishRod.SetActive(true);
+        _seedBag.SetActive(false);
+        
         _animator.SetBool("IsFishing", true);
         _animator.SetInteger("FishingState", _fishingState);
 

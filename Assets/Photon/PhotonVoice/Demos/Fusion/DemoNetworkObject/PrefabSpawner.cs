@@ -184,8 +184,8 @@ namespace Photon.Voice.Fusion.Demo
 
         private void SpawnDino(NetworkRunner runner)
         {
-            var dino = runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
-            dino.SetPrefabSpawner(this);
+            //var dino = runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
+            //dino.SetPrefabSpawner(this);
         }
 
         private bool TryDespawnPlayer(NetworkRunner runner, PlayerRef player)

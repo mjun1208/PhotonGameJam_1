@@ -31,6 +31,8 @@ public class KingDino : NetworkBehaviour
     [Networked] private DinoState DinoStateHAHAHA { get; set; }
     private float _stateCoolTime = 0;
 
+    private float _targetCoolTime = 0f;
+
     enum DinoState
     {
         Walk,
@@ -48,12 +50,19 @@ public class KingDino : NetworkBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.V))
+        if (!HasStateAuthority)
         {
-            if (HasStateAuthority)
-            {
-                GetTarget();
-            }
+            return;
+        }
+        
+        if (_targetCoolTime > 0f)
+        {
+            _targetCoolTime -= Time.deltaTime;
+        }
+        else
+        {
+            GetTarget();
+            _targetCoolTime = Random.Range(5f, 10f);
         }
     }
 

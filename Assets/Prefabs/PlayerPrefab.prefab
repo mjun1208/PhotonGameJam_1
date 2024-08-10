@@ -4988,6 +4988,7 @@ MonoBehaviour:
   _fishingFIFIFIFX: {fileID: 1823711575972399166}
   _fishCatchCanvas: {fileID: 8955466906497955849}
   _HitCanvas: {fileID: 2450016018877913070}
+  _spawnFish: {fileID: 1434932663762337264, guid: 4f1a5072508a6e54a8116f9060009786, type: 3}
   _pants: {fileID: 4786402483203308829}
   _hideBody:
   - {fileID: 4786402483203308829}
@@ -5033,6 +5034,9 @@ MonoBehaviour:
   - {fileID: 1338279280078107820}
   - {fileID: 7408884406807288596}
   - {fileID: 2777255159206476151}
+  _shovel: {fileID: 1968811116566850902}
+  _seedBag: {fileID: 2507955719991785330}
+  _fishRod: {fileID: 4545129592549978851}
 --- !u!54 &51156373098311387
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5081,7 +5085,7 @@ MonoBehaviour:
     ColliderLayer: 0
     CollisionLayerMask:
       serializedVersion: 2
-      m_Bits: 129
+      m_Bits: 4294967295
     ProxyInterpolationMode: 0
     TeleportThreshold: 1
     AntiJitterDistance: {x: 0.025, y: 0.01}
@@ -6054,6 +6058,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VillagerSack
       objectReference: {fileID: 0}
+    - target: {fileID: 3923913272363152177, guid: 69354c9f263dd5340bcb5261e6c35f6b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6062,6 +6070,11 @@ PrefabInstance:
 --- !u!4 &2507955719991683922 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3923913272362987281, guid: 69354c9f263dd5340bcb5261e6c35f6b, type: 3}
+  m_PrefabInstance: {fileID: 1493653716981613635}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2507955719991785330 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3923913272363152177, guid: 69354c9f263dd5340bcb5261e6c35f6b, type: 3}
   m_PrefabInstance: {fileID: 1493653716981613635}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2804051528554120313
@@ -6075,6 +6088,10 @@ PrefabInstance:
     - target: {fileID: 1871937558990206618, guid: 422c6cc9382646440b6c952fd1da4bb2, type: 3}
       propertyPath: m_Name
       value: VillagerFishingRod
+      objectReference: {fileID: 0}
+    - target: {fileID: 1871937558990206618, guid: 422c6cc9382646440b6c952fd1da4bb2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1871937558990367418, guid: 422c6cc9382646440b6c952fd1da4bb2, type: 3}
       propertyPath: m_RootOrder
@@ -6132,6 +6149,89 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1871937558990367418, guid: 422c6cc9382646440b6c952fd1da4bb2, type: 3}
   m_PrefabInstance: {fileID: 2804051528554120313}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4545129592549978851 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1871937558990206618, guid: 422c6cc9382646440b6c952fd1da4bb2, type: 3}
+  m_PrefabInstance: {fileID: 2804051528554120313}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4156336863089891707
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6540325035318866374}
+    m_Modifications:
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3636
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3636
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3636
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.265
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.583
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.022
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6513105
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.44616875
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.3399629
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.5110316
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -13.517
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 67.587
+      objectReference: {fileID: 0}
+    - target: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -85.306
+      objectReference: {fileID: 0}
+    - target: {fileID: 5429967866310012436, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: SortKey
+      value: 2636073112
+      objectReference: {fileID: 0}
+    - target: {fileID: 6528959241494291010, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_Name
+      value: SharkV1Weapon
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+--- !u!4 &2182143507998999211 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2875198367613393872, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+  m_PrefabInstance: {fileID: 4156336863089891707}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4400403166869837957
 PrefabInstance:
@@ -6477,6 +6577,11 @@ PrefabInstance:
 --- !u!4 &1968811116566491510 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5061380594161523050, guid: 38533aa7d37c4c9409eefc51a6ca5f20, type: 3}
+  m_PrefabInstance: {fileID: 6732667665296697372}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1968811116566850902 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5061380594161288522, guid: 38533aa7d37c4c9409eefc51a6ca5f20, type: 3}
   m_PrefabInstance: {fileID: 6732667665296697372}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6984151227743866657
@@ -6946,6 +7051,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5408663870200538173, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2507955719991683922}
+    - targetCorrespondingSourceObject: {fileID: 3242882747939926295, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2182143507998999211}
     - targetCorrespondingSourceObject: {fileID: 3242882747939926295, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1968811116566491510}
