@@ -1,11 +1,19 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using Photon.Voice.Unity;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
+
+public enum PlayerType
+{
+    Farmer,
+    Fisher
+}
 
 public partial class Player : NetworkBehaviour
 {
@@ -29,6 +37,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private FishCatchCanvas _fishCatchCanvas;
     [SerializeField] private HitCanvas _HitCanvas;
     [SerializeField] private FishWeapon _spawnFish;
+    [SerializeField] private TMP_Text _nameText;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -42,11 +51,13 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private GameObject _shovel;
     [SerializeField] private GameObject _seedBag;
     [SerializeField] private GameObject _fishRod;
+    [SerializeField] private FishWeapon _fishWeapon;
     
     private const float Gravity = 9.81f; // 중력 가속도
 
     private int _hp = 1000;
     [Networked] private NetworkBool _dead { get; set; } = false;
+    [Networked, OnChangedRender(nameof(OnChangedPlayerType))] private PlayerType _playerType { get; set; } 
     
     public enum ShootType
     {
@@ -84,11 +95,54 @@ public partial class Player : NetworkBehaviour
     [Networked] private TickTimer _mouse1delay { get; set; }
 
     [Networked] public PlayerRef MyPlayerRef { get; set; }
+    
+    [Networked,OnChangedRender(nameof(OnChangedMyName))] public string MyName { get; set; }
 
+    // ServerOnly
+    public void SetPlayerType(PlayerType playerType)
+    {
+        _playerType = playerType;
+        RpcSetPlayerType(playerType);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcSetPlayerType(PlayerType playerType)
+    {
+        _playerType = playerType;
+        OnChangedPlayerType();
+    }
+    
     // ServerOnly
     public void SetPlayerRef(PlayerRef playerRef)
     {
         MyPlayerRef = playerRef;
+    }
+
+    public void OnChangedPlayerType()
+    {
+        if (_playerType == PlayerType.Farmer)
+        {
+            _shovel.SetActive(true);
+            _fishRod.SetActive(false);
+        }
+        
+        if (_playerType == PlayerType.Fisher)
+        {
+            _fishRod.SetActive(true);
+            _shovel.SetActive(false);
+        }
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcSetMyName(string myName)
+    {
+        MyName = myName;
+        OnChangedPlayerType();
+    }
+
+    public void OnChangedMyName()
+    {
+        _nameText.text = MyName;
     }
     
     public override void Spawned()
@@ -99,10 +153,16 @@ public partial class Player : NetworkBehaviour
 
         SetRagDollMode(false);
 
+        OnChangedPlayerType();
+        OnChangedMyName();
+
         if (!HasInputAuthority)
         {
             return;
         }
+
+        _nameText.gameObject.SetActive(false);
+        RpcSetMyName(Global.Instance.MyName);
 
         _playerCamera = GameObject.Find("PlayerFollowCamera").GetComponent<PlayerCamera>();
         _playerCamera.CinemachineCamera.Follow = this._playerCameraRootTransform;
@@ -138,6 +198,28 @@ public partial class Player : NetworkBehaviour
 
         newMateriala.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
         _pants.material = newMateriala;
+    }
+
+    private void Update()
+    {
+        if (!HasInputAuthority)
+        { 
+            return;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (Global.Instance.ChatManager.IsFocus)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+        }
     }
 
     private void FixedUpdate()

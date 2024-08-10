@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Chat;
@@ -22,6 +23,16 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     public string Server { get; set; } = "Dummy";
 
     private ChatClient _chatClient;
+
+    private void Awake()
+    {
+        Global.Instance.SetChatManager(this);
+    }
+
+    public void SetName(string userName)
+    {
+        UserName = userName;
+    }
 
     private void Start()
     {
@@ -107,6 +118,8 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         var chatItem = Instantiate(_chatItem, _chatListTransform);
         chatItem.Set("SERVER", "엔터를 눌러서 채팅을 치세요");
         chatItem.gameObject.SetActive(true);
+        
+        _chatClient.PublishMessage(Server, $"{UserName}님이 들어오셨습니다");
     }
 
     public void OnUnsubscribed(string[] channels)

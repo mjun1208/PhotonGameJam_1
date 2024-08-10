@@ -1,6 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Photon.Voice.Fusion.Demo;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -31,16 +29,36 @@ public class Global : MonoBehaviour
     
     public BasicSpawner BasicSpawner { get; set; }
 
+    public GameObject Selecter;
+    public SelectCanvas SelectCanvas;
+    public LobbyCanvas LobbyCanvas;
+
+    public PrefabSpawner PrefabSpawner { get; set; }
+    public ChatManager ChatManager { get; set; }
+
     public void SetBasicSpawner(BasicSpawner basicSpawner)
     {
         if (BasicSpawner != null)
         {
             Destroy(BasicSpawner.gameObject);
+            BasicSpawner = null;
         }
         
         BasicSpawner = basicSpawner;
         BasicSpawner.transform.SetParent(this.transform);
 
         RoomName = BasicSpawner.RoomName;
+    }
+
+    public void SetChatManager(ChatManager chatManager)
+    {
+        if (ChatManager != null)
+        {
+            Destroy(ChatManager.gameObject);
+            ChatManager = null;
+        }
+
+        ChatManager = chatManager;
+        ChatManager.SetName(MyName);
     }
 }

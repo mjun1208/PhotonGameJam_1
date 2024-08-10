@@ -10,15 +10,23 @@ namespace Photon.Voice.Fusion.Demo
 
     public class PrefabSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
+        [SerializeField] private NetworkObject lobbyPlayerInfo;
         [SerializeField]
         private NetworkObject prefab;
 
         public Dictionary<PlayerRef, NetworkObject> spawnedPlayers { get; set; } = new Dictionary<PlayerRef, NetworkObject>();
+        public Dictionary<PlayerRef, NetworkRunner> playerRunners { get; set; } = new Dictionary<PlayerRef, NetworkRunner>();
 
         [SerializeField]
         private bool debugLogs;
 
-#region INetworkRunnerCallbacks
+
+        private void Awake()
+        {
+            Global.Instance.PrefabSpawner = this;
+        }
+
+        #region INetworkRunnerCallbacks
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
@@ -31,9 +39,17 @@ namespace Photon.Voice.Fusion.Demo
                 case GameMode.Single:
                 case GameMode.Server:
                 case GameMode.Host:
-                    this.SpawnPlayer(runner, player);
+                    SelectGOGO(runner, player);
+                    playerRunners.Add(player, runner);
+                    // this.SpawnPlayer(runner, player);
                     break;
             }
+        }
+
+        public void SelectGOGO(NetworkRunner runner, PlayerRef player)
+        {
+            NetworkObject instance = runner.Spawn(this.lobbyPlayerInfo, Vector3.zero, Quaternion.identity, player);
+            this.spawnedPlayers[player] = instance;
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -48,6 +64,11 @@ namespace Photon.Voice.Fusion.Demo
                 case GameMode.Server:
                 case GameMode.Host:
                     this.TryDespawnPlayer(runner, player);
+                    if (playerRunners.ContainsKey(player))
+                    {
+                        playerRunners.Remove(player);
+                    }
+
                     break;
             }
         }
@@ -80,7 +101,7 @@ namespace Photon.Voice.Fusion.Demo
             }
             if (runner.GameMode == GameMode.Shared)
             {
-                this.SpawnPlayer(runner, runner.LocalPlayer);
+                // this.SpawnPlayer(runner, runner.LocalPlayer);
             }
         }
 
@@ -96,7 +117,7 @@ namespace Photon.Voice.Fusion.Demo
             }
             if (runner.GameMode == GameMode.Shared)
             {
-                this.TryDespawnPlayer(runner, runner.LocalPlayer);
+                // this.TryDespawnPlayer(runner, runner.LocalPlayer);
             }
         }
 
@@ -158,8 +179,10 @@ namespace Photon.Voice.Fusion.Demo
 
         [SerializeField] private KingDino _kingDino;
         
-        private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
+        public void SpawnPlayer(PlayerRef player, PlayerType playerType)
         {
+            playerRunners.TryGetValue(player, out var runner);
+            
             NetworkObject instance = runner.Spawn(this.prefab, Vector3.zero, Quaternion.identity, player);
             if (this.debugLogs)
             {
@@ -173,8 +196,11 @@ namespace Photon.Voice.Fusion.Demo
                 }
             }
             
-            instance.GetComponent<Player>().SetPlayerRef(player);
-            this.spawnedPlayers[player] = instance;
+            var playerComponent = instance.GetComponent<Player>();
+            playerComponent.SetPlayerRef(player);
+            playerComponent.SetPlayerType(playerType);
+            playerComponent.OnChangedPlayerType();
+            // this.spawnedPlayers[player] = instance;
             
             if (runner.IsServer && player.PlayerId == 1)
             {

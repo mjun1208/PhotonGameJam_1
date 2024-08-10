@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Item
   - Door
+  - Selecter
   layers:
   - Default
   - TransparentFX
@@ -34,7 +35,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Select
   - 
   - 
   - 

@@ -4989,6 +4989,7 @@ MonoBehaviour:
   _fishCatchCanvas: {fileID: 8955466906497955849}
   _HitCanvas: {fileID: 2450016018877913070}
   _spawnFish: {fileID: 1434932663762337264, guid: 4f1a5072508a6e54a8116f9060009786, type: 3}
+  _nameText: {fileID: 8333592754285839341}
   _pants: {fileID: 4786402483203308829}
   _hideBody:
   - {fileID: 4786402483203308829}
@@ -5037,6 +5038,8 @@ MonoBehaviour:
   _shovel: {fileID: 1968811116566850902}
   _seedBag: {fileID: 2507955719991785330}
   _fishRod: {fileID: 4545129592549978851}
+  _fishWeapon: {fileID: 0}
+  _MyName: 
 --- !u!54 &51156373098311387
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5127,8 +5130,8 @@ MonoBehaviour:
   TotalWords: 6
   ApplyTiming: 2
   SyncSettings: 127
-  StateHashes: 000000002b1a167c79406955d164bfca9906418d5be08bb4c797ffc3bdf9e93671a141c78a18fce4385ad405b294b50351d49e5a08c5bc9aeb8597c39ef5bbed7db590b43d60df73de20f42a
-  TriggerHashes: 0000000050a62dfd95eb7283
+  StateHashes: 000000002b1a167c79406955d164bfca9906418d5be08bb4c797ffc3bbd02cb6a141165c0181252f1b101fc5bdf9e93671a141c78a18fce4385ad405b294b50351d49e5a08c5bc9aeb8597c39ef5bbed7db590b43d60df73de20f42a
+  TriggerHashes: 0000000050a62dfd95eb728322ff2dfd98ae2464
 --- !u!136 &2011838460682775140
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -6222,6 +6225,10 @@ PrefabInstance:
     - target: {fileID: 6528959241494291010, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
       propertyPath: m_Name
       value: SharkV1Weapon
+      objectReference: {fileID: 0}
+    - target: {fileID: 6528959241494291010, guid: 220cce3e11a94654da5bb7b08ba7a926, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

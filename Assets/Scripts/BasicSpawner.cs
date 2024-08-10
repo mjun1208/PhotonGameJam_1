@@ -27,11 +27,16 @@ public class BasicSpawner : MonoBehaviour
     private TMP_InputField _clientNameInput;
     [SerializeField]
     private TMP_InputField _clientRoomInput;
+    
+    [SerializeField]
+    private GameObject _loading;
 
     public string RoomName { get; set; }
 
     async void StartGame(GameMode mode)
     {
+        _loading.SetActive(true);
+        
         Global.Instance.SetBasicSpawner(this);
         await SceneManager.LoadSceneAsync("SampleScene2");
         
@@ -53,7 +58,8 @@ public class BasicSpawner : MonoBehaviour
             GameMode = mode,
             SessionName = RoomName,
             Scene = scene,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+            PlayerCount = 4,
         });
     }
 
@@ -119,22 +125,7 @@ public class BasicSpawner : MonoBehaviour
     {
         StartGame(GameMode.Client);
     }
-    
-    // private void OnGUI()
-    // {
-    //     if (_runner == null)
-    //     {
-    //         if (GUI.Button(new Rect(0,0,200,40), "Host"))
-    //         {
-    //             StartGame(GameMode.Host);
-    //         }
-    //         if (GUI.Button(new Rect(0,40,200,40), "Join"))
-    //         {
-    //             StartGame(GameMode.Client);
-    //         }
-    //     }
-    // }
-    
+
     private const int ASCII_A = 65;  // 'A'의 아스키 코드 값
     private const int ASCII_Z = 90;  // 'Z'의 아스키 코드 값
 

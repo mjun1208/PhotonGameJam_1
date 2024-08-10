@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1608498923481640645}
   - component: {fileID: 4198165936385413806}
   - component: {fileID: 7748359823917921452}
+  - component: {fileID: 3845415120073435212}
   m_Layer: 15
   m_Name: SharkV1Weapon
   m_TagString: Untagged
@@ -106,3 +107,15 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -4108424097152807243, guid: ca38d4485fce19f4aa0d3d7bdd8b6cf2, type: 3}
+--- !u!114 &3845415120073435212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6528959241494291010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec5c03149cf9037449e8cf2667b43407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

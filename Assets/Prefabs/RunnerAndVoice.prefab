@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ffc0a1300a0ac41b74f03246bf255f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lobbyPlayerInfo: {fileID: 9025274509154897236, guid: 3a544023dc7c7b649b49b0dfde321435, type: 3}
   prefab: {fileID: 252211076266817995, guid: 7b8db9ba41053d747adfb6a658552a8d, type: 3}
   debugLogs: 0
   _kingDino: {fileID: 6188222217791134213, guid: 5c3d21f6d498ccb4e9873fb632f07085, type: 3}
