@@ -1,6 +1,7 @@
 #if FUSION_WEAVER
 using Fusion;
 using Fusion.Sockets;
+using Unity.VisualScripting;
 
 namespace Photon.Voice.Fusion.Demo
 {
@@ -49,6 +50,7 @@ namespace Photon.Voice.Fusion.Demo
         public void SelectGOGO(NetworkRunner runner, PlayerRef player)
         {
             NetworkObject instance = runner.Spawn(this.lobbyPlayerInfo, Vector3.zero, Quaternion.identity, player);
+            instance.GetComponent<LobbyPlayerInfo>().SetPlayerRef(player);
             this.spawnedPlayers[player] = instance;
         }
 

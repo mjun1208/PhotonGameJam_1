@@ -57,12 +57,14 @@ public class LobbyCanvas : MonoBehaviour
 
     public void ClickStart()
     {
+        Global.Instance.BasicSpawner.LockRoom();
+        
         int childCount = PlayerListTransform.childCount;
         
         for (int i = 0; i < childCount; i++)
         {
             var lobbyPlayerInfo = PlayerListTransform.GetChild(i).GetComponent<LobbyPlayerInfo>();
-            lobbyPlayerInfo.RpcStart();
+            lobbyPlayerInfo.Spawn();
         }
     }
 

@@ -41,7 +41,7 @@ public class SelectCanvas : MonoBehaviour
         
         _selectedPlayerType = PlayerType.Farmer;
 
-        _farmerButton.transform.DOScale(new Vector3(1.2f, 1.2f, 1.2f), 0.1f);
+        _farmerButton.transform.DOScale(new Vector3(1.1f, 1.1f, 1.1f), 0.1f);
         _fisherObject.SetActive(false);
         _farmerInfo.SetActive(true);
 
@@ -58,7 +58,7 @@ public class SelectCanvas : MonoBehaviour
         
         _selectedPlayerType = PlayerType.Fisher;
         
-        _fisherButton.transform.DOScale(new Vector3(1.2f, 1.2f, 1.2f), 0.1f);
+        _fisherButton.transform.DOScale(new Vector3(1.1f, 1.1f, 1.1f), 0.1f);
         _farmerObject.SetActive(false);
         _fisherInfo.SetActive(true);
 

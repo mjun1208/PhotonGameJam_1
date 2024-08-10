@@ -16,6 +16,13 @@ public class LobbyPlayerInfo : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnChangedReady))] public NetworkBool _readied { get; set; }
     [Networked, OnChangedRender(nameof(OnChangedReady))] public NetworkBool _roomMaster { get; set; } = false;
 
+    private PlayerRef _playerRef;
+
+    public void SetPlayerRef(PlayerRef playerRef)
+    {
+        _playerRef = playerRef;
+    }
+    
     public override void Spawned()
     {
         base.Spawned();
@@ -34,6 +41,8 @@ public class LobbyPlayerInfo : NetworkBehaviour
             
             var lobbyCanvas = Global.Instance.LobbyCanvas;
             lobbyCanvas.SetLobbyPlayerInfo(this, Runner.IsServer);
+            
+            lobbyCanvas.gameObject.SetActive(true);
             
             SetMyName(Global.Instance.MyName);
             SetRoomMaster(HasStateAuthority);
@@ -86,10 +95,12 @@ public class LobbyPlayerInfo : NetworkBehaviour
             if (_playerType == PlayerType.Farmer)
             {
                 _typeText.text = "농술사";
+                _typeText.color = Global.Instance.FarmerColor;
             }   
             if (_playerType == PlayerType.Fisher)
             {
                 _typeText.text = "수산술사";
+                _typeText.color = Global.Instance.FisherColor;
             }   
         }
     }
@@ -157,30 +168,29 @@ public class LobbyPlayerInfo : NetworkBehaviour
         OnChangedReady();
     }
     
-    ///
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
     public void RpcStart()
     {
         Global.Instance.LobbyCanvas.gameObject.SetActive(false);
-        SelectConfirm(Global.Instance.SelectCanvas.SelectedPlayerType);
     }
-    
-    public void SelectConfirm(PlayerType playerType)
-    {
-        RpcSelectConfirm(Runner.LocalPlayer, playerType);
-    }
-    
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RpcSelectConfirm(PlayerRef player, PlayerType playerType)
-    {
-        if (HasStateAuthority)
-        {
-            Spawn(player, playerType);
-        }
-    }
+    //
+    // public void SelectConfirm(PlayerType playerType)
+    // {
+    //     RpcSelectConfirm(Runner.LocalPlayer, playerType);
+    // }
+    //
+    // [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    // public void RpcSelectConfirm(PlayerRef player, PlayerType playerType)
+    // {
+    //     if (HasStateAuthority)
+    //     {
+    //         Spawn(player, playerType);
+    //     }
+    // }
 
-    private void Spawn(PlayerRef player, PlayerType playerType)
+    public void Spawn()
     {
-        Global.Instance.PrefabSpawner.SpawnPlayer(player, playerType);
+        RpcStart();
+        Global.Instance.PrefabSpawner.SpawnPlayer(_playerRef, _playerType);
     }
 }

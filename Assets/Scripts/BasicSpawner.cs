@@ -63,20 +63,12 @@ public class BasicSpawner : MonoBehaviour
         });
     }
 
-    private void Update()
+    public void LockRoom()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            LockRoom(_runner);
-        }
-    }
-
-    public void LockRoom(NetworkRunner runner)
-    {
-        if (runner.IsRunning)
+        if (_runner.IsRunning)
         {
             // 방의 속성을 업데이트하여 방을 잠그기
-            runner.SessionInfo.IsOpen = false;
+            _runner.SessionInfo.IsOpen = false;
         }
     }
 
