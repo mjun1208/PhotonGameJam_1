@@ -53,7 +53,7 @@ public class BasicSpawner : MonoBehaviour
         }
 
         // Start or join (depends on gamemode) a session with a specific name
-        await _runner.StartGame(new StartGameArgs()
+        var result = await _runner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = RoomName,
@@ -62,7 +62,16 @@ public class BasicSpawner : MonoBehaviour
             PlayerCount = 4,
         });
 
+        if (result.Ok == false)
+        {
+            await SceneManager.LoadSceneAsync("Title");
+            
+            Global.Instance.RoomEnterFail();
+            return;
+        }
+
         Global.Instance.RoomName = _runner.SessionInfo.Name;
+        Global.Instance.ChatManager.SetName(Global.Instance.RoomName,Global.Instance.MyName);
     }
 
     public void LockRoom()

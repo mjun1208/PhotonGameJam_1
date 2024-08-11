@@ -1,7 +1,6 @@
 #if FUSION_WEAVER
 using Fusion;
 using Fusion.Sockets;
-using Unity.VisualScripting;
 
 namespace Photon.Voice.Fusion.Demo
 {
@@ -215,7 +214,7 @@ namespace Photon.Voice.Fusion.Demo
 
         private void SpawnDino(NetworkRunner runner)
         {
-            var dino = runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
+            var dino = runner.Spawn(_kingDino, new Vector3(-6f, 0, -38f), Quaternion.identity);
             dino.SetPrefabSpawner(this);
         }
 

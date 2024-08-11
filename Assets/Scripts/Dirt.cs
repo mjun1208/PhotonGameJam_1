@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 
@@ -10,6 +12,12 @@ public class Dirt : NetworkBehaviour
     [SerializeField] private GameObject FX;
     [SerializeField] private GameObject FX_grow;
     
+    [SerializeField] private GameObject DestoryFx;
+    
+    [SerializeField] private Missile missile;
+    
+    [SerializeField] private List<Transform> missileSpawnPoint;
+
     [Networked, OnChangedRender(nameof(OnChangePlated))] 
     public NetworkBool Planted { get; set; }
     
@@ -18,6 +26,8 @@ public class Dirt : NetworkBehaviour
 
     private float _growDelay;
     private bool _growDelayTimerOn = false;
+
+    private bool _shoot = false;
 
     public override void Spawned()
     {
@@ -37,6 +47,52 @@ public class Dirt : NetworkBehaviour
         fx.transform.localScale *= 3;
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcSpawnMissile()
+    {
+        if (Global.Instance.KingDino == null)
+        {
+            return;
+        }
+        
+        SpawnMissile();
+    }
+
+    public async void SpawnMissile()
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            await UniTask.Delay(300);
+         
+            for (int i = 0; i < 3; i++)
+            {
+                var pos = missileSpawnPoint[i].position;
+
+                var kingPos = Global.Instance.KingDino.MissileTarget.transform.position;
+                var dir = kingPos - pos;
+                dir = dir.normalized;
+
+                var spawnMissile = GameObject.Instantiate(missile, missileSpawnPoint[i].position, Quaternion.identity);
+                spawnMissile.transform.LookAt(kingPos);
+                spawnMissile.Go(dir);
+            }
+        }
+
+        await UniTask.Delay(1000);
+        
+        Instantiate(FX ,this.transform.position, Quaternion.identity);
+        Instantiate(DestoryFx ,this.transform.position, Quaternion.identity);
+        
+        this.gameObject.SetActive(false);
+
+        await UniTask.Delay(1000);
+        
+        if (HasStateAuthority)
+        {
+            Runner.Despawn(this.GetComponent<NetworkObject>());
+        }
+    }
+    
     private void Start()
     {
         _outline.enabled = false;
@@ -58,6 +114,12 @@ public class Dirt : NetworkBehaviour
             else
             {
                 Grew = true;
+
+                if (!_shoot)
+                {
+                    _shoot = true;
+                    RpcSpawnMissile();
+                }
             }
         }
     }

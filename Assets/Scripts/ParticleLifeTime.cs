@@ -9,6 +9,12 @@ public class ParticleLifeTime : MonoBehaviour
      async void Start()
      {
          await UniTask.Delay((int) (_lifeTime * 1000));
+
+         if (this == null)
+         {
+             return;
+         }
+         
          Destroy(this.gameObject);
      }
 }

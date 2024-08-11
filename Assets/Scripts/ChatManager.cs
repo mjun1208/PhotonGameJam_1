@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using ExitGames.Client.Photon;
 using Photon.Chat;
 using TMPro;
@@ -29,8 +30,9 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         Global.Instance.SetChatManager(this);
     }
 
-    public void SetName(string userName)
+    public void SetName(string serverName, string userName)
     {
+        Server = serverName;
         UserName = userName;
     }
 
@@ -91,7 +93,12 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void OnConnected()
     {
-        // _chatClient.UserId = UserName;
+        ServerSubscribe();
+    }
+
+    private async void ServerSubscribe()
+    {
+        await UniTask.WaitWhile(() => string.IsNullOrWhiteSpace(Server));
         _chatClient.Subscribe(new string[] {Server});
     }
 

@@ -11,32 +11,11 @@ public partial class Player
     {
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
-            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
-            {
-                if (_lookingFishWeapon != null)
-                {
-                    RpcEquipFish(_lookingFishWeapon);
-                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                }
-            }
-
             // 공격..
             if (_isEquipWeapon)
             {
                 if (_mouse0delay.ExpiredOrNotRunning(Runner))
                 {
-                    if (HasInputAuthority)
-                    {
-                        _mp--;
-                        
-                        _HitCanvas.SetMp(_mp);
-
-                        if (_mp == 0)
-                        {
-                            RpcUnEquipFish();
-                        }                   
-                    }
-
                     if (HasStateAuthority)
                     {
                         if (_attackState == 1)
@@ -45,8 +24,9 @@ public partial class Player
 
                             RpcTriggerAttack1();
 
+                            SpendMp();
+                            
                             _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-
                             return;
                         }
 
@@ -55,9 +35,10 @@ public partial class Player
                             _attackState = 3;
 
                             RpcTriggerAttack2();
-
+                            
+                            SpendMp();
+                            
                             _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-
                             return;
                         }
 
@@ -67,14 +48,43 @@ public partial class Player
 
                             RpcTriggerAttack3();
 
+                            SpendMp();
+                            
                             _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-
                             return;
                         }
                     }
                 }
+
+                return;
+            }
+            
+            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
+            {
+                if (_lookingFishWeapon != null)
+                {
+                    RpcEquipFishInputToState(_lookingFishWeapon);
+                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                }
             }
         }
+    }
+
+    private void SpendMp()
+    {
+        _mp--;
+        RpcSpendMp(_mp);
+        
+        if (_mp < 0)
+        {
+            RpcUnEquipFish2();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RpcSpendMp(int mp)
+    {
+        _HitCanvas.SetMp(mp);
     }
 
     public void HitOn()
@@ -87,13 +97,6 @@ public partial class Player
     {
         _fishWeapon.HitOn(false);
         _fishWeapon.HitClear();
-    }
-    
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RpcUnEquipFish()
-    {
-        _isEquipWeapon = false;
-        RpcUnEquipFish2();
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -111,17 +114,22 @@ public partial class Player
     }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RpcEquipFish(FishWeapon fishWeapon)
+    private void RpcEquipFishInputToState(FishWeapon fishWeapon)
     {
         _isEquipWeapon = true;
         _mp = 15;
+        
         Runner.Despawn(fishWeapon.GetComponent<NetworkObject>());
-        RpcEquipFish2();
+        
+        RpcEquipFishStateToAll();
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RpcEquipFish2()
+    private void RpcEquipFishStateToAll()
     {
+        _isEquipWeapon = true;
+        _mp = 15;
+        
         _fishWeapon.gameObject.SetActive(true);
         _fishRod.gameObject.SetActive(false);
 
@@ -133,6 +141,7 @@ public partial class Player
             
             _HitCanvas.ShowMP(_mp);
         }
+        
         _equipFx.gameObject.SetActive(true);
         _equipFx.Play();
     }

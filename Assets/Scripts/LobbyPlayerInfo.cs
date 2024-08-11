@@ -97,6 +97,7 @@ public class LobbyPlayerInfo : NetworkBehaviour
                 _typeText.text = "농술사";
                 _typeText.color = Global.Instance.FarmerColor;
             }   
+            
             if (_playerType == PlayerType.Fisher)
             {
                 _typeText.text = "수산술사";

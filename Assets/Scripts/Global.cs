@@ -1,3 +1,4 @@
+using System;
 using Photon.Voice.Fusion.Demo;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -19,9 +20,22 @@ public class Global : MonoBehaviour
 
     private static Global _instance = null;
 
+    private void OnDestroy()
+    {
+        _instance = null;
+    }
+
     public void Awake()
     {
+        if (_instance != null)
+        {
+            Destroy(this.gameObject);
+        }
+        
         DontDestroyOnLoad(this);
+        
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     public string MyName { get; set; }
@@ -35,6 +49,8 @@ public class Global : MonoBehaviour
 
     public PrefabSpawner PrefabSpawner { get; set; }
     public ChatManager ChatManager { get; set; }
+    
+    public KingDino KingDino { get; set; }
 
     public Color FarmerColor = new Color(0f, 115f / 255f, 25f / 255f);
     public Color FisherColor = new Color(0f, 32f / 255f, 115f / 255f);
@@ -62,6 +78,18 @@ public class Global : MonoBehaviour
         }
 
         ChatManager = chatManager;
-        ChatManager.SetName(MyName);
+        ChatManager.SetName(RoomName,MyName);
+    }
+
+    [SerializeField] private GameObject FailCanvas;
+
+    public void RoomEnterFail()
+    {
+        FailCanvas.SetActive(true);
+    }
+    
+    public void CloseRoomEnterFailPopup()
+    {
+        FailCanvas.SetActive(false);
     }
 }

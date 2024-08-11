@@ -7,6 +7,7 @@ using Fusion;
 using Photon.Voice.Fusion.Demo;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -22,6 +23,12 @@ public class KingDino : NetworkBehaviour
     [SerializeField] private CallColl _callColl;
     [SerializeField] private Image _hpImage;
     [SerializeField] private GameObject _hpCanvas;
+    
+    [SerializeField] private GameObject End;
+    
+    [SerializeField] private List<GameObject> EndEffect;
+    
+    public GameObject MissileTarget;
 
     private List<CallColl> _callCollList = new List<CallColl>();
     
@@ -37,11 +44,14 @@ public class KingDino : NetworkBehaviour
     private float _targetCoolTime = 0f;
 
     [Networked, OnChangedRender(nameof(OnChangedHp))]
-    public int Hp { get; set; } = 4000;
+    public int Hp { get; set; } = 3000;
+
+    private bool isDead = false;
 
     public override void Spawned()
     {
         _hpCanvas.SetActive(true);
+        Global.Instance.KingDino = this;
     }
 
     public void Damaged(int damage)
@@ -57,10 +67,54 @@ public class KingDino : NetworkBehaviour
         if (Hp <= 0)
         {
             _hpImage.fillAmount = 0f;
+
+            if (!isDead)
+            {
+                isDead = true;
+                _animator.SetTrigger("Dead");
+                
+                EndEffectGo();
+                Enda();
+            }
         }
         else
         {
-            _hpImage.fillAmount = Hp / 4000f;
+            _hpImage.fillAmount = Hp / 3000f;
+        }
+    }
+
+    private async void Enda()
+    {
+        await UniTask.Delay(5000);
+
+        End.gameObject.SetActive(true);
+        
+        await UniTask.Delay(5000);
+
+        await Runner.Shutdown();
+        
+        Destroy(Global.Instance.gameObject);
+        
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        SceneManager.LoadSceneAsync("Title");
+    }
+
+    private async void EndEffectGo()
+    {
+        for (int i = 0; i < 80; i++)
+        {
+            await UniTask.Delay(500);
+
+            foreach (var a in EndEffect)
+            {
+                var randomX = Random.Range(-20, 20);
+                var randomY = Random.Range(0, 20);
+                var randomZ = Random.Range(-20, 20);
+                var randomPosition = new Vector3(randomX, randomY, randomZ);
+                
+                GameObject.Instantiate(a, this.transform.position + randomPosition, Quaternion.identity);
+            }
         }
     }
 
@@ -155,6 +209,11 @@ public class KingDino : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
+            if (isDead)
+            {
+                return;
+            }
+            
             switch (DinoStateHAHAHA)
             {
                 case DinoState.Walk:
@@ -508,5 +567,18 @@ public class KingDino : NetworkBehaviour
         callColl.SetInfo(networkObject.transform);
         
         _callCollList.Add(callColl);
+    }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        var missile = other.transform.GetComponent<Missile>();
+        if (missile == null)
+        {
+            return;
+        }
+        
+        Damaged(missile.Damage);
+        Instantiate(missile.HitFx, missile.transform.position, Quaternion.identity);
+        Destroy(missile.gameObject);
     }
 }

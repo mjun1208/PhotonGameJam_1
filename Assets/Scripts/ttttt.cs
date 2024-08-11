@@ -7,6 +7,7 @@ public class ttttt : MonoBehaviour
     public Player Player;
     public FishingRodLine FishingRodLine;
     public ParticleSystem FeedFx;
+    public AudioSource sound;
     
     public void GOFinalPosition()
     {
@@ -27,8 +28,9 @@ public class ttttt : MonoBehaviour
     public void HitOn()
     {
         Player.HitOn();
+        sound.Play();
     }
-    
+
     public void HitOff()
     {
         Player.HitOff();
