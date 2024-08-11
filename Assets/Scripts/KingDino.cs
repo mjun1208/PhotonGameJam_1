@@ -73,8 +73,8 @@ public class KingDino : NetworkBehaviour
                 isDead = true;
                 _animator.SetTrigger("Dead");
                 
-                EndEffectGo();
-                Enda();
+                ShowEndEffect();
+                EndSequence();
             }
         }
         else
@@ -83,7 +83,7 @@ public class KingDino : NetworkBehaviour
         }
     }
 
-    private async void Enda()
+    private async void EndSequence()
     {
         await UniTask.Delay(5000);
 
@@ -100,7 +100,7 @@ public class KingDino : NetworkBehaviour
         SceneManager.LoadSceneAsync("Title");
     }
 
-    private async void EndEffectGo()
+    private async void ShowEndEffect()
     {
         for (int i = 0; i < 80; i++)
         {

@@ -12,7 +12,7 @@ public class LobbyPlayerInfo : NetworkBehaviour
 
     [Networked, OnChangedRender(nameof(OnChangedMyName))] private string _myName { get; set; }
     [Networked, OnChangedRender(nameof(OnChangedPlayerType))] private PlayerType _playerType { get; set; }
-    [Networked, OnChangedRender(nameof(OnChangedPlayerType))] private bool _playerTypeSelected { get; set; }
+    [Networked, OnChangedRender(nameof(OnChangedPlayerType))] private NetworkBool _playerTypeSelected { get; set; }
     [Networked, OnChangedRender(nameof(OnChangedReady))] public NetworkBool _readied { get; set; }
     [Networked, OnChangedRender(nameof(OnChangedReady))] public NetworkBool _roomMaster { get; set; } = false;
 
