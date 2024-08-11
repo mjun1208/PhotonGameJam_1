@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class LobbyCanvas : MonoBehaviour
@@ -6,6 +7,7 @@ public class LobbyCanvas : MonoBehaviour
     [SerializeField] private GameObject _readyCancelButton;
     [SerializeField] private GameObject _startButton;
     [SerializeField] private GameObject _mustEveryReady;
+    [SerializeField] private TMP_Text _codeText;
     public Transform PlayerListTransform;
 
     private bool _ready = false;
@@ -23,6 +25,8 @@ public class LobbyCanvas : MonoBehaviour
             _readyButton.SetActive(false);
             _readyCancelButton.SetActive(false);
         }
+
+        _codeText.text = $"방 코드 : {Global.Instance.RoomName}";
     }
     
     public void Ready()

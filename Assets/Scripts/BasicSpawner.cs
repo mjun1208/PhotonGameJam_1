@@ -61,6 +61,8 @@ public class BasicSpawner : MonoBehaviour
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
             PlayerCount = 4,
         });
+
+        Global.Instance.RoomName = _runner.SessionInfo.Name;
     }
 
     public void LockRoom()

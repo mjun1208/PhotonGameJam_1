@@ -11,6 +11,9 @@ public class HitCanvas : MonoBehaviour
     [SerializeField] private Image _hpGauge;
     [SerializeField] private GameObject _deadImage;
     [SerializeField] private TMP_Text _respawnTime;
+    
+    [SerializeField] private GameObject _mp;
+    [SerializeField] private Image _mpGauge;
         
     private CancellationTokenSource _clt;
 
@@ -59,5 +62,28 @@ public class HitCanvas : MonoBehaviour
         _canvasGroup.alpha = 1f;
         
         _canvasGroup.DOFade(0, 1f).WithCancellation(cancellationToken);
+    }
+
+    public void ShowMP(int mp)
+    {
+        _mp.SetActive(true);
+        SetMp(mp);
+    }
+
+    public void HideMp()
+    {
+        _mp.SetActive(false);
+    }
+
+    public void SetMp(int mp)
+    {
+        if (mp <= 0)
+        {
+            _mpGauge.fillAmount = 0f;
+        }
+        else
+        {
+            _mpGauge.fillAmount = mp / 15f;
+        }
     }
 }

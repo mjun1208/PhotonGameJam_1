@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -38,6 +37,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private HitCanvas _HitCanvas;
     [SerializeField] private FishWeapon _spawnFish;
     [SerializeField] private TMP_Text _nameText;
+    [SerializeField] private ParticleSystem _equipFx;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -51,7 +51,8 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private GameObject _shovel;
     [SerializeField] private GameObject _seedBag;
     [SerializeField] private GameObject _fishRod;
-    [SerializeField] private FishWeapon _fishWeapon;
+    [SerializeField] private Weapon _fishWeapon;
+    [SerializeField] private GameObject _fishWeapon2222;
     
     private const float Gravity = 9.81f; // 중력 가속도
 
@@ -82,6 +83,8 @@ public partial class Player : NetworkBehaviour
 
     private Dirt _plantTargetDirt = null;
     private bool _plantAble = false;
+    
+    private bool _isEquipWeapon = false;
 
     [Networked]
     private Vector3 _networkedMoveDirection { get; set; }
@@ -288,17 +291,17 @@ public partial class Player : NetworkBehaviour
                 _simpleKCC.Move(Vector3.down * Gravity * Runner.DeltaTime);
             }
         }
+        
+        
+        if (_playerType == PlayerType.Fisher)
+        {
+            FishWeaponUpdate(inputData);
+        }
 
-        // 슛.
-
-        // if (HasInputAuthority && delay.ExpiredOrNotRunning(Runner))
-        // {
-        //     if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-        //     {
-        //         delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-        //         RpcDoSomething();
-        //     }
-        // }
+        if (_isEquipWeapon)
+        {
+            return;
+        }
 
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
@@ -308,8 +311,6 @@ public partial class Player : NetworkBehaviour
                 {
                     RpcDoSomething(_plantTargetDirt);
                     RpcTriggerFeedingAnimeInput();
-                    // _plantTargetDirt.Looking(false);
-                    // _plantTargetDirt = null;
                 }
             }
 
@@ -334,18 +335,6 @@ public partial class Player : NetworkBehaviour
                         _fishCatchComplete = false;
                     }
                 }
-
-                // if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-                // {
-                //     delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                //     Runner.Spawn(_prefabBall,
-                //         transform.position + _forward, Quaternion.LookRotation(_forward),
-                //         Object.InputAuthority, (runner, o) =>
-                //         {
-                //             // Initialize the Ball before synchronizing it
-                //             o.GetComponent<Ball>().Init();
-                //         });
-                // }
             }
         }
 
@@ -373,6 +362,12 @@ public partial class Player : NetworkBehaviour
         }
 
         ShootGOGO();
+
+        if (_playerType == PlayerType.Fisher)
+        {
+            GetFish();
+        }
+
         ShowSpeakingIcon();
         
         if (!HasInputAuthority)
@@ -480,7 +475,10 @@ public partial class Player : NetworkBehaviour
         _playerCameraRootTransform.transform.rotation = Quaternion.Euler(_cameraRotation);
         _modelTransform.rotation = Quaternion.Euler(0, _cameraRotation.y, 0);
 
-        _playerCameraRootTransform.transform.position = _headPivot.transform.position;
+        if (!_animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
+        {
+            _playerCameraRootTransform.transform.position = _headPivot.transform.position;
+        }
 
         if (HasStateAuthority)
         {
@@ -530,7 +528,7 @@ public partial class Player : NetworkBehaviour
 
     private void ShootGOGO()
     {
-        if (_isFishing)
+        if (_isFishing || _lookingFishWeapon != null || _isEquipWeapon)
         {
             NotShowingGround();
             return;
@@ -539,7 +537,7 @@ public partial class Player : NetworkBehaviour
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
         LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
         LayerMask waterMask = 1 << LayerMask.NameToLayer("Water");
-        
+
         int layer = groundMask | dirtMask | waterMask;
         
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,

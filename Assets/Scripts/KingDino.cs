@@ -7,6 +7,7 @@ using Fusion;
 using Photon.Voice.Fusion.Demo;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class KingDino : NetworkBehaviour
@@ -19,6 +20,8 @@ public class KingDino : NetworkBehaviour
     
     [SerializeField] private GameObject _stampColl;
     [SerializeField] private CallColl _callColl;
+    [SerializeField] private Image _hpImage;
+    [SerializeField] private GameObject _hpCanvas;
 
     private List<CallColl> _callCollList = new List<CallColl>();
     
@@ -32,6 +35,34 @@ public class KingDino : NetworkBehaviour
     private float _stateCoolTime = 0;
 
     private float _targetCoolTime = 0f;
+
+    [Networked, OnChangedRender(nameof(OnChangedHp))]
+    public int Hp { get; set; } = 4000;
+
+    public override void Spawned()
+    {
+        _hpCanvas.SetActive(true);
+    }
+
+    public void Damaged(int damage)
+    {
+        if (HasStateAuthority)
+        {
+            Hp -= damage;
+        }
+    }
+
+    public void OnChangedHp()
+    {
+        if (Hp <= 0)
+        {
+            _hpImage.fillAmount = 0f;
+        }
+        else
+        {
+            _hpImage.fillAmount = Hp / 4000f;
+        }
+    }
 
     enum DinoState
     {
@@ -225,10 +256,10 @@ public class KingDino : NetworkBehaviour
     {
         if (_prefabSpawner != null)
         {
-            int playerCount = _prefabSpawner.spawnedPlayers.Count;
+            int playerCount = _prefabSpawner.spawnedPlayerOb.Count;
             int randomPick = Random.Range(0, playerCount);
 
-            var playerObject = _prefabSpawner.spawnedPlayers.ToList()[randomPick].Value;
+            var playerObject = _prefabSpawner.spawnedPlayerOb.ToList()[randomPick].Value;
 
             var playerScript = playerObject.GetComponent<Player>();
             _targetPlayer = playerScript;
@@ -384,7 +415,7 @@ public class KingDino : NetworkBehaviour
     {
         if (HasStateAuthority)
         {
-            foreach (var player in _prefabSpawner.spawnedPlayers)
+            foreach (var player in _prefabSpawner.spawnedPlayerOb)
             {
                 RpcSpawnColl(player.Value);   
             }

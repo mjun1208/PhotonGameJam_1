@@ -10,4 +10,9 @@ public class FishWeapon : NetworkBehaviour
     {
         _rigidbody.AddForce(Vector3.up * 10f, ForceMode.Impulse);
     }
+
+    public void Look(bool look)
+    {
+        _outline.enabled = look;
+    }
 }

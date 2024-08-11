@@ -16,6 +16,7 @@ namespace Photon.Voice.Fusion.Demo
         private NetworkObject prefab;
 
         public Dictionary<PlayerRef, NetworkObject> spawnedPlayers { get; set; } = new Dictionary<PlayerRef, NetworkObject>();
+        public Dictionary<PlayerRef, NetworkObject> spawnedPlayerOb { get; set; } = new Dictionary<PlayerRef, NetworkObject>();
         public Dictionary<PlayerRef, NetworkRunner> playerRunners { get; set; } = new Dictionary<PlayerRef, NetworkRunner>();
 
         [SerializeField]
@@ -184,7 +185,7 @@ namespace Photon.Voice.Fusion.Demo
         public void SpawnPlayer(PlayerRef player, PlayerType playerType)
         {
             playerRunners.TryGetValue(player, out var runner);
-            
+
             NetworkObject instance = runner.Spawn(this.prefab, Vector3.zero, Quaternion.identity, player);
             if (this.debugLogs)
             {
@@ -197,6 +198,8 @@ namespace Photon.Voice.Fusion.Demo
                     Debug.Log($"Spawned NO {instance?.Id} for {player}");
                 }
             }
+            
+            spawnedPlayerOb.Add(player, instance);
             
             var playerComponent = instance.GetComponent<Player>();
             playerComponent.SetPlayerRef(player);
@@ -212,8 +215,8 @@ namespace Photon.Voice.Fusion.Demo
 
         private void SpawnDino(NetworkRunner runner)
         {
-            //var dino = runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
-            //dino.SetPrefabSpawner(this);
+            var dino = runner.Spawn(_kingDino, Vector3.zero, Quaternion.identity);
+            dino.SetPrefabSpawner(this);
         }
 
         private bool TryDespawnPlayer(NetworkRunner runner, PlayerRef player)

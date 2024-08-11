@@ -23,4 +23,14 @@ public class ttttt : MonoBehaviour
     {
         Player.DoDig();
     }
+    
+    public void HitOn()
+    {
+        Player.HitOn();
+    }
+    
+    public void HitOff()
+    {
+        Player.HitOff();
+    }
 }
