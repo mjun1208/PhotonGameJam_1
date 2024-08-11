@@ -366,8 +366,12 @@ public partial class Player : NetworkBehaviour
     {
         base.Render();
         SetAnimation();
-        
-        GetPlantTarget();
+
+        if (_playerType == PlayerType.Farmer)
+        {
+            GetPlantTarget();
+        }
+
         ShootGOGO();
         ShowSpeakingIcon();
         
@@ -547,32 +551,38 @@ public partial class Player : NetworkBehaviour
                 return;
             }
 
-            if (1 << hit.transform.gameObject.layer == groundMask.value)
+            if (_playerType == PlayerType.Farmer)
             {
-                _shootPosition = hit.point;
-                _shootAble = true;
-
-                DirtRender();
-                if (_fish_ghost.activeSelf)
+                if (1 << hit.transform.gameObject.layer == groundMask.value)
                 {
-                    _fish_ghost.SetActive(false);
-                }
+                    _shootPosition = hit.point;
+                    _shootAble = true;
 
-                _shootType = ShootType.Dirt;
+                    DirtRender();
+                    if (_fish_ghost.activeSelf)
+                    {
+                        _fish_ghost.SetActive(false);
+                    }
+
+                    _shootType = ShootType.Dirt;
+                }
             }
-            
-            if (1 << hit.transform.gameObject.layer == waterMask.value)
-            {
-                _shootPosition = hit.point;
-                _shootAble = true;
 
-                FishingRender();
-                if (_dirt_ghost.activeSelf)
+            if (_playerType == PlayerType.Fisher)
+            {
+                if (1 << hit.transform.gameObject.layer == waterMask.value)
                 {
-                    _dirt_ghost.SetActive(false);
+                    _shootPosition = hit.point;
+                    _shootAble = true;
+
+                    FishingRender();
+                    if (_dirt_ghost.activeSelf)
+                    {
+                        _dirt_ghost.SetActive(false);
+                    }
+
+                    _shootType = ShootType.Fishing;
                 }
-                
-                _shootType = ShootType.Fishing;
             }
         }
         else

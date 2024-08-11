@@ -36,14 +36,14 @@ public class LobbyPlayerInfo : NetworkBehaviour
 
         if (HasInputAuthority)
         {
+            Global.Instance.Selecter.SetActive(true);
+            
             var selectCanvas = Global.Instance.SelectCanvas;
             selectCanvas.SetLobbyPlayerInfo(this);
             
             var lobbyCanvas = Global.Instance.LobbyCanvas;
             lobbyCanvas.SetLobbyPlayerInfo(this, Runner.IsServer);
-            
-            lobbyCanvas.gameObject.SetActive(true);
-            
+
             SetMyName(Global.Instance.MyName);
             SetRoomMaster(HasStateAuthority);
             SetPlayerType(Global.Instance.SelectCanvas.SelectedPlayerType);

@@ -36,7 +36,7 @@ public class Global : MonoBehaviour
     public PrefabSpawner PrefabSpawner { get; set; }
     public ChatManager ChatManager { get; set; }
 
-    public Color FarmerColor = new Color(0f, 32f / 255f, 115f / 255f);
+    public Color FarmerColor = new Color(0f, 115f / 255f, 25f / 255f);
     public Color FisherColor = new Color(0f, 32f / 255f, 115f / 255f);
 
     public void SetBasicSpawner(BasicSpawner basicSpawner)
