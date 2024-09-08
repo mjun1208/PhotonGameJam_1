@@ -53,6 +53,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private GameObject _fishRod;
     [SerializeField] private Weapon _fishWeapon;
     [SerializeField] private GameObject _fishWeapon2222;
+    [SerializeField] private Axe _axe;
     
     private const float Gravity = 9.81f; // 중력 가속도
 
@@ -64,6 +65,7 @@ public partial class Player : NetworkBehaviour
     {
         Dirt,
         Fishing,
+        Bonfire,
     }
 
     private Vector3 _forward = Vector3.forward;
@@ -291,7 +293,11 @@ public partial class Player : NetworkBehaviour
                 _simpleKCC.Move(Vector3.down * Gravity * Runner.DeltaTime);
             }
         }
+
+        TreeUpdate(inputData);
         
+        /// 
+        return;
         
         if (_playerType == PlayerType.Fisher)
         {
@@ -367,6 +373,10 @@ public partial class Player : NetworkBehaviour
         {
             GetFish();
         }
+
+        GetTree();
+        GetLog();
+        GetBonFire();
 
         ShowSpeakingIcon();
         
@@ -557,12 +567,14 @@ public partial class Player : NetworkBehaviour
                     _shootAble = true;
 
                     DirtRender();
+                    BonFireRender();
                     if (_fish_ghost.activeSelf)
                     {
                         _fish_ghost.SetActive(false);
                     }
 
                     _shootType = ShootType.Dirt;
+                    _shootType = ShootType.Bonfire;
                 }
             }
 
@@ -600,6 +612,10 @@ public partial class Player : NetworkBehaviour
             if (_fish_ghost.activeSelf)
             {
                 _fish_ghost.SetActive(false);
+            }
+            if (_bonFire_Ghost.activeSelf)
+            {
+                _bonFire_Ghost.SetActive(false);
             }
         }
     }
@@ -660,9 +676,8 @@ public partial class Player : NetworkBehaviour
     public void RpcTriggerShovelAnime(Vector3 shootPosition)
     {
         _animator.SetTrigger("Shovel");
+        SetToolFalse();
         _shovel.SetActive(true);
-        _fishRod.SetActive(false);
-        _seedBag.SetActive(false);
         _shootPosition = shootPosition;
         _isDigging = true;
     }
@@ -679,9 +694,9 @@ public partial class Player : NetworkBehaviour
     public void RpcTriggerFeedingAnime()
     {
         _animator.SetTrigger("Feed");
-        
-        _shovel.SetActive(false);
-        _fishRod.SetActive(false);
+
+        SetToolFalse();
+
         _seedBag.SetActive(true);
     }
 
@@ -692,10 +707,10 @@ public partial class Player : NetworkBehaviour
         _isFishing = true;
         _fishingState = 0;
 
-        _shovel.SetActive(false);
-        _fishRod.SetActive(true);
-        _seedBag.SetActive(false);
+        SetToolFalse();
         
+        _fishRod.SetActive(true);
+
         _animator.SetBool("IsFishing", true);
         _animator.SetInteger("FishingState", _fishingState);
 
@@ -894,5 +909,13 @@ public partial class Player : NetworkBehaviour
         _animator.enabled = !enable;
         _ragDollCollider.ForEach(x => x.enabled = enable);
         _ragDollRigidbody.ForEach(x => x.isKinematic = !enable);
+    }
+
+    private void SetToolFalse()
+    {
+        _shovel.SetActive(false);
+        _fishRod.SetActive(false);
+        _seedBag.SetActive(false);
+        _axe.gameObject.SetActive(false);   
     }
 }

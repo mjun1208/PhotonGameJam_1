@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class ttttt : MonoBehaviour
     public FishingRodLine FishingRodLine;
     public ParticleSystem FeedFx;
     public AudioSource sound;
+    public Axe Axe;
     
     public void GOFinalPosition()
     {
@@ -34,5 +36,15 @@ public class ttttt : MonoBehaviour
     public void HitOff()
     {
         Player.HitOff();
+    }
+
+    public void AxeOn()
+    {
+        Axe.CollOn();
+    }
+
+    public void AxeOff()
+    {
+        Axe.CollOff();
     }
 }
