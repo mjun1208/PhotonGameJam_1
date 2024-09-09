@@ -59,8 +59,8 @@ public partial class Player : NetworkBehaviour
 
     private int _hp = 1000;
     [Networked] private NetworkBool _dead { get; set; } = false;
-    [Networked, OnChangedRender(nameof(OnChangedPlayerType))] private PlayerType _playerType { get; set; } 
-    
+    [Networked, OnChangedRender(nameof(OnChangedPlayerType))] private PlayerType _playerType { get; set; }
+
     public enum ShootType
     {
         Dirt,
@@ -166,6 +166,8 @@ public partial class Player : NetworkBehaviour
             return;
         }
 
+        _inventoryBar.SetPlayer(this);
+        
         _nameText.gameObject.SetActive(false);
         RpcSetMyName(Global.Instance.MyName);
 
@@ -210,6 +212,61 @@ public partial class Player : NetworkBehaviour
         if (!HasInputAuthority)
         { 
             return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            _inventoryBar.SelectItem(0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            _inventoryBar.SelectItem(1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            _inventoryBar.SelectItem(2);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            _inventoryBar.SelectItem(3);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            _inventoryBar.SelectItem(4);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            _inventoryBar.SelectItem(5);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            _inventoryBar.SelectItem(6);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            _inventoryBar.SelectItem(7);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            _inventoryBar.SelectItem(8);
+        }
+
+        if (Input.mouseScrollDelta.y < 0)
+        {
+            _inventoryBar.SelectNext();
+        }
+        
+        if (Input.mouseScrollDelta.y > 0)
+        {
+            _inventoryBar.SelectPrev();
         }
         
         if (Input.GetKeyDown(KeyCode.Return))
@@ -295,11 +352,9 @@ public partial class Player : NetworkBehaviour
         }
 
         TreeUpdate(inputData);
-        
-        /// 
-        return;
-        
-        if (_playerType == PlayerType.Fisher)
+
+        // if (_playerType == PlayerType.Fisher)
+        if (_inventoryItemType == InventoryItemType.Fish || _inventoryItemType == InventoryItemType.FishRod)
         {
             FishWeaponUpdate(inputData);
         }
@@ -362,14 +417,16 @@ public partial class Player : NetworkBehaviour
         base.Render();
         SetAnimation();
 
-        if (_playerType == PlayerType.Farmer)
+        // if (_playerType == PlayerType.Farmer)
+        if (_inventoryItemType == InventoryItemType.SeedBag)
         {
             GetPlantTarget();
         }
 
         ShootGOGO();
 
-        if (_playerType == PlayerType.Fisher)
+        // if (_playerType == PlayerType.Fisher)
+        if (_inventoryItemType == InventoryItemType.FishRod)
         {
             GetFish();
         }
@@ -559,38 +616,66 @@ public partial class Player : NetworkBehaviour
                 return;
             }
 
-            if (_playerType == PlayerType.Farmer)
+            // if (_playerType == PlayerType.Farmer)
+            if (_inventoryItemType == InventoryItemType.Shovel || _inventoryItemType == InventoryItemType.Log)
             {
+                if (_fish_ghost.activeSelf)
+                {
+                    _fish_ghost.SetActive(false);
+                }
+                
                 if (1 << hit.transform.gameObject.layer == groundMask.value)
                 {
                     _shootPosition = hit.point;
                     _shootAble = true;
 
-                    DirtRender();
-                    BonFireRender();
-                    if (_fish_ghost.activeSelf)
+                    if (_inventoryItemType == InventoryItemType.Shovel)
                     {
-                        _fish_ghost.SetActive(false);
+                        DirtRender();
+                        _shootType = ShootType.Dirt;
                     }
-
-                    _shootType = ShootType.Dirt;
-                    _shootType = ShootType.Bonfire;
+                    else
+                    {
+                        if (_dirt_ghost.activeSelf)
+                        {
+                            _dirt_ghost.SetActive(false);
+                        }
+                    }
+           
+                    if (_inventoryItemType == InventoryItemType.Log)
+                    {
+                        BonFireRender();
+                        _shootType = ShootType.Bonfire;
+                    }
+                    else
+                    {
+                        if (_bonFire_Ghost.activeSelf)
+                        {
+                            _bonFire_Ghost.SetActive(false);
+                        }
+                    }
                 }
             }
 
-            if (_playerType == PlayerType.Fisher)
+            // if (_playerType == PlayerType.Fisher)
+            if (_inventoryItemType == InventoryItemType.FishRod)
             {
+                if (_dirt_ghost.activeSelf)
+                {
+                    _dirt_ghost.SetActive(false);
+                }
+                if (_bonFire_Ghost.activeSelf)
+                {
+                    _bonFire_Ghost.SetActive(false);
+                }
+                
                 if (1 << hit.transform.gameObject.layer == waterMask.value)
                 {
                     _shootPosition = hit.point;
                     _shootAble = true;
 
                     FishingRender();
-                    if (_dirt_ghost.activeSelf)
-                    {
-                        _dirt_ghost.SetActive(false);
-                    }
-
+                    
                     _shootType = ShootType.Fishing;
                 }
             }
