@@ -178,11 +178,22 @@ public partial class Player : NetworkBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
+        Global.Instance.IngameActivingCursor = false; 
+
         HideBody();
         
         _HitCanvas.gameObject.SetActive(true);
     }
-    
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        base.Despawned(runner, hasState);
+        if (HasInputAuthority)
+        {
+            Global.Instance.IngameActivingCursor = true;
+        }
+    }
+
     private void HideBody()
     {
         _hideBody.ForEach(x => x.shadowCastingMode = ShadowCastingMode.ShadowsOnly);
@@ -275,13 +286,48 @@ public partial class Player : NetworkBehaviour
             {
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
+
+                Global.Instance.IngameActivingCursor = true;
             }
             else
             {
                 Cursor.visible = false;
                 Cursor.lockState = CursorLockMode.Locked;
+                
+                Global.Instance.IngameActivingCursor = false; 
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+            if (_inventoryUI.gameObject.activeSelf)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                _inventoryUI.OnClickInventoryTab();
+
+                Global.Instance.IngameActivingCursor = true;
+            }
+            else
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                
+                Global.Instance.IngameActivingCursor = false; 
+            }
+        }
+        
+        // if (Input.GetKeyDown(KeyCode.R))
+        // {
+        //     _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+        //
+        //     if (_inventoryUI.gameObject.activeSelf)
+        //     {
+        //         _inventoryUI.OnClickInventoryTab();
+        //     }
+        // }
     }
 
     private void FixedUpdate()

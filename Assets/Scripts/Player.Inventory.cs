@@ -6,6 +6,7 @@ using UnityEngine;
 public partial class Player
 {
     [SerializeField] private InventoryBar _inventoryBar;
+    [SerializeField] private InventoryUI _inventoryUI;
     private InventoryItemType _inventoryItemType { get; set; }
 
     // public void OnChangedEquipItem()

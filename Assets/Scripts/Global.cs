@@ -55,6 +55,8 @@ public class Global : MonoBehaviour
     public Color FarmerColor = new Color(0f, 115f / 255f, 25f / 255f);
     public Color FisherColor = new Color(0f, 32f / 255f, 115f / 255f);
 
+    public bool IngameActivingCursor = true;
+
     public void SetBasicSpawner(BasicSpawner basicSpawner)
     {
         if (BasicSpawner != null)
@@ -82,6 +84,7 @@ public class Global : MonoBehaviour
     }
 
     [SerializeField] private GameObject FailCanvas;
+    [SerializeField] private GameObject MenuCanvas;
 
     public void RoomEnterFail()
     {
@@ -91,5 +94,43 @@ public class Global : MonoBehaviour
     public void CloseRoomEnterFailPopup()
     {
         FailCanvas.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            MenuCanvas.SetActive(!MenuCanvas.activeSelf);
+
+            if (!MenuCanvas.activeSelf)
+            {
+                if (!IngameActivingCursor)
+                {
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+            }
+            else
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
+    }
+
+    public void Continue()
+    {
+        MenuCanvas.SetActive(false);
+        
+        if (!IngameActivingCursor)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
+    
+    public void Quit()
+    {
+        Application.Quit();
     }
 }

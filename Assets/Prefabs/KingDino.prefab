@@ -1287,7 +1287,7 @@ MonoBehaviour:
   - {fileID: 8202410161701405397, guid: 25f8a06e8555a5041904acded44bc97c, type: 3}
   - {fileID: 6555377131790855691, guid: 08816012032abb14993fa0ec2ad3016a, type: 3}
   MissileTarget: {fileID: 6289258875052017893}
-  _Hp: 3000
+  _Hp: 10
 --- !u!114 &7652004014433931735
 MonoBehaviour:
   m_ObjectHideFlags: 0
