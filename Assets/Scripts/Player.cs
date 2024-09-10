@@ -372,6 +372,9 @@ public partial class Player : NetworkBehaviour
                 {
                     RpcDoSomething(_plantTargetDirt);
                     RpcTriggerFeedingAnimeInput();
+                    
+                    _plantTargetDirt.Looking(false);
+                    _plantTargetDirt = null;
                 }
             }
 
@@ -422,6 +425,17 @@ public partial class Player : NetworkBehaviour
         {
             GetPlantTarget();
         }
+        else
+        {
+            if (HasInputAuthority)
+            {
+                if (_plantTargetDirt != null)
+                {
+                    _plantTargetDirt.Looking(false);
+                    _plantTargetDirt = null;
+                }
+            }
+        }
 
         ShootGOGO();
 
@@ -431,9 +445,12 @@ public partial class Player : NetworkBehaviour
             GetFish();
         }
 
-        GetTree();
-        GetLog();
-        GetBonFire();
+        if (HasInputAuthority)
+        {
+            GetTree();
+            GetLog();
+            GetBonFire();
+        }
 
         ShowSpeakingIcon();
         
@@ -656,9 +673,7 @@ public partial class Player : NetworkBehaviour
                     }
                 }
             }
-
-            // if (_playerType == PlayerType.Fisher)
-            if (_inventoryItemType == InventoryItemType.FishRod)
+            else
             {
                 if (_dirt_ghost.activeSelf)
                 {
@@ -668,7 +683,11 @@ public partial class Player : NetworkBehaviour
                 {
                     _bonFire_Ghost.SetActive(false);
                 }
-                
+            }
+
+            // if (_playerType == PlayerType.Fisher)
+            if (_inventoryItemType == InventoryItemType.FishRod)
+            {
                 if (1 << hit.transform.gameObject.layer == waterMask.value)
                 {
                     _shootPosition = hit.point;
@@ -677,6 +696,13 @@ public partial class Player : NetworkBehaviour
                     FishingRender();
                     
                     _shootType = ShootType.Fishing;
+                }
+            }
+            else
+            {
+                if (_fish_ghost.activeSelf)
+                {
+                    _fish_ghost.SetActive(false);
                 }
             }
         }

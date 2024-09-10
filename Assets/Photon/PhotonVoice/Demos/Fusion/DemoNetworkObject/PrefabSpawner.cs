@@ -50,7 +50,12 @@ namespace Photon.Voice.Fusion.Demo
         public void SelectGOGO(NetworkRunner runner, PlayerRef player)
         {
             NetworkObject instance = runner.Spawn(this.lobbyPlayerInfo, Vector3.zero, Quaternion.identity, player);
-            instance.GetComponent<LobbyPlayerInfo>().SetPlayerRef(player);
+            var lobbyPlayerInfo = instance.GetComponent<LobbyPlayerInfo>();
+            if (lobbyPlayerInfo != null)
+            {
+                lobbyPlayerInfo.SetPlayerRef(player);
+            }
+
             this.spawnedPlayers[player] = instance;
         }
 

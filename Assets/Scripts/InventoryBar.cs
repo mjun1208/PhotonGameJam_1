@@ -15,6 +15,8 @@ public class InventoryBar : MonoBehaviour
         
         // Test
         _inventoryListItems.ForEach(x=> x.SetInventoryItemType((InventoryItemType)_inventoryListItems.IndexOf(x)));
+
+        SelectItem(0);
     }
 
     public void SelectItem(int index)

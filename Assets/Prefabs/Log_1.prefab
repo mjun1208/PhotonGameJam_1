@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 7079993046450573593}
   - component: {fileID: 1463176104074589718}
   - component: {fileID: 1385847950797638107}
+  - component: {fileID: 4954860042399076749}
   m_Layer: 21
   m_Name: Log_1
   m_TagString: Item
@@ -119,7 +120,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8484211937304222675}
@@ -395,6 +396,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7079993046450573593}
+  - {fileID: 4954860042399076749}
 --- !u!114 &1385847950797638107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,3 +415,19 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &4954860042399076749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8888455770991610570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

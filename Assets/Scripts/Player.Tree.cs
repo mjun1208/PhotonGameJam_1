@@ -15,19 +15,22 @@ public partial class Player
 
     private void TreeUpdate(NetworkInputData inputData)
     {
-        // if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
-        // {
-        //     if (HasStateAuthority)
-        //     {
-        //         RpcTriggerRig();
-        //     }
-        //     
-        //     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-        // }
-        
+        if (_inventoryItemType == InventoryItemType.Axe)
+        {
+            if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+            {
+                if (HasStateAuthority)
+                {
+                    RpcTriggerRig();
+                }
+
+                _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+            }
+        }
+
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
-            if (HasStateAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
+            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
             {
                 if (_lookingBonfire != null)
                 {
@@ -41,7 +44,7 @@ public partial class Player
                     if (_shootType == ShootType.Bonfire)
                     {
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                        SpawnBonFire();
+                        RpcSpawnBonFire(_shootPosition);
                     }
                 }
             }
@@ -63,7 +66,8 @@ public partial class Player
         _bonFire_Ghost.transform.position = _shootPosition;
     }
 
-    public void SpawnBonFire()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcSpawnBonFire(Vector3 shootPosition)
     {
         if (!HasStateAuthority)
         {
@@ -72,19 +76,21 @@ public partial class Player
         
         if (_shootAble && _shootType == ShootType.Bonfire)
         {
-            Runner.Spawn(_bonfire, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+            Runner.Spawn(_bonfire, shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
         }
     }
 
     public void SpawnLog(Vector3 hitPosition, Vector3 dir, Tree targetTree)
     {
+        var lookPos = hitPosition + dir;
+        
         if (HasStateAuthority)
         {
-            var lookPos = hitPosition + dir;
-            
             var spawnedlog = Runner.Spawn(_log, hitPosition, Quaternion.LookRotation(lookPos), Object.InputAuthority);
-            Instantiate(_logFx, hitPosition, Quaternion.LookRotation(lookPos));
         }
+        
+        targetTree.Hit();
+        Instantiate(_logFx, hitPosition, Quaternion.LookRotation(lookPos));
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

@@ -38,7 +38,7 @@ public class InventoryListItem : MonoBehaviour
 
     private void SelectItemAction()
     {
-        _player.Equip(_inventoryItemType);
+        _player.RpcEquipToServer(_inventoryItemType);
     }
 
     public void SetPlayer(Player player)

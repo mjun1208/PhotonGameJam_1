@@ -6,11 +6,23 @@ using UnityEngine;
 public partial class Player
 {
     [SerializeField] private InventoryBar _inventoryBar;
-    [Networked, OnChangedRender(nameof(OnChangedEquipItem))] private InventoryItemType _inventoryItemType { get; set; }
+    private InventoryItemType _inventoryItemType { get; set; }
 
-    public void OnChangedEquipItem()
+    // public void OnChangedEquipItem()
+    // {
+    //     Equip(_inventoryItemType);
+    // }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcEquipToServer(InventoryItemType inventoryItemType)
     {
-        Equip(_inventoryItemType);
+        RpcEquipToAll(inventoryItemType);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcEquipToAll(InventoryItemType inventoryItemType)
+    {
+        Equip(inventoryItemType);
     }
     
     public void Equip(InventoryItemType inventoryItemType)
