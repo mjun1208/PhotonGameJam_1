@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,9 +14,9 @@ public class InventoryUI : MonoBehaviour
     
     [SerializeField] private GameObject _inventoryGroup;
     [SerializeField] private GameObject _craftGroup;
+    [SerializeField] private InventoryBar _inventoryBar;
     
     private InventoryTab _inventoryTab = InventoryTab.Inventory;
-    
 
     public void OnClickInventoryTab()
     {

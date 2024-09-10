@@ -6022,6 +6022,7 @@ MonoBehaviour:
   _craftTabButton: {fileID: 2306202542250234517}
   _inventoryGroup: {fileID: 7250961694416605020}
   _craftGroup: {fileID: 7488994623596006238}
+  _inventoryBar: {fileID: 6827073183006154999}
 --- !u!1 &1786104082790007941
 GameObject:
   m_ObjectHideFlags: 0
