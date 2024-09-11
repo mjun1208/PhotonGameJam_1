@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public enum InventoryItemType
@@ -16,8 +18,9 @@ public enum InventoryItemType
     Dummy_8,
 }
 
-public class InventoryListItem : MonoBehaviour
+public class InventoryListItem : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
+    [SerializeField] private GameObject _rayCastImage;
     [SerializeField] private GameObject _selectImage;
     [SerializeField] private Image _iconImage;
     [SerializeField] private List<Sprite> _itemIcons;
@@ -44,6 +47,8 @@ public class InventoryListItem : MonoBehaviour
         Empty = false;
     }
 
+    public InventoryItemType GetInventoryItemType => _inventoryItemType;
+
     public void SetEmpty()
     {
         _iconImage.gameObject.SetActive(false);
@@ -58,5 +63,22 @@ public class InventoryListItem : MonoBehaviour
     public void SetPlayer(Player player)
     {
         _player = player;
+    }
+
+    public bool Dragging { get; set; } = false;
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        Dragging = true;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        Dragging = false;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        Dragging = true;
     }
 }

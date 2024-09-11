@@ -1,13 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class InventoryBar : MonoBehaviour
 {
     [SerializeField] private List<InventoryListItem> _inventoryListItems;
+    [SerializeField] private InventoryUI _inventoryUI;
 
     private int _selectedIndex = 0;
     private InventoryListItem _currentSelectedItem;
+    
+    public List<InventoryListItem> InventoryListItems => _inventoryListItems;
 
     public void SetPlayer(Player player)
     {

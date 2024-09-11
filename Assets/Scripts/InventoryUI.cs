@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
@@ -12,11 +15,19 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Image _inventoryTabButton;
     [SerializeField] private Image _craftTabButton;
     
+    [SerializeField] private InventoryListItem _draggingItem;
+    private bool _dragging = false;
+    
     [SerializeField] private GameObject _inventoryGroup;
     [SerializeField] private GameObject _craftGroup;
     [SerializeField] private InventoryBar _inventoryBar;
+
+    [SerializeField] private List<InventoryListItem> _inventoryListItems;
+    [SerializeField] private List<InventoryListItem> _inventoryBarListItems;
     
     private InventoryTab _inventoryTab = InventoryTab.Inventory;
+
+    // private InventoryListItem _draggingItem;
 
     public void OnClickInventoryTab()
     {
@@ -27,6 +38,13 @@ public class InventoryUI : MonoBehaviour
         
         _inventoryGroup.SetActive(true);
         _craftGroup.SetActive(false);
+
+        for (int i = 0; i < _inventoryBar.InventoryListItems.Count; i++)
+        {
+            _inventoryBarListItems[i].SetInventoryItemType(_inventoryBar.InventoryListItems[i].GetInventoryItemType);
+        }
+
+        _dragging = false;
     }
     
     public void OnClickCraftTab()
@@ -38,5 +56,52 @@ public class InventoryUI : MonoBehaviour
         
         _craftGroup.SetActive(true);
         _inventoryGroup.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (_dragging)
+        {
+            if (!_draggingItem.gameObject.activeSelf)
+            {
+                _draggingItem.gameObject.SetActive(true);
+            }
+
+            _draggingItem.transform.position = Input.mousePosition;
+        }
+        else
+        {
+            if (_draggingItem.gameObject.activeSelf)
+            {
+                _draggingItem.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        // _draggingItem
+            
+        if (!_draggingItem.gameObject.activeSelf)
+        {
+            _draggingItem.gameObject.SetActive(true);
+        }
+
+        _dragging = true;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (_draggingItem.gameObject.activeSelf)
+        {
+            _draggingItem.gameObject.SetActive(false);
+        }
+
+        _dragging = false;
+    }
+
+    public void CurrentItem()
+    {
+        
     }
 }
