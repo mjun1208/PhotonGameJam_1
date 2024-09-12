@@ -42,6 +42,12 @@ public class InventoryUI : MonoBehaviour
         for (int i = 0; i < _inventoryBar.InventoryListItems.Count; i++)
         {
             _inventoryBarListItems[i].SetInventoryItemType(_inventoryBar.InventoryListItems[i].GetInventoryItemType);
+            _inventoryBarListItems[i].SetInventoryUI(this);
+        }
+
+        foreach (var inventoryListItem in _inventoryListItems)
+        {
+            inventoryListItem.SetInventoryUI(this);
         }
 
         _dragging = false;
@@ -78,13 +84,18 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData eventData, InventoryItemType inventoryItemType)
     {
         // _draggingItem
             
         if (!_draggingItem.gameObject.activeSelf)
         {
             _draggingItem.gameObject.SetActive(true);
+        }
+
+        if (_draggingItem.GetInventoryItemType != inventoryItemType)
+        {
+            _draggingItem.SetInventoryItemType(inventoryItemType);
         }
 
         _dragging = true;
