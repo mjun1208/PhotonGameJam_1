@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class InventoryUI : MonoBehaviour
     
     [SerializeField] private InventoryListItem _draggingItem;
     private bool _dragging = false;
+    private InventoryItemType _draggingInventoryItemType;
+    private InventoryListItem _dragSlot;
     
     [SerializeField] private GameObject _inventoryGroup;
     [SerializeField] private GameObject _craftGroup;
@@ -43,10 +46,13 @@ public class InventoryUI : MonoBehaviour
         {
             _inventoryBarListItems[i].SetInventoryItemType(_inventoryBar.InventoryListItems[i].GetInventoryItemType);
             _inventoryBarListItems[i].SetInventoryUI(this);
+            _inventoryBarListItems[i].SetInventoryBar(_inventoryBar);
+            _inventoryBarListItems[i].SetInventoryBarIndex(i);
         }
 
         foreach (var inventoryListItem in _inventoryListItems)
         {
+            inventoryListItem.SetInventoryItemType((InventoryItemType)Random.Range(0, (int)InventoryItemType.Dummy_8));
             inventoryListItem.SetInventoryUI(this);
         }
 
@@ -84,9 +90,18 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    public void OnBeginDrag(PointerEventData eventData, InventoryItemType inventoryItemType)
+    public InventoryItemType GetDraggingItemType => _draggingInventoryItemType;
+
+    public void OnBeginDrag(PointerEventData eventData, InventoryListItem slot, InventoryItemType inventoryItemType)
     {
         // _draggingItem
+
+        if (_dragging)
+        {
+            return;
+        }
+
+        _dragSlot = slot;
             
         if (!_draggingItem.gameObject.activeSelf)
         {
@@ -99,13 +114,43 @@ public class InventoryUI : MonoBehaviour
         }
 
         _dragging = true;
+
+        _draggingInventoryItemType = inventoryItemType;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnDrop()
+    {
+        if (_draggingItem.gameObject.activeSelf)                                                         
+        {
+            _draggingItem.gameObject.SetActive(false);
+        }
+        
+        _dragSlot.SetInventoryItemType(GetDraggingItemType);
+
+        _dragging = false;
+    }
+    
+    public void OnDrop(PointerEventData eventData, InventoryItemType inventoryItemType, bool isEmpty)
     {
         if (_draggingItem.gameObject.activeSelf)
         {
             _draggingItem.gameObject.SetActive(false);
+        }
+        
+        _dragSlot.SetInventoryItemType(inventoryItemType);
+        if (isEmpty)
+        {
+            _dragSlot.SetEmpty();
+        }
+        
+        if (_dragSlot.InventoryBar != null)
+        {
+            _inventoryBar.InventoryListItems[_dragSlot.InventoryBarIndex].SetInventoryItemType(_dragSlot.GetInventoryItemType);
+
+            if (_dragSlot.InventoryBar.CurrentIndex == _dragSlot.InventoryBarIndex)
+            {
+                _inventoryBar.SelectItem(_dragSlot.InventoryBar.CurrentIndex);
+            }
         }
 
         _dragging = false;
