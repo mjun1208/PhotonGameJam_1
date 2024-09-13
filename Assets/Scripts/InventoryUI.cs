@@ -48,11 +48,16 @@ public class InventoryUI : MonoBehaviour
             _inventoryBarListItems[i].SetInventoryUI(this);
             _inventoryBarListItems[i].SetInventoryBar(_inventoryBar);
             _inventoryBarListItems[i].SetInventoryBarIndex(i);
+
+            if (_inventoryBar.InventoryListItems[i].Empty)
+            {
+                _inventoryBarListItems[i].SetEmpty();
+            }
         }
 
         foreach (var inventoryListItem in _inventoryListItems)
         {
-            inventoryListItem.SetInventoryItemType((InventoryItemType)Random.Range(0, (int)InventoryItemType.Dummy_8));
+            // inventoryListItem.SetInventoryItemType((InventoryItemType)Random.Range(0, (int)InventoryItemType.Dummy_8));
             inventoryListItem.SetInventoryUI(this);
         }
 
@@ -146,7 +151,12 @@ public class InventoryUI : MonoBehaviour
         if (_dragSlot.InventoryBar != null)
         {
             _inventoryBar.InventoryListItems[_dragSlot.InventoryBarIndex].SetInventoryItemType(_dragSlot.GetInventoryItemType);
-
+            
+            if (isEmpty)
+            {
+                _inventoryBar.InventoryListItems[_dragSlot.InventoryBarIndex].SetEmpty();
+            }
+            
             if (_dragSlot.InventoryBar.CurrentIndex == _dragSlot.InventoryBarIndex)
             {
                 _inventoryBar.SelectItem(_dragSlot.InventoryBar.CurrentIndex);

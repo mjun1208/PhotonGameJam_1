@@ -15,18 +15,18 @@ public partial class Player
     // }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RpcEquipToServer(InventoryItemType inventoryItemType)
+    public void RpcEquipToServer(InventoryItemType inventoryItemType, bool isEmpty)
     {
-        RpcEquipToAll(inventoryItemType);
+        RpcEquipToAll(inventoryItemType, isEmpty);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RpcEquipToAll(InventoryItemType inventoryItemType)
+    public void RpcEquipToAll(InventoryItemType inventoryItemType, bool isEmpty)
     {
-        Equip(inventoryItemType);
+        Equip(inventoryItemType, isEmpty);
     }
     
-    public void Equip(InventoryItemType inventoryItemType)
+    public void Equip(InventoryItemType inventoryItemType, bool isEmpty)
     {
         if (_inventoryItemType != inventoryItemType)
         {
@@ -34,6 +34,11 @@ public partial class Player
         }
 
         SetToolFalse();
+
+        if (isEmpty)
+        {
+            return;
+        }
 
         switch (_inventoryItemType)
         {

@@ -10,7 +10,7 @@ public class InventoryBar : MonoBehaviour
     private InventoryListItem _currentSelectedItem;
     
     public List<InventoryListItem> InventoryListItems => _inventoryListItems;
-    public int CurrentIndex => _selectedIndex;
+    public int CurrentIndex => _selectedIndex;// 
 
     public void SetPlayer(Player player)
     {
