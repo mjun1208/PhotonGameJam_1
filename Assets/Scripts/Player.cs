@@ -172,6 +172,8 @@ public partial class Player : NetworkBehaviour
             return;
         }
 
+        Global.Instance.MyPlayer = this;
+
         _inventoryBar.SetPlayer(this);
         _inventoryUI.SetUpInventory();
         
@@ -327,6 +329,41 @@ public partial class Player : NetworkBehaviour
                 Global.Instance.IngameActivingCursor = false; 
             }
         }
+
+        if (Input.GetMouseButtonDown(0) && _lookingBonfire != null && !_inventoryUI.gameObject.activeSelf)
+        {
+            _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+            RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
+
+            if (_inventoryUI.gameObject.activeSelf)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                _inventoryUI.OnClickCook();
+
+                Global.Instance.IngameActivingCursor = true;
+            }
+            else
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                
+                Global.Instance.IngameActivingCursor = false; 
+            }
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Escape) && _inventoryUI.gameObject.activeSelf && !Global.Instance.MenuCanvas.activeSelf)
+        {
+            _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+            RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
+            
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+                
+            Global.Instance.IngameActivingCursor = false; 
+        }
         
         // if (Input.GetKeyDown(KeyCode.R))
         // {
@@ -337,6 +374,35 @@ public partial class Player : NetworkBehaviour
         //         _inventoryUI.OnClickInventoryTab();
         //     }
         // }
+    }
+
+    public void CloseInven()
+    {
+        _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+        RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
+
+        if (_inventoryUI.gameObject.activeSelf)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            _inventoryUI.OnClickInventoryTab();
+
+            Global.Instance.IngameActivingCursor = true;
+        }
+        else
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+                
+            Global.Instance.IngameActivingCursor = false; 
+        }
+    }
+    
+    // Local Only
+    public bool IsInvenOpen()
+    {
+        return _inventoryUI.gameObject.activeSelf;
     }
 
     private void FixedUpdate()
@@ -518,7 +584,7 @@ public partial class Player : NetworkBehaviour
 
         if (HasInputAuthority)
         {
-            GetTree();
+            // GetTree();
             GetLog();
             GetBonFire();
         }

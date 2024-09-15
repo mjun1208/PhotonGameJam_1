@@ -57,6 +57,8 @@ public class Global : MonoBehaviour
 
     public bool IngameActivingCursor = true;
 
+    public Player MyPlayer = null;
+
     public void SetBasicSpawner(BasicSpawner basicSpawner)
     {
         if (BasicSpawner != null)
@@ -84,7 +86,7 @@ public class Global : MonoBehaviour
     }
 
     [SerializeField] private GameObject FailCanvas;
-    [SerializeField] private GameObject MenuCanvas;
+    public GameObject MenuCanvas;
 
     public void RoomEnterFail()
     {
@@ -100,6 +102,11 @@ public class Global : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (MyPlayer != null && MyPlayer.IsInvenOpen() && !MenuCanvas.activeSelf)
+            {
+                return;
+            }
+
             MenuCanvas.SetActive(!MenuCanvas.activeSelf);
 
             if (!MenuCanvas.activeSelf)

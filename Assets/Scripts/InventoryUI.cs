@@ -236,6 +236,11 @@ public partial class InventoryUI : MonoBehaviour
             if (slot.InventoryBar != null)
             {
                 slot.InventoryBar.InventoryListItems[slot.InventoryBarIndex].SetInventoryItem(slot);
+                
+                if (slot.InventoryBar.CurrentIndex == slot.InventoryBarIndex)
+                {
+                    slot.InventoryBar.SelectItem(slot.InventoryBarIndex);
+                }
             }
 
             return true;
@@ -272,6 +277,11 @@ public partial class InventoryUI : MonoBehaviour
                     if (inventoryListItem.InventoryBar != null)
                     {
                         inventoryListItem.InventoryBar.InventoryListItems[inventoryListItem.InventoryBarIndex].SetInventoryItem(inventoryListItem);
+                        
+                        if (inventoryListItem.InventoryBar.CurrentIndex == inventoryListItem.InventoryBarIndex)
+                        {
+                            inventoryListItem.InventoryBar.SelectItem(inventoryListItem.InventoryBarIndex);
+                        }
                     }
                 }
             }

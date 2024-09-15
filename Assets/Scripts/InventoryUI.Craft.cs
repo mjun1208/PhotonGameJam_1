@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public partial class InventoryUI : MonoBehaviour
@@ -7,6 +8,10 @@ public partial class InventoryUI : MonoBehaviour
     [SerializeField] private CraftInfo _craftInfo;
     [SerializeField] private Player _player;
     [SerializeField] private CraftEnd _craftEnd;
+    [SerializeField] private Transform _recipeListParent;
+    [SerializeField] private CraftRecipeListItem _originCraftRecipeListItem;
+
+    private List<CraftRecipeListItem> _craftRecipeListItems = new List<CraftRecipeListItem>();
 
     public List<CraftRecipe> CraftRecipes = new List<CraftRecipe>()
     {
@@ -22,9 +27,38 @@ public partial class InventoryUI : MonoBehaviour
             }
         }
     };
+    
+    public List<CraftRecipe> CookRecipes = new List<CraftRecipe>()
+    {
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.CornSoup,
+            Name = "옥수수 죽",
+            Desc = "",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            }
+        },
+    };
 
     private CraftRecipe _craftRecipe = null;
 
+    public void OnClickCook()
+    {
+        _inventoryTab = InventoryTab.Craft;
+        
+        _craftTabButton.color = Color.white;
+        _inventoryTabButton.color = Color.gray;
+        
+        _craftGroup.SetActive(true);
+        _inventoryGroup.SetActive(false);
+        
+        SetRecipes(CookRecipes);
+        
+        OnClickRecipe(CookRecipes[0]);
+    }
+    
     public void OnClickCraftTab()
     {
         _inventoryTab = InventoryTab.Craft;
@@ -35,7 +69,38 @@ public partial class InventoryUI : MonoBehaviour
         _craftGroup.SetActive(true);
         _inventoryGroup.SetActive(false);
 
+        SetRecipes(CraftRecipes);
+
         OnClickRecipe(CraftRecipes[0]);
+    }
+
+    private void SetRecipes(List<CraftRecipe> craftRecipes)
+    {
+        _craftRecipeListItems.ForEach(x=> x.gameObject.SetActive(false));
+
+        for (int i = 0; i < craftRecipes.Count; i++)
+        {
+            if (i > _craftRecipeListItems.Count - 1)
+            {
+                var newRecipeListItem =  Instantiate(_originCraftRecipeListItem, _recipeListParent);
+                _craftRecipeListItems.Add(newRecipeListItem);
+            }
+
+            _craftRecipeListItems[i].SetInventoryUI(this, craftRecipes[i], OnClickRecipe);
+            _craftRecipeListItems[i].SetCraftAble(CraftAble(craftRecipes[i]));
+            _craftRecipeListItems[i].gameObject.SetActive(true);
+        }
+    }
+
+    private void UpdateRecipes()
+    {
+        _craftRecipeListItems.ForEach(x=>
+        {
+            if (x.gameObject.activeSelf)
+            {
+                x.SetCraftAble(CraftAble(x.GetRecipe));
+            }
+        });
     }
 
     public int GetInventoryItemCount(InventoryItemType type)
@@ -94,6 +159,7 @@ public partial class InventoryUI : MonoBehaviour
         
         _craftEnd.Show(_craftRecipe);
         
+        UpdateRecipes();
         // _player.ShowNotice("제작 완료", Color.green);
     }
 

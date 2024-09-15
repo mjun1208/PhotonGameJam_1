@@ -65,6 +65,8 @@ public partial class Player
                     {
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                         RpcSpawnBonFire(_shootPosition);
+                        
+                        _inventoryUI.RemoveItem(InventoryItemType.BonFire, 1);
                     }
                 }
             }
