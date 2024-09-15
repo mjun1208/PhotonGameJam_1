@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Fusion;
 using Fusion.Addons.SimpleKCC;
 using Photon.Voice.Unity;
@@ -38,6 +41,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private FishWeapon _spawnFish;
     [SerializeField] private TMP_Text _nameText;
     [SerializeField] private ParticleSystem _equipFx;
+    [SerializeField] private TMP_Text _noticeText;
     
     [SerializeField] private Renderer _pants;
     [SerializeField] private List<Renderer> _hideBody;
@@ -161,12 +165,15 @@ public partial class Player : NetworkBehaviour
         OnChangedPlayerType();
         OnChangedMyName();
 
+        Equip(_inventoryItemType, _inventoryItemType == InventoryItemType.None);
+
         if (!HasInputAuthority)
         {
             return;
         }
 
         _inventoryBar.SetPlayer(this);
+        _inventoryUI.SetUpInventory();
         
         _nameText.gameObject.SetActive(false);
         RpcSetMyName(Global.Instance.MyName);
@@ -298,9 +305,11 @@ public partial class Player : NetworkBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E)  && !_isFishing)
         {
             _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+            RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
 
             if (_inventoryUI.gameObject.activeSelf)
             {
@@ -342,8 +351,11 @@ public partial class Player : NetworkBehaviour
     {
         var inputData = GetInput<NetworkInputData>().GetValueOrDefault();
 
-        _simpleKCC.AddLookRotation(inputData.lookDelta);
-        
+        if (!BlockByInventory())
+        {
+            _simpleKCC.AddLookRotation(inputData.lookDelta);
+        }
+
         if (!_isFishing)
         {
             Look();
@@ -397,6 +409,11 @@ public partial class Player : NetworkBehaviour
             }
         }
 
+        if (BlockByInventory())
+        {
+            return;
+        }
+        
         TreeUpdate(inputData);
 
         // if (_playerType == PlayerType.Fisher)
@@ -459,6 +476,14 @@ public partial class Player : NetworkBehaviour
                 }
             }
         }
+    }
+
+    private bool LookingWho()
+    {
+        bool looking = _lookingBonfire != null || _lookingLog != null ||
+                       _lookingFishWeapon != null;
+
+        return looking;
     }
 
     public override void Render()
@@ -544,6 +569,12 @@ public partial class Player : NetworkBehaviour
 
     private void SetAnimation()
     {
+        if (BlockByInventory())
+        {
+            _animator.SetBool("Move", false);
+            return;
+        }
+
         if (_networkedMoveDirection.sqrMagnitude > 0)
         {
             _animator.SetBool("Move", true);
@@ -565,6 +596,11 @@ public partial class Player : NetworkBehaviour
 
     private void Move(NetworkInputData networkInputData)
     {
+        if (BlockByInventory())
+        {
+            return;
+        }
+        
         if (_isFishing)
         {
             return;
@@ -599,6 +635,11 @@ public partial class Player : NetworkBehaviour
     /// </summary>
     private void Look()
     {
+        if (BlockByInventory())
+        {
+            return;
+        }
+
         var input = _simpleKCC.GetLookRotation(true, true);
 
         _cameraRotation = new Vector3(input.x, input.y);
@@ -680,7 +721,7 @@ public partial class Player : NetworkBehaviour
             }
 
             // if (_playerType == PlayerType.Farmer)
-            if (_inventoryItemType == InventoryItemType.Shovel || _inventoryItemType == InventoryItemType.Log)
+            if (_inventoryItemType == InventoryItemType.Shovel || _inventoryItemType == InventoryItemType.BonFire)
             {
                 if (_fish_ghost.activeSelf)
                 {
@@ -705,7 +746,7 @@ public partial class Player : NetworkBehaviour
                         }
                     }
            
-                    if (_inventoryItemType == InventoryItemType.Log)
+                    if (_inventoryItemType == InventoryItemType.BonFire)
                     {
                         BonFireRender();
                         _shootType = ShootType.Bonfire;
@@ -1074,5 +1115,46 @@ public partial class Player : NetworkBehaviour
         _fishRod.SetActive(false);
         _seedBag.SetActive(false);
         _axe.gameObject.SetActive(false);   
+    }
+
+    private bool BlockByInventory()
+    {
+        if (HasInputAuthority && _inventoryUI.gameObject.activeSelf)
+        {
+            return true;
+        }
+
+        if (_isInventoryOpen)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private CancellationTokenSource _noticeCts;
+    
+    public async void ShowNotice(string text, Color color)
+    {
+        _noticeText.text = text;
+        _noticeText.color = color;
+
+        if (_noticeCts != null)
+        {
+            _noticeCts.Cancel();
+        }
+
+        _noticeCts = new CancellationTokenSource();
+
+        try
+        {
+            await _noticeText.DOFade(1, 0.2f).ToUniTask(cancellationToken: _noticeCts.Token);
+            await UniTask.Delay(500, cancellationToken: _noticeCts.Token);
+            await _noticeText.DOFade(0, 0.2f).ToUniTask(cancellationToken: _noticeCts.Token);
+        }
+        catch (OperationCanceledException e)
+        {
+            return;
+        }
     }
 }

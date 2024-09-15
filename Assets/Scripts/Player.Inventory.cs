@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -7,12 +5,20 @@ public partial class Player
 {
     [SerializeField] private InventoryBar _inventoryBar;
     [SerializeField] private InventoryUI _inventoryUI;
-    private InventoryItemType _inventoryItemType { get; set; }
+    [Networked] private InventoryItemType _inventoryItemType { get; set; }
+    
+    [Networked] private NetworkBool _isInventoryOpen { get; set; } = false;
 
     // public void OnChangedEquipItem()
     // {
     //     Equip(_inventoryItemType);
     // }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcOpenInventoryUI(bool isOpen)
+    {
+        _isInventoryOpen = isOpen;
+    }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcEquipToServer(InventoryItemType inventoryItemType, bool isEmpty)
@@ -35,8 +41,9 @@ public partial class Player
 
         SetToolFalse();
 
-        if (isEmpty)
+        if (isEmpty || inventoryItemType == InventoryItemType.None)
         {
+            _inventoryItemType = InventoryItemType.None;
             return;
         }
 
@@ -66,6 +73,10 @@ public partial class Player
             case InventoryItemType.Axe:
             {
                 _axe.gameObject.SetActive(true);   
+                break;
+            }
+            case InventoryItemType.BonFire:
+            {
                 break;
             }
             case InventoryItemType.Log:

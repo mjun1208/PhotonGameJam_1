@@ -1,18 +1,18 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public enum InventoryItemType
 {
-    Shovel,
-    SeedBag,
-    FishRod,
-    Fish,
-    Axe,
-    Log,
+    None = -1,
+    Shovel = 0,
+    SeedBag = 1,
+    FishRod = 2,
+    Fish = 3,
+    Axe = 4,
+    BonFire = 5,
+    Log = 6,
     Dummy_6,
     Dummy_7,
     Dummy_8,
@@ -24,11 +24,15 @@ public class InventoryListItem : MonoBehaviour
     [SerializeField] private Image _iconImage;
     [SerializeField] private List<Sprite> _itemIcons;
     [SerializeField] private InventoryListItemDrag _drag;
+    [SerializeField] private TMP_Text _itemCountText;
+    
     private Player _player;
-    private InventoryItemType _inventoryItemType;
+    private InventoryItemType _inventoryItemType = InventoryItemType.None;
     public InventoryUI InventoryUI { get; set; } = null;
     public InventoryBar InventoryBar { get; set; } = null;
     public int InventoryBarIndex { get; set; } = -1;
+    
+    public int ItemCount { get; set; } = 0;
     
     public bool Empty { get; set; } = true;
  
@@ -42,12 +46,26 @@ public class InventoryListItem : MonoBehaviour
         }
     }
 
-    public void SetInventoryItemType(InventoryItemType inventoryItemType)
+    public void SetInventoryItem(InventoryListItem inventoryListItem)
+    {
+        SetInventoryItemType(inventoryListItem.GetInventoryItemType, inventoryListItem.ItemCount);
+    }
+    
+    public void SetInventoryItemType(InventoryItemType inventoryItemType, int itemCount)
     {
         _inventoryItemType = inventoryItemType;
+        ItemCount = itemCount;
+        
+        if (inventoryItemType == InventoryItemType.None)
+        {
+            SetEmpty();
+            return;
+        }
+        
         _iconImage.sprite = _itemIcons[(int)inventoryItemType];
         _iconImage.gameObject.SetActive(true);
         Empty = false;
+        _itemCountText.text = $"{itemCount}";
 
         if (_drag != null)
         {
@@ -75,6 +93,7 @@ public class InventoryListItem : MonoBehaviour
     public void SetEmpty(bool dragging = false)
     {
         _iconImage.gameObject.SetActive(false);
+        _itemCountText.text = "";
         Empty = true;
 
         if (!dragging)

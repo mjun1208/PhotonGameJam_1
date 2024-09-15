@@ -15,7 +15,7 @@ public partial class Player
 
     private void TreeUpdate(NetworkInputData inputData)
     {
-        if (_inventoryItemType == InventoryItemType.Axe)
+        if (_inventoryItemType == InventoryItemType.Axe && !LookingWho())
         {
             if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
@@ -27,8 +27,28 @@ public partial class Player
                 _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
             }
         }
-
+        
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        {
+            if (HasInputAuthority)
+            {
+                if (_lookingLog != null)
+                {
+                    if (_inventoryUI.AddItem(InventoryItemType.Log, 1))
+                    {
+                        _lookingLog.gameObject.SetActive(false);
+
+                        RpcGetLogInputToState(_lookingLog);
+                        
+                        _lookingLog = null;
+                        
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    }
+                }
+            }
+        }
+
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0) && !LookingWho())
         {
             if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
             {
@@ -49,6 +69,12 @@ public partial class Player
                 }
             }
         }
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RpcGetLogInputToState(Log log)
+    {
+        Runner.Despawn(log.GetComponent<NetworkObject>());
     }
     
     private void BonFireRender()
@@ -155,8 +181,8 @@ public partial class Player
     {
         LayerMask logLayer = 1 << LayerMask.NameToLayer("Log");
 
-        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward,
-                out RaycastHit hit, InteractionRayCastDistance))
+        if (Physics.SphereCast(_playerCameraRootTransform.transform.position, 0.25f, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
+                InteractionRayCastDistance, logLayer))
         {
             var log = hit.transform.GetComponent<Log>();
             if (log)
