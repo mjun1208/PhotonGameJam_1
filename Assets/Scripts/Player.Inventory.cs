@@ -83,9 +83,7 @@ public partial class Player
             {
                 break;
             }
-            case InventoryItemType.Dummy_6:
-            case InventoryItemType.Dummy_7:
-            case InventoryItemType.Dummy_8:
+            default:
             {
                 break;
             }

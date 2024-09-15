@@ -13,9 +13,7 @@ public enum InventoryItemType
     Axe = 4,
     BonFire = 5,
     Log = 6,
-    Dummy_6,
-    Dummy_7,
-    Dummy_8,
+    CornSoup = 7,
 }
 
 public class InventoryListItem : MonoBehaviour
