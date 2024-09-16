@@ -1,4 +1,5 @@
 using Fusion;
+using TMPro;
 using UnityEngine;
 
 public partial class Player
@@ -7,7 +8,7 @@ public partial class Player
     [SerializeField] private GameObject _logFx;
     [SerializeField] private BonFire _bonfire;
     [SerializeField] private GameObject _bonFire_Ghost;
-    [SerializeField] private GameObject _interactionText;
+    [SerializeField] private TMP_Text _interactionText;
     
     private Tree _lookingTree;
     private Log _lookingLog;
@@ -30,7 +31,7 @@ public partial class Player
         
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
-            if (HasInputAuthority)
+            if (HasInputAuthority && CanClick)
             {
                 if (_lookingLog != null)
                 {
@@ -38,7 +39,8 @@ public partial class Player
                     {
                         _lookingLog.gameObject.SetActive(false);
 
-                        RpcGetLogInputToState(_lookingLog);
+                        var networkObject = _lookingLog.GetComponent<NetworkObject>();
+                        RpcGetLogInputToState(networkObject);
                         
                         _lookingLog = null;
                         
@@ -50,7 +52,7 @@ public partial class Player
 
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0) && !LookingWho())
         {
-            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
+            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner) && CanClick)
             {
                 if (_lookingBonfire != null)
                 {
@@ -74,9 +76,10 @@ public partial class Player
     }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RpcGetLogInputToState(Log log)
+    private void RpcGetLogInputToState(NetworkObject log)
     {
-        Runner.Despawn(log.GetComponent<NetworkObject>());
+        Debug.Log(log.Id);
+        Runner.Despawn(log);
     }
     
     private void BonFireRender()
@@ -104,7 +107,7 @@ public partial class Player
         
         if (_shootAble && _shootType == ShootType.Bonfire)
         {
-            Runner.Spawn(_bonfire, shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+            Runner.Spawn(_bonfire, shootPosition, Quaternion.LookRotation(_forward), Object.StateAuthority);
         }
     }
 
@@ -114,7 +117,7 @@ public partial class Player
         
         if (HasStateAuthority)
         {
-            var spawnedlog = Runner.Spawn(_log, hitPosition, Quaternion.LookRotation(lookPos), Object.InputAuthority);
+            var spawnedlog = Runner.Spawn(_log, hitPosition, Quaternion.LookRotation(lookPos), Object.StateAuthority);
         }
         
         targetTree.Hit();
@@ -170,11 +173,15 @@ public partial class Player
 
         if (_lookingBonfire != null)
         {
-            _interactionText.gameObject.SetActive(true);
+            _interactionText.text = "클릭 - 제작하기";
+            _interactionText.transform.parent.gameObject.SetActive(true);
         }
         else
         {
-            _interactionText.gameObject.SetActive(false);
+            if (_lookingNpc == null)
+            {
+                _interactionText.transform.parent.gameObject.SetActive(false);
+            }
         }
     }
 

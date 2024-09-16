@@ -70,6 +70,7 @@ public partial class Player : NetworkBehaviour
         Dirt,
         Fishing,
         Bonfire,
+        Table,
     }
 
     private Vector3 _forward = Vector3.forward;
@@ -91,6 +92,12 @@ public partial class Player : NetworkBehaviour
     private bool _plantAble = false;
     
     private bool _isEquipWeapon = false;
+
+
+    private DateTime _lastClickTime;
+    private float _localInputDelay = 0.1f;
+
+    private bool CanClick => (DateTime.UtcNow - _lastClickTime).TotalSeconds > _localInputDelay;
 
     [Networked]
     private Vector3 _networkedMoveDirection { get; set; }
@@ -329,6 +336,11 @@ public partial class Player : NetworkBehaviour
                 Global.Instance.IngameActivingCursor = false; 
             }
         }
+        
+        if (Input.GetMouseButtonDown(0) && CanClick)
+        {
+            _lastClickTime = DateTime.UtcNow;
+        }
 
         if (Input.GetMouseButtonDown(0) && _lookingBonfire != null && !_inventoryUI.gameObject.activeSelf)
         {
@@ -447,7 +459,7 @@ public partial class Player : NetworkBehaviour
                     
                     if (HasStateAuthority)
                     {
-                        var spawnedFish = Runner.Spawn(_spawnFish, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.InputAuthority);
+                        var spawnedFish = Runner.Spawn(_spawnFish, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.StateAuthority);
                         spawnedFish.Fished();
                     }
                 }
@@ -479,7 +491,8 @@ public partial class Player : NetworkBehaviour
         {
             return;
         }
-        
+
+        NpcUpdate(inputData);
         TreeUpdate(inputData);
 
         // if (_playerType == PlayerType.Fisher)
@@ -547,7 +560,7 @@ public partial class Player : NetworkBehaviour
     private bool LookingWho()
     {
         bool looking = _lookingBonfire != null || _lookingLog != null ||
-                       _lookingFishWeapon != null;
+                       _lookingFishWeapon != null || _lookingNpc != null;
 
         return looking;
     }
@@ -585,6 +598,7 @@ public partial class Player : NetworkBehaviour
         if (HasInputAuthority)
         {
             // GetTree();
+            GetNpc();
             GetLog();
             GetBonFire();
         }
@@ -774,6 +788,7 @@ public partial class Player : NetworkBehaviour
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
         LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
         LayerMask waterMask = 1 << LayerMask.NameToLayer("Water");
+        LayerMask tableMask = 1 << LayerMask.NameToLayer("Table");
 
         int layer = groundMask | dirtMask | waterMask;
         
@@ -784,6 +799,22 @@ public partial class Player : NetworkBehaviour
             {
                 NotShowingGround();
                 return;
+            }
+
+            if (_inventoryItemType == InventoryItemType.Table)
+            {
+                _shootPosition = hit.point;
+                _shootAble = true;
+
+                TableRender(hit.transform.gameObject.layer != LayerMask.NameToLayer("Table"));
+                _shootType = ShootType.Table;
+            }
+            else
+            {
+                if (_table_Ghost.gameObject.activeSelf)
+                {
+                    _table_Ghost.gameObject.SetActive(false);
+                }
             }
 
             // if (_playerType == PlayerType.Farmer)
@@ -881,6 +912,10 @@ public partial class Player : NetworkBehaviour
             {
                 _bonFire_Ghost.SetActive(false);
             }
+            if (_table_Ghost.gameObject.activeSelf)
+            {
+                _table_Ghost.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -930,7 +965,7 @@ public partial class Player : NetworkBehaviour
         
         if (_shootAble && _shootType == ShootType.Dirt)
         {
-            Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.InputAuthority);
+            Runner.Spawn(_dirt, _shootPosition, Quaternion.LookRotation(_forward), Object.StateAuthority);
         }
 
         _isDigging = false;

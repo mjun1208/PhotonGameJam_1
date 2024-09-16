@@ -5,7 +5,7 @@ public partial class Player
 {
     [SerializeField] private InventoryBar _inventoryBar;
     [SerializeField] private InventoryUI _inventoryUI;
-    [Networked] private InventoryItemType _inventoryItemType { get; set; }
+    private InventoryItemType _inventoryItemType { get; set; }
     
     [Networked] private NetworkBool _isInventoryOpen { get; set; } = false;
 
@@ -23,6 +23,8 @@ public partial class Player
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcEquipToServer(InventoryItemType inventoryItemType, bool isEmpty)
     {
+        Equip(inventoryItemType, isEmpty);
+        
         RpcEquipToAll(inventoryItemType, isEmpty);
     }
 
@@ -37,6 +39,23 @@ public partial class Player
         if (_inventoryItemType != inventoryItemType)
         {
             _inventoryItemType = inventoryItemType;
+        }
+
+        if (inventoryItemType == InventoryItemType.Table)
+        {
+            if (HasInputAuthority)
+            {
+                Global.Instance.IngameManager.IsTabling = true;
+                Global.Instance.IngameManager.Tables.ForEach(x=> x.ShowSizeObject(true));
+            }
+        }
+        else
+        {
+            if (HasInputAuthority)
+            {
+                Global.Instance.IngameManager.IsTabling = false;
+                Global.Instance.IngameManager.Tables.ForEach(x=> x.ShowSizeObject(false));
+            }
         }
 
         SetToolFalse();
@@ -80,6 +99,10 @@ public partial class Player
                 break;
             }
             case InventoryItemType.Log:
+            {
+                break;
+            }
+            case InventoryItemType.Table:
             {
                 break;
             }

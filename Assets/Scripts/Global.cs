@@ -49,6 +49,7 @@ public class Global : MonoBehaviour
 
     public PrefabSpawner PrefabSpawner { get; set; }
     public ChatManager ChatManager { get; set; }
+    public IngameManager IngameManager { get; set; }
     
     public KingDino KingDino { get; set; }
 

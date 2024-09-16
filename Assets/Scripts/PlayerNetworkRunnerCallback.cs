@@ -21,8 +21,6 @@ public class PlayerNetworkRunnerCallback : MonoBehaviour, INetworkRunnerCallback
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData();
-        
-        Debug.Log(runner.IsPlayer);
 
         if (Input.GetKey(KeyCode.W))
             data.direction += Vector3.forward;

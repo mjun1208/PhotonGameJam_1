@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public partial class InventoryUI : MonoBehaviour
 {
@@ -12,35 +12,6 @@ public partial class InventoryUI : MonoBehaviour
     [SerializeField] private CraftRecipeListItem _originCraftRecipeListItem;
 
     private List<CraftRecipeListItem> _craftRecipeListItems = new List<CraftRecipeListItem>();
-
-    public List<CraftRecipe> CraftRecipes = new List<CraftRecipe>()
-    {
-        new CraftRecipe()
-        {
-            ResultItem = InventoryItemType.BonFire,
-            Name = "모닥불",
-            Desc = "뜨끈뜨끈 하다.\n여기서 요리를 할 수 있을 것 같다",
-            Material = new Dictionary<InventoryItemType, int>()
-            {
-                {InventoryItemType.Log, 5},
-                {InventoryItemType.Axe, 1}
-            }
-        }
-    };
-    
-    public List<CraftRecipe> CookRecipes = new List<CraftRecipe>()
-    {
-        new CraftRecipe()
-        {
-            ResultItem = InventoryItemType.CornSoup,
-            Name = "옥수수 죽",
-            Desc = "",
-            Material = new Dictionary<InventoryItemType, int>()
-            {
-                {InventoryItemType.Log, 1},
-            }
-        },
-    };
 
     private CraftRecipe _craftRecipe = null;
 
@@ -54,9 +25,9 @@ public partial class InventoryUI : MonoBehaviour
         _craftGroup.SetActive(true);
         _inventoryGroup.SetActive(false);
         
-        SetRecipes(CookRecipes);
+        SetRecipes(CraftRecipeManager.CookRecipes);
         
-        OnClickRecipe(CookRecipes[0]);
+        OnClickRecipe(CraftRecipeManager.CookRecipes[0]);
     }
     
     public void OnClickCraftTab()
@@ -69,9 +40,9 @@ public partial class InventoryUI : MonoBehaviour
         _craftGroup.SetActive(true);
         _inventoryGroup.SetActive(false);
 
-        SetRecipes(CraftRecipes);
+        SetRecipes(CraftRecipeManager.CraftRecipes);
 
-        OnClickRecipe(CraftRecipes[0]);
+        OnClickRecipe(CraftRecipeManager.CraftRecipes[0]);
     }
 
     private void SetRecipes(List<CraftRecipe> craftRecipes)
@@ -188,4 +159,77 @@ public class CraftRecipe
     //     
     //     return false;
     // }
+}
+
+public static class CraftRecipeManager
+{
+    public static List<CraftRecipe> CraftRecipes = new List<CraftRecipe>()
+    {
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.BonFire,
+            Name = "모닥불",
+            Desc = "뜨끈뜨끈 하다.\n여기서 요리를 할 수 있을 것 같다",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 5},
+            }
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.Table,
+            Name = "테이블",
+            Desc = "손님 맞을 준비 OK?",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            }
+        },
+    };
+    
+    public static List<CraftRecipe> CookRecipes = new List<CraftRecipe>()
+    {
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.CornSoup,
+            Name = "옥수수 죽",
+            Desc = "옥수수를 끓여 만든 옥수수 죽.\n간단하게 만들수 있어서 최고~",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            }
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.BlueCornBread,
+            Name = "파란 옥수수 빵",
+            Desc = "파란 옥수수로 만든 빵이다.\n왜 이 세상의 옥수수는 파란색인걸까!!!",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            }
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.SharkJuice,
+            Name = "상어 주스",
+            Desc = "상어로 주스를 만들다니?",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            }
+        },
+    };
+
+    public static CraftRecipe GetRecipe(InventoryItemType type)
+    {
+        var find = CraftRecipes.FirstOrDefault(x => x.ResultItem == type);
+        
+        if (find == null)
+        {
+            find = CookRecipes.FirstOrDefault(x => x.ResultItem == type);
+        }
+        
+        return find;
+    }
 }

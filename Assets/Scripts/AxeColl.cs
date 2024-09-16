@@ -21,6 +21,11 @@ public class AxeColl : MonoBehaviour
 
     public void OnTrigger(Collider other)
     {
+        if (other.GetComponent<Tree>() == null)
+        {
+            return;
+        }
+        
         var dir = other.ClosestPoint(this.transform.position) - transform.position;
         _axe.CutTree(other.ClosestPoint(this.transform.position), dir.normalized, other.GetComponent<Tree>());
     }

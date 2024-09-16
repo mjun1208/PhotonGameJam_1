@@ -5,7 +5,7 @@ using UnityEngine;
 public class FloatingUI : MonoBehaviour
 {
     private Camera _mainCamera;
-    private Vector3 _offset = new Vector3(0, 180, 0);
+    private Vector3 _offset = new Vector3(-15, 180, 0);
     // Start is called before the first frame update
     void Start()
     {

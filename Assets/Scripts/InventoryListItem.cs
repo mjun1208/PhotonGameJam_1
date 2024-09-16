@@ -14,6 +14,9 @@ public enum InventoryItemType
     BonFire = 5,
     Log = 6,
     CornSoup = 7,
+    BlueCornBread = 8,
+    SharkJuice = 9,
+    Table = 10,
 }
 
 public class InventoryListItem : MonoBehaviour
