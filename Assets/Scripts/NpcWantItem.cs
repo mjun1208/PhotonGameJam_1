@@ -4,6 +4,14 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+[Serializable]
+public struct NpcWantItem_Networked
+{
+    public InventoryItemType WantCraftRecipe;
+    public bool IsSuccess;
+    public bool IsFail;
+}
+
 public class NpcWantItem : MonoBehaviour
 {
     [SerializeField] private InventoryListItem _icon;
@@ -38,5 +46,15 @@ public class NpcWantItem : MonoBehaviour
     {
         IsFail = true;
         _failImage.SetActive(true);
+    }
+
+    public NpcWantItem_Networked ToNetworked()
+    {
+        return new NpcWantItem_Networked
+        {
+            WantCraftRecipe = this.WantCraftRecipe.ResultItem,
+            IsSuccess = this.IsSuccess,
+            IsFail = this.IsFail,
+        };
     }
 }

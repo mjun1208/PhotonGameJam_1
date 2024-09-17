@@ -40,12 +40,12 @@ public partial class Player
                     {
                         if (!_tableYes)
                         {
-                            ShowNotice("다른 테이블과 겹치는 공간에 설치할 수 없습니다.", Color.red);
+                            ShowNotice("설치 할 수 없는 공간입니다.", Color.red);
                             return;
                         }
                         
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
-                        RpcSpawnTable(_shootPosition);
+                        RpcSpawnTable(_shootPosition, _table_Ghost.transform.rotation);
                         
                         _inventoryUI.RemoveItem(InventoryItemType.Table, 1);
                     }
@@ -159,7 +159,7 @@ public partial class Player
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RpcSpawnTable(Vector3 shootPosition)
+    public void RpcSpawnTable(Vector3 shootPosition, Quaternion shootRotation)
     {
         if (!HasStateAuthority)
         {
@@ -168,7 +168,7 @@ public partial class Player
         
         if (_shootAble && _shootType == ShootType.Table)
         {
-            Runner.Spawn(_table, shootPosition, Quaternion.LookRotation(_forward), Object.StateAuthority);
+            Runner.Spawn(_table, shootPosition, shootRotation, Object.StateAuthority);
         }
     }
 }

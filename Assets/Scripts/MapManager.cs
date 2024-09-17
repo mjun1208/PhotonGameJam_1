@@ -11,19 +11,19 @@ public class MapManager : MonoBehaviour
 
     public void UpdateMap()
     {
-        _navMeshSurfaceList[index].BuildNavMesh();
-        SetNextIndex();
+        // _navMeshSurfaceList[index].BuildNavMesh();
+        // SetNextIndex();
     }
 
     private void SetNextIndex()
     {
-        if (index == 0)
+        if (index == _navMeshSurfaceList.Count - 1)
         {
-            index = 1;
+            index = 0;
         }
         else
         {
-            index = 0;
+            index++;
         }
     }
 }

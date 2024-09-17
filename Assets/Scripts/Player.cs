@@ -806,7 +806,7 @@ public partial class Player : NetworkBehaviour
                 _shootPosition = hit.point;
                 _shootAble = true;
 
-                TableRender(hit.transform.gameObject.layer != LayerMask.NameToLayer("Table"));
+                TableRender(hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground"));
                 _shootType = ShootType.Table;
             }
             else
