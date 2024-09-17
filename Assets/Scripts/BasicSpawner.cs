@@ -106,6 +106,12 @@ public class BasicSpawner : MonoBehaviour
     public void SetHostInfo()
     {
         Global.Instance.MyName = _hostInput.text;
+        
+        if (string.IsNullOrWhiteSpace(Global.Instance.MyName))
+        {
+            Global.Instance.MyName = "방장";
+        }
+        
         RoomName = GetRandomString();
 
         StartHost();
@@ -114,6 +120,11 @@ public class BasicSpawner : MonoBehaviour
     public void SetClientInfo()
     {
         Global.Instance.MyName = _clientNameInput.text;
+
+        if (string.IsNullOrWhiteSpace(Global.Instance.MyName))
+        {
+            Global.Instance.MyName = "플레이어";
+        }
         RoomName = _clientRoomInput.text;
 
         StartClient();

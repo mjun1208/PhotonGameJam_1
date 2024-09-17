@@ -17,7 +17,9 @@ public class InventoryBar : MonoBehaviour
         _inventoryListItems.ForEach(x=> x.SetPlayer(player));
         
         // TestCow
-        _inventoryListItems[0].SetInventoryItemType(InventoryItemType.Table, 300);
+        _inventoryListItems[0].SetInventoryItemType(InventoryItemType.Axe, 1);
+        _inventoryListItems[1].SetInventoryItemType(InventoryItemType.BonFire, 300);
+        _inventoryListItems[2].SetInventoryItemType(InventoryItemType.Table, 300);
         // _inventoryListItems.ForEach(x=> x.SetInventoryItemType((InventoryItemType)_inventoryListItems.IndexOf(x), 1));
 
         SelectItem(0);

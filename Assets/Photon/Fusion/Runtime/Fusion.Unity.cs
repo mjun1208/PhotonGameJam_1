@@ -1,3 +1,5 @@
+using UnityEngine.SceneManagement;
+
 #if !FUSION_DEV
 
 #region Assets/Photon/Fusion/Runtime/AssemblyAttributes/FusionAssemblyAttributes.Common.cs
@@ -860,10 +862,17 @@ namespace Fusion {
       } finally {
         _builder.Clear();
       }
-
+      
       switch (logType) {
         case LogType.Error:
           Debug.LogError(fullMessage, IsInMainThread ? obj : null);
+
+          if (message.ToString().Contains("Code: 104"))
+          {
+            // 서버와의 연결이 끊겼을 때 처리
+            Debug.Log("서버와의 연결이 끊겼습니다.");
+            SceneManager.LoadScene("Title");
+          }
           break;
         case LogType.Warn:
           Debug.LogWarning(fullMessage, IsInMainThread ? obj : null);

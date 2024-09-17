@@ -12,6 +12,8 @@ public class IngameManager : MonoBehaviour
     public MapManager MapManager;
     public Transform NpcSpawnPosition;
 
+    public int RewardCount = 0;
+    
     public int MaxTable = 10;
     public bool IsTabling = false;
 

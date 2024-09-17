@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9024763078433543243}
   - component: {fileID: 2369481059277494495}
   - component: {fileID: 2792676132639013242}
-  m_Layer: 25
+  m_Layer: 26
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 4980334722679749484}
   - component: {fileID: 5403488885205333849}
   - component: {fileID: 3925491202477911307}
-  m_Layer: 25
+  m_Layer: 26
   m_Name: Table_Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}

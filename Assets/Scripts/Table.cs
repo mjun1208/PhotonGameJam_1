@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
+using TMPro;
 using UnityEngine;
 
 public class Table : NetworkBehaviour
@@ -14,6 +15,16 @@ public class Table : NetworkBehaviour
     
     public GameObject SizeObject;
 
+    [SerializeField] private GameObject _rewardObject;
+    [SerializeField] private TMP_Text _rewardText;
+    [SerializeField] private Outline _outline;
+    [Networked, OnChangedRender(nameof(SetNetworkedRewardCount))] public int RewardCount { get; set; }
+
+    public void Look(bool look)
+    {
+        _outline.enabled = look;
+    }
+    
     public override void Spawned()
     {
         base.Spawned();
@@ -42,6 +53,7 @@ public class Table : NetworkBehaviour
         
         var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
         npc.TargetSit = GetEmptySit();
+        npc.TargetTable = this;
     }
 
     public Transform GetEmptySit()
@@ -67,5 +79,44 @@ public class Table : NetworkBehaviour
     public void ShowSizeObject(bool show)
     {
         SizeObject.SetActive(show);
+    }
+
+    public void ReceiveReward()
+    {
+        SetReward(0);
+    }
+
+    public void SetReward(int count)
+    {
+        RewardCount = count;
+        _rewardText.text = count.ToString();
+        
+        if (RewardCount > 0)
+        {
+            _rewardObject.SetActive(true);
+        }
+        else
+        {
+            _rewardObject.SetActive(false);
+        }
+    }
+    
+    public void SetNetworkedRewardCount()
+    {
+        if (HasStateAuthority)
+        {
+            return;
+        }
+       
+        _rewardText.text = RewardCount.ToString();
+        
+        if (RewardCount > 0)
+        {
+            _rewardObject.SetActive(true);
+        }
+        else
+        {
+            _rewardObject.SetActive(false);
+        }
     }
 }

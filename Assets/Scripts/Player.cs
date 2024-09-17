@@ -9,6 +9,7 @@ using Photon.Voice.Unity;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public enum PlayerType
@@ -136,17 +137,17 @@ public partial class Player : NetworkBehaviour
 
     public void OnChangedPlayerType()
     {
-        if (_playerType == PlayerType.Farmer)
-        {
-            _shovel.SetActive(true);
-            _fishRod.SetActive(false);
-        }
+        // if (_playerType == PlayerType.Farmer)
+        // {
+        //     _shovel.SetActive(true);
+        //     _fishRod.SetActive(false);
+        // }
         
-        if (_playerType == PlayerType.Fisher)
-        {
-            _fishRod.SetActive(true);
-            _shovel.SetActive(false);
-        }
+        // if (_playerType == PlayerType.Fisher)
+        // {
+        //     _fishRod.SetActive(true);
+        //     _shovel.SetActive(false);
+        // }
     }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -560,7 +561,7 @@ public partial class Player : NetworkBehaviour
     private bool LookingWho()
     {
         bool looking = _lookingBonfire != null || _lookingLog != null ||
-                       _lookingFishWeapon != null || _lookingNpc != null;
+                       _lookingFishWeapon != null || _lookingNpc != null || _lookingTable;
 
         return looking;
     }
@@ -601,6 +602,7 @@ public partial class Player : NetworkBehaviour
             GetNpc();
             GetLog();
             GetBonFire();
+            GetTable();
         }
 
         ShowSpeakingIcon();
@@ -784,7 +786,16 @@ public partial class Player : NetworkBehaviour
             NotShowingGround();
             return;
         }
-        
+
+        if (!(_inventoryItemType == InventoryItemType.Shovel ||
+            _inventoryItemType == InventoryItemType.BonFire || 
+            _inventoryItemType == InventoryItemType.Table ||
+            _inventoryItemType == InventoryItemType.FishRod))
+        {
+            NotShowingGround();
+            return;
+        }
+
         LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
         LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
         LayerMask waterMask = 1 << LayerMask.NameToLayer("Water");
@@ -1256,6 +1267,14 @@ public partial class Player : NetworkBehaviour
         catch (OperationCanceledException e)
         {
             return;
+        }
+    }
+
+    public void DisableInteractionText()
+    {
+        if (_lookingBonfire == null && _lookingNpc == null && _lookingTable == null)
+        {
+            _interactionText.transform.parent.gameObject.SetActive(false);
         }
     }
 }

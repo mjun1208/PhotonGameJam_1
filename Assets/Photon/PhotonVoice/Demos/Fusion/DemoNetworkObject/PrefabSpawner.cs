@@ -213,15 +213,15 @@ namespace Photon.Voice.Fusion.Demo
             
             if (runner.IsServer && player.PlayerId == 1)
             {
-                SpawnDino(runner);
+                // SpawnDino(runner);
             }
         }
 
-        private void SpawnDino(NetworkRunner runner)
-        {
-            var dino = runner.Spawn(_kingDino, new Vector3(-6f, 0, -38f), Quaternion.identity);
-            dino.SetPrefabSpawner(this);
-        }
+        // private void SpawnDino(NetworkRunner runner)
+        // {
+        //     var dino = runner.Spawn(_kingDino, new Vector3(-6f, 0, -38f), Quaternion.identity);
+        //     dino.SetPrefabSpawner(this);
+        // }
 
         private bool TryDespawnPlayer(NetworkRunner runner, PlayerRef player)
         {

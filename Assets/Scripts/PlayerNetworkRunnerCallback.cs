@@ -5,6 +5,7 @@ using Fusion;
 using Fusion.Sockets;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerNetworkRunnerCallback : MonoBehaviour, INetworkRunnerCallbacks
 {

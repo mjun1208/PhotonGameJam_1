@@ -28,6 +28,7 @@ public class NPC : NetworkBehaviour
    [Networked, OnChangedRender(nameof(SetColor))] private Color _myColor { get; set; }
    [Networked, OnChangedRender(nameof(SetTimer))] private float _fillAmount { get; set; }
    [Networked, OnChangedRender(nameof(StartOrder_Networked))] private bool _isStartOrder_Networked { get; set; }
+   [Networked, OnChangedRender(nameof(SetResting))] private bool _isResting { get; set; }
    [Networked, OnChangedRender(nameof(SetWantItem_Networked)), Capacity(3000)] private string _npcWantItems_Networked { get; set; } = "";
 
    private float _timerTime;
@@ -38,8 +39,11 @@ public class NPC : NetworkBehaviour
    public bool IsFail = false;
 
    public bool IsEnd => IsSuccess || IsFail;
+   public bool IsStart => _isStartOrder_Networked;
+   public bool IsResting => _isResting;
    
    public Transform TargetSit { get; set; }
+   public Table TargetTable { get; set; }
    // [Networked] private 
    
    public override void Spawned()
@@ -49,8 +53,9 @@ public class NPC : NetworkBehaviour
       if (HasStateAuthority)
       {
          _myColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
-         SetColor();
       }
+      
+      SetColor();
 
       _faceImage.gameObject.SetActive(false);
       Global.Instance.IngameManager.Npcs.Add(this);
@@ -218,6 +223,19 @@ public class NPC : NetworkBehaviour
                   {
                      StartOrder();
                   }
+
+                  if (Global.Instance.IngameManager.NpcSpawnPosition == TargetSit)
+                  {
+                     // Return;
+                     _isResting = true;
+                     _faceImage.gameObject.SetActive(false);
+                     
+                     _resultParticleList[0].gameObject.SetActive(false);
+                     _resultParticleList[1].gameObject.SetActive(false);
+                     _resultParticleList[2].gameObject.SetActive(false);
+                     
+                     this.gameObject.SetActive(false);
+                  }
                }
             }
          }
@@ -257,6 +275,24 @@ public class NPC : NetworkBehaviour
       }
    }
 
+   public void SetResting()
+   {
+      if (HasStateAuthority)
+      {
+         return;
+      }
+
+      if (IsResting)
+      {
+         _resultParticleList[0].gameObject.SetActive(false);
+         _resultParticleList[1].gameObject.SetActive(false);
+         _resultParticleList[2].gameObject.SetActive(false);
+         
+         _faceImage.gameObject.SetActive(false);
+         gameObject.SetActive(false);
+      }
+   }
+
    public void SetTimer()
    {
       if (HasStateAuthority)
@@ -282,7 +318,15 @@ public class NPC : NetworkBehaviour
          _resultParticleList[0].gameObject.SetActive(true);
          _resultParticleList[0].Play();
 
+         if (TargetTable != null)
+         {
+            TargetTable.SetReward(TargetTable.RewardCount + 1000);
+         }
+
          IsSuccess = true;
+
+         TargetTable = null;
+         TargetSit = Global.Instance.IngameManager.NpcSpawnPosition;
          return;
       }
    }

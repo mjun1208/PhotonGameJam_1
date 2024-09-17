@@ -11,6 +11,7 @@ public partial class Player
     private bool _tableYes = false;
     
     private NPC _lookingNpc = null;
+    private Table _lookingTable = null;
 
     private void NpcUpdate(NetworkInputData inputData)
     {
@@ -30,11 +31,23 @@ public partial class Player
             }
         }
         
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        {
+            if (HasInputAuthority && CanClick)
+            {
+                if (_lookingTable != null)
+                {
+                    RpcReceiveReward(_lookingTable);
+                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                }
+            }
+        }
+        
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0) && !LookingWho())
         {
             if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner) && CanClick)
             {
-                if (_shootAble)
+                if (_shootAble && _inventoryItemType == InventoryItemType.Table)
                 {
                     if (_shootType == ShootType.Table)
                     {
@@ -53,6 +66,19 @@ public partial class Player
             }
         }
     }
+        
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcReceiveReward(Table lookingTable)
+    {
+        lookingTable.ReceiveReward();
+    }
+    
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcGiveItemToNpc(NPC lookingNpc, InventoryItemType type)
+    {
+        lookingNpc.ReceiveItem(type);
+    }
 
     private bool GiveItemToNpc()
     {
@@ -64,7 +90,7 @@ public partial class Player
             {
                 if (_inventoryUI.GetInventoryItemCount(wantItemType) > 0)
                 {
-                    _lookingNpc.ReceiveItem(wantItemType);
+                    RpcGiveItemToNpc(_lookingNpc, wantItemType);
                     _inventoryUI.RemoveItem(wantItemType, 1);
                     giveItem = true;
                 }
@@ -90,8 +116,16 @@ public partial class Player
                     _lookingNpc = null;
                 }
 
-                npc.Look(true);
-                _lookingNpc = npc;
+                if (!npc.IsEnd && npc.IsStart)
+                {
+                    npc.Look(true);
+                    _lookingNpc = npc;
+                }
+                else
+                {
+                    npc.Look(false);
+                    _lookingNpc = null;
+                }
             }
             else
             {
@@ -118,10 +152,7 @@ public partial class Player
         }
         else
         {
-            if (_lookingBonfire == null)
-            {
-                _interactionText.transform.parent.gameObject.SetActive(false);
-            }
+            DisableInteractionText();
         }
     }
     
@@ -169,6 +200,61 @@ public partial class Player
         if (_shootAble && _shootType == ShootType.Table)
         {
             Runner.Spawn(_table, shootPosition, shootRotation, Object.StateAuthority);
+        }
+    }
+
+    private void GetTable()
+    {
+        LayerMask tableLayer = 1 << LayerMask.NameToLayer("Table");
+        
+        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward,
+                out RaycastHit hit, InteractionRayCastDistance, tableLayer))
+        {
+            var table = hit.transform.GetComponent<Table>();
+            if (table)
+            {
+                if (_lookingTable != null && _lookingTable != table)
+                {
+                    _lookingTable.Look(false);
+                    _lookingTable = null;
+                }
+
+                if (table.RewardCount > 0)
+                {
+                    table.Look(true);
+                    _lookingTable = table;
+                }
+                else
+                {
+                    table.Look(false);
+                }
+            }
+            else
+            {
+                if (_lookingTable != null)
+                {
+                    _lookingTable.Look(false);
+                    _lookingTable = null;
+                }
+            }
+        }
+        else
+        {
+            if (_lookingTable != null)
+            {
+                _lookingTable.Look(false);
+                _lookingTable = null;
+            }
+        }
+
+        if (_lookingTable != null)
+        {
+            _interactionText.text = "클릭 - 보상 받기";
+            _interactionText.transform.parent.gameObject.SetActive(true);
+        }
+        else
+        {
+            DisableInteractionText();
         }
     }
 }

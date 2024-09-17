@@ -63,7 +63,7 @@ public partial class Player
                 
                 if (_shootAble)
                 {
-                    if (_shootType == ShootType.Bonfire)
+                    if (_shootType == ShootType.Bonfire && _inventoryItemType == InventoryItemType.BonFire)
                     {
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                         RpcSpawnBonFire(_shootPosition);
@@ -178,10 +178,7 @@ public partial class Player
         }
         else
         {
-            if (_lookingNpc == null)
-            {
-                _interactionText.transform.parent.gameObject.SetActive(false);
-            }
+            DisableInteractionText();
         }
     }
 
