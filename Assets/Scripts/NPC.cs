@@ -29,7 +29,7 @@ public class NPC : NetworkBehaviour
    [Networked, OnChangedRender(nameof(SetTimer))] private float _fillAmount { get; set; }
    [Networked, OnChangedRender(nameof(StartOrder_Networked))] private bool _isStartOrder_Networked { get; set; }
    [Networked, OnChangedRender(nameof(SetResting))] private bool _isResting { get; set; }
-   [Networked, OnChangedRender(nameof(SetWantItem_Networked)), Capacity(3000)] private string _npcWantItems_Networked { get; set; } = "";
+   [Networked, OnChangedRender(nameof(SetWantItem_Networked)), Capacity(200)] private string _npcWantItems_Networked { get; set; } = "";
 
    private float _timerTime;
    private float _waitTime;
@@ -111,15 +111,15 @@ public class NPC : NetworkBehaviour
       {
          var wantItem = Instantiate(_originWantItem, _wantItemParent);
          wantItem.gameObject.SetActive(true);
-         var wantItemRecipe = CraftRecipeManager.GetRecipe(npcWantItemNetworked.WantCraftRecipe);
+         var wantItemRecipe = CraftRecipeManager.GetRecipe((InventoryItemType)npcWantItemNetworked.R);
          wantItem.SetInfo(wantItemRecipe);
 
-         if (npcWantItemNetworked.IsSuccess)
+         if (npcWantItemNetworked.S)
          {
             wantItem.SetSuccess();
          }
          
-         if (npcWantItemNetworked.IsFail)
+         if (npcWantItemNetworked.F)
          {
             wantItem.SetFail();
          }
@@ -147,22 +147,17 @@ public class NPC : NetworkBehaviour
       }
       
       _npcWantItems.Clear();
-      
-      // Test
-      var wantItem = Instantiate(_originWantItem, _wantItemParent);
-      wantItem.gameObject.SetActive(true);
-      var wantItemRecipe = CraftRecipeManager.GetRecipe(InventoryItemType.BonFire);
-      wantItem.SetInfo(wantItemRecipe);
 
-      _npcWantItems.Add(wantItem);
-      
-      // Test 2
-      var wantItem2 = Instantiate(_originWantItem, _wantItemParent);
-      wantItem2.gameObject.SetActive(true);
-      var wantItemRecipe2 = CraftRecipeManager.GetRecipe(InventoryItemType.BonFire);
-      wantItem2.SetInfo(wantItemRecipe2);
+      for (int i = 0; i < 4; i++)
+      {
+         // Test
+         var wantItem = Instantiate(_originWantItem, _wantItemParent);
+         wantItem.gameObject.SetActive(true);
+         var wantItemRecipe = CraftRecipeManager.GetRecipe(InventoryItemType.BonFire);
+         wantItem.SetInfo(wantItemRecipe);
 
-      _npcWantItems.Add(wantItem2);
+         _npcWantItems.Add(wantItem);
+      }
 
       SendNetworkNpcWantItems();
    }
@@ -212,7 +207,7 @@ public class NPC : NetworkBehaviour
       {
          _navMeshAgent.SetDestination(TargetSit.position);
 
-         if (Vector3.Distance(TargetSit.position, this.transform.position) < 0.5f)
+         if (Vector3.Distance(TargetSit.position, this.transform.position) < 1f)
          {
             if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
             {

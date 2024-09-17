@@ -59,6 +59,10 @@ MonoBehaviour:
   _roomMasterText: {fileID: 7362841104763457755}
   _readyText: {fileID: 2146945858418117765}
   _notReadyText: {fileID: 3195722079914221369}
+  __readied:
+    _value: 0
+  __roomMaster:
+    _value: 0
 --- !u!114 &9025274509154897236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,7 +500,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6563132385729656838
 RectTransform:
   m_ObjectHideFlags: 0

@@ -7,9 +7,12 @@ using UnityEngine;
 [Serializable]
 public struct NpcWantItem_Networked
 {
-    public InventoryItemType WantCraftRecipe;
-    public bool IsSuccess;
-    public bool IsFail;
+    // Recipe
+    public int R;
+    // Success
+    public bool S;
+    // Fail
+    public bool F;
 }
 
 public class NpcWantItem : MonoBehaviour
@@ -52,9 +55,9 @@ public class NpcWantItem : MonoBehaviour
     {
         return new NpcWantItem_Networked
         {
-            WantCraftRecipe = this.WantCraftRecipe.ResultItem,
-            IsSuccess = this.IsSuccess,
-            IsFail = this.IsFail,
+            R = (int)this.WantCraftRecipe.ResultItem,
+            S = this.IsSuccess,
+            F = this.IsFail,
         };
     }
 }

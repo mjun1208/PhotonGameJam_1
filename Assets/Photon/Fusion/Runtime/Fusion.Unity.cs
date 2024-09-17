@@ -871,7 +871,7 @@ namespace Fusion {
           {
             // 서버와의 연결이 끊겼을 때 처리
             Debug.Log("서버와의 연결이 끊겼습니다.");
-            SceneManager.LoadScene("Title");
+            SceneManager.LoadScene("DisconnectScene");
           }
           break;
         case LogType.Warn:

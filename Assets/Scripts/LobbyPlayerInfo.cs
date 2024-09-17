@@ -38,15 +38,19 @@ public class LobbyPlayerInfo : NetworkBehaviour
         {
             Global.Instance.Selecter.SetActive(true);
             
-            var selectCanvas = Global.Instance.SelectCanvas;
-            selectCanvas.SetLobbyPlayerInfo(this);
+            // var selectCanvas = Global.Instance.SelectCanvas;
+            // selectCanvas.SetLobbyPlayerInfo(this);
             
             var lobbyCanvas = Global.Instance.LobbyCanvas;
             lobbyCanvas.SetLobbyPlayerInfo(this, Runner.IsServer);
 
             SetMyName(Global.Instance.MyName);
             SetRoomMaster(HasStateAuthority);
-            SetPlayerType(Global.Instance.SelectCanvas.SelectedPlayerType);
+            
+            Global.Instance.LobbyCanvas.gameObject.SetActive(true);
+            Global.Instance.LobbyCanvas.TypeSelected(PlayerType.Farmer);
+
+            // SetPlayerType(Global.Instance.SelectCanvas.SelectedPlayerType);
         }
 
         if (HasStateAuthority)

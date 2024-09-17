@@ -15826,8 +15826,7 @@ MonoBehaviour:
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
-  m_Cameras:
-  - {fileID: 8923587498617650594}
+  m_Cameras: []
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
@@ -43397,6 +43396,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 390495863974881282, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2221917694353968329, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -43437,12 +43440,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2228887247029383864, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4198965791909325869, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
       propertyPath: m_Name
       value: Global
       objectReference: {fileID: 0}
+    - target: {fileID: 7266734571120562433, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7266734571120562433, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
@@ -56784,11 +56796,6 @@ CapsuleCollider:
   m_Height: 0.46282387
   m_Direction: 0
   m_Center: {x: 0.23141193, y: 0, z: 0}
---- !u!20 &8923587498617650594 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 1480674184446081462, guid: 9ecf927fefcc55c42afa4d6e228a3802, type: 3}
-  m_PrefabInstance: {fileID: 5510751032238739900}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9196919070137718696
 Transform:
   m_ObjectHideFlags: 0

@@ -44,7 +44,7 @@ public class Global : MonoBehaviour
     public BasicSpawner BasicSpawner { get; set; }
 
     public GameObject Selecter;
-    public SelectCanvas SelectCanvas;
+    // public SelectCanvas SelectCanvas;
     public LobbyCanvas LobbyCanvas;
 
     public PrefabSpawner PrefabSpawner { get; set; }
@@ -90,6 +90,11 @@ public class Global : MonoBehaviour
     public GameObject MenuCanvas;
 
     public void RoomEnterFail()
+    {
+        FailCanvas.SetActive(true);
+    }
+    
+    public void RoomDisconnected()
     {
         FailCanvas.SetActive(true);
     }
