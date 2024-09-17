@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
@@ -17,6 +15,8 @@ public class NPC : NetworkBehaviour
    [SerializeField] private GameObject _timerObject;
    
    [SerializeField] private Renderer _renderer;
+   [SerializeField] private Animator _animator;
+   [SerializeField] private GameObject _chair;
    [SerializeField] private NavMeshAgent _navMeshAgent;
    [SerializeField] private Outline _outline;
    [SerializeField] private Image _faceImage;
@@ -73,10 +73,15 @@ public class NPC : NetworkBehaviour
 
    public void StartOrder()
    {
+      _animator.SetBool("Sit", true);
       _isStartOrder_Networked = true;
       _isStartOrder = true;
       SetWantItem();
       StartTimer();
+
+      this.transform.position = TargetSit.transform.position;
+      this.transform.rotation = TargetSit.transform.rotation;
+      this.transform.rotation = TargetSit.transform.rotation;
       
       _timerObject.gameObject.SetActive(true);
    }
@@ -136,6 +141,8 @@ public class NPC : NetworkBehaviour
          _resultParticleList[0].Play();
 
          IsSuccess = true;
+         
+         _animator.SetTrigger("Clap");
       }
    }
 
@@ -183,6 +190,36 @@ public class NPC : NetworkBehaviour
 
    public void Update()
    {
+      if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Sit"))
+      {
+         if (HasStateAuthority)
+         {
+            _navMeshAgent.updateRotation = false;
+            
+            if (TargetTable != null)
+            {
+               this.transform.Rotate(new Vector3(0, 50, 0));
+            }
+         }
+
+         if (!_chair.activeSelf)
+         {
+            _chair.SetActive(true);
+         }
+      }
+      else
+      {
+         if (HasStateAuthority)
+         {
+            // _navMeshAgent.updateRotation = true;
+         }
+
+         if (_chair.activeSelf)
+         {
+            _chair.SetActive(false);
+         }
+      }
+      
       if (!HasStateAuthority)
       {
          if (_isStartOrder_Networked)
@@ -196,6 +233,8 @@ public class NPC : NetworkBehaviour
                   _resultParticleList[2].gameObject.SetActive(true);
                   _resultParticleList[2].Play();
                   IsFail = true;
+                  
+                  _animator.SetBool("Sit", false);
                }
             }
          }
@@ -205,7 +244,10 @@ public class NPC : NetworkBehaviour
       
       if (TargetSit != null)
       {
-         _navMeshAgent.SetDestination(TargetSit.position);
+         if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move"))
+         {
+            _navMeshAgent.SetDestination(TargetSit.position);  
+         }
 
          if (Vector3.Distance(TargetSit.position, this.transform.position) < 1f)
          {
@@ -221,7 +263,6 @@ public class NPC : NetworkBehaviour
 
                   if (Global.Instance.IngameManager.NpcSpawnPosition == TargetSit)
                   {
-                     // Return;
                      _isResting = true;
                      _faceImage.gameObject.SetActive(false);
                      
@@ -257,6 +298,7 @@ public class NPC : NetworkBehaviour
                _resultParticleList[2].gameObject.SetActive(true);
                _resultParticleList[2].Play();
                IsFail = true;
+               _animator.SetBool("Sit", false);
 
                var wantItems = _npcWantItems.Where(x => !x.IsSuccess && !x.IsFail);
                foreach (var npcWantItem in wantItems)
@@ -265,6 +307,9 @@ public class NPC : NetworkBehaviour
                }
 
                SendNetworkNpcWantItems();
+               
+               TargetTable = null;
+               TargetSit = Global.Instance.IngameManager.NpcSpawnPosition;
             }
          }
       }
@@ -319,6 +364,8 @@ public class NPC : NetworkBehaviour
          }
 
          IsSuccess = true;
+         _animator.SetBool("Sit", false);
+         _animator.SetTrigger("Clap");
 
          TargetTable = null;
          TargetSit = Global.Instance.IngameManager.NpcSpawnPosition;

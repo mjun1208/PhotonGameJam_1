@@ -53,7 +53,13 @@ public class Table : NetworkBehaviour
         
         var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
         npc.TargetSit = GetEmptySit();
+        IsTableSit1 = true;
         npc.TargetTable = this;
+        
+        var npc2 = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
+        npc2.TargetSit = GetEmptySit();
+        IsTableSit2 = true;
+        npc2.TargetTable = this;
     }
 
     public Transform GetEmptySit()
