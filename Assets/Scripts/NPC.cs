@@ -29,7 +29,8 @@ public class NPC : NetworkBehaviour
    private List<NpcWantItem> _npcWantItems = new List<NpcWantItem>();
 
    [Networked, OnChangedRender(nameof(SetColor))] private Color _myColor { get; set; }
-   [Networked, OnChangedRender(nameof(SetTimer))] private float _fillAmount { get; set; }
+
+   [Networked, OnChangedRender(nameof(SetTimer))] private float _fillAmount { get; set; } = 1f;
    [Networked, OnChangedRender(nameof(StartOrder_Networked))] private bool _isStartOrder_Networked { get; set; }
    [Networked, OnChangedRender(nameof(SetResting))] private bool _isResting { get; set; }
    [Networked, OnChangedRender(nameof(SetWantItem_Networked)), Capacity(200)] private string _npcWantItems_Networked { get; set; } = "";
@@ -193,58 +194,55 @@ public class NPC : NetworkBehaviour
 
    private void LateUpdate()
    {
-      if (TargetSit != null)
+      if (HasStateAuthority)
       {
-         if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move"))
+         if (TargetSit != null)
          {
-            _navMeshAgent.SetDestination(TargetSit.position);
-
-            if (!_navMeshAgent.hasPath)
+            if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move"))
             {
-               Debug.LogError(TargetSit.name);
-               Debug.LogError("경로 찾기 실패!");
+               _navMeshAgent.SetDestination(TargetSit.position);
+            }
+
+            if (Vector3.Distance(TargetSit.position, this.transform.position) < 2f)
+            {
+               if (Global.Instance.IngameManager.NpcReturnPosition == TargetSit)
+               {
+                  _isResting = true;
+                  _faceImage.gameObject.SetActive(false);
+
+                  _resultParticleList[0].gameObject.SetActive(false);
+                  _resultParticleList[1].gameObject.SetActive(false);
+                  _resultParticleList[2].gameObject.SetActive(false);
+
+                  this.gameObject.SetActive(false);
+               }
+            }
+
+            if (Vector3.Distance(TargetSit.position, this.transform.position) < 1f)
+            {
+               if (!_isStartOrder)
+               {
+                  StartOrder();
+               }
+
+               // if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
+               // {
+               //    // 목표 지점에 도착한 경우
+               //    if (!_navMeshAgent.hasPath || _navMeshAgent.velocity.sqrMagnitude == 0f)
+               //    {
+               //    }
+               // }
             }
          }
 
-         if (Vector3.Distance(TargetSit.position, this.transform.position) < 2f)
+         if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Sit"))
          {
-            if (Global.Instance.IngameManager.NpcReturnPosition == TargetSit)
+            if (HasStateAuthority)
             {
-               _isResting = true;
-               _faceImage.gameObject.SetActive(false);
-                     
-               _resultParticleList[0].gameObject.SetActive(false);
-               _resultParticleList[1].gameObject.SetActive(false);
-               _resultParticleList[2].gameObject.SetActive(false);
-                     
-               this.gameObject.SetActive(false);
-            }
-         }
-
-         if (Vector3.Distance(TargetSit.position, this.transform.position) < 1f)
-         {
-            if (!_isStartOrder)
-            {
-               StartOrder();
-            }
-
-            // if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
-            // {
-            //    // 목표 지점에 도착한 경우
-            //    if (!_navMeshAgent.hasPath || _navMeshAgent.velocity.sqrMagnitude == 0f)
-            //    {
-            //    }
-            // }
-         }
-      }
-      
-      if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Sit"))
-      {
-         if (HasStateAuthority)
-         {
-            if (TargetTable != null)
-            {
-               this.transform.LookAt(TargetTable.transform);
+               if (TargetTable != null)
+               {
+                  this.transform.LookAt(TargetTable.transform);
+               }
             }
          }
       }
@@ -285,43 +283,44 @@ public class NPC : NetworkBehaviour
                }
             }
          }
-         
          return;
       }
-
-      if (!IsEnd && _isStartOrder)
+      else
       {
-         _waitTime += Time.deltaTime;
-
-         if (_timerTime > _waitTime)
+         if (!IsEnd && _isStartOrder)
          {
-            _fillAmount = (_timerTime - _waitTime) / _timerTime;
-            _timerImage.fillAmount = _fillAmount;
-         }
-         else
-         {
-            _fillAmount = 0f;
-            _timerImage.fillAmount = _fillAmount;
+            _waitTime += Time.deltaTime;
 
-            if (!IsEnd)
+            if (_timerTime > _waitTime)
             {
-               _faceImage.gameObject.SetActive(true);
-               _faceImage.sprite = _faceImageList[2];
-               _resultParticleList[2].gameObject.SetActive(true);
-               _resultParticleList[2].Play();
-               IsFail = true;
-               _animator.SetBool("Sit", false);
+               _fillAmount = (_timerTime - _waitTime) / _timerTime;
+               _timerImage.fillAmount = _fillAmount;
+            }
+            else
+            {
+               _fillAmount = 0f;
+               _timerImage.fillAmount = _fillAmount;
 
-               var wantItems = _npcWantItems.Where(x => !x.IsSuccess && !x.IsFail);
-               foreach (var npcWantItem in wantItems)
+               if (!IsEnd)
                {
-                  npcWantItem.SetFail();
-               }
+                  _faceImage.gameObject.SetActive(true);
+                  _faceImage.sprite = _faceImageList[2];
+                  _resultParticleList[2].gameObject.SetActive(true);
+                  _resultParticleList[2].Play();
+                  IsFail = true;
+                  _animator.SetBool("Sit", false);
 
-               SendNetworkNpcWantItems();
-               
-               TargetTable = null;
-               TargetSit = Global.Instance.IngameManager.NpcReturnPosition;
+                  var wantItems = _npcWantItems.Where(x => !x.IsSuccess && !x.IsFail);
+                  foreach (var npcWantItem in wantItems)
+                  {
+                     npcWantItem.SetFail();
+                  }
+
+                  SendNetworkNpcWantItems();
+
+                  TargetTable = null;
+                  TargetSit = Global.Instance.IngameManager.NpcReturnPosition;
+               }
             }
          }
       }

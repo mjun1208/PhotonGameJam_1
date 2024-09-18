@@ -19,20 +19,23 @@ public class ServerOnlyGameManager : NetworkBehaviour
     public int ThisTimeNpcCount { get; set; } = 1;
 
     public TutorialManager TutorialManager;
+    
+    [Networked, OnChangedRender(nameof(OnChangedTutorialIndex))] public int TutorialIndex { get; set; } = 0;
 
     public override void Spawned()
     {
         base.Spawned();
+        
         Global.Instance.IngameManager.ServerOnlyGameManager = this;
 
         if (HasStateAuthority)
         {
             Wave = 0;
             RewardCount = 0;
-
-            OnChangedWaveCount();
-            OnChangedRewardCount();
         }
+        
+        OnChangedWaveCount();
+        OnChangedRewardCount();
     }
 
     public void OnChangedWaveCount()
@@ -47,5 +50,30 @@ public class ServerOnlyGameManager : NetworkBehaviour
         _rewardText.text = RewardCount.ToString();
         _rewardTextDOTween.DORewind();
         _rewardTextDOTween.DOPlay();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            RpcSetTutorialIndex(TutorialIndex + 1);
+        }
+    }
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RpcSetTutorialIndex(int index)
+    {
+        if (HasStateAuthority)
+        {
+            if (TutorialIndex < index)
+            {
+                TutorialIndex = index;
+            }
+        }
+    }
+    
+    public void OnChangedTutorialIndex()
+    {
+        TutorialManager.OnChangedTutorialIndex();
     }
 }
