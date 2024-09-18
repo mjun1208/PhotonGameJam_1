@@ -51,15 +51,15 @@ public class Table : NetworkBehaviour
             return;
         }
         
-        var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
+        var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position + new Vector3(0, 0.5f, 0), Quaternion.identity, Object.StateAuthority);
         npc.TargetSit = GetEmptySit();
         IsTableSit1 = true;
         npc.TargetTable = this;
-        
-        var npc2 = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
-        npc2.TargetSit = GetEmptySit();
-        IsTableSit2 = true;
-        npc2.TargetTable = this;
+        //
+        // var npc2 = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
+        // npc2.TargetSit = GetEmptySit();
+        // IsTableSit2 = true;
+        // npc2.TargetTable = this;
     }
 
     public Transform GetEmptySit()
@@ -89,6 +89,7 @@ public class Table : NetworkBehaviour
 
     public void ReceiveReward()
     {
+        Global.Instance.IngameManager.ServerOnlyGameManager.RewardCount += RewardCount;
         SetReward(0);
     }
 

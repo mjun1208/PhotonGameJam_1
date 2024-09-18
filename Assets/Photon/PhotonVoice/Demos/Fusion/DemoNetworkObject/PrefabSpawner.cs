@@ -185,6 +185,7 @@ namespace Photon.Voice.Fusion.Demo
         #endregion
 
         [SerializeField] private KingDino _kingDino;
+        [SerializeField] private ServerOnlyGameManager _gameManager;
         
         public void SpawnPlayer(PlayerRef player, PlayerType playerType)
         {
@@ -213,7 +214,7 @@ namespace Photon.Voice.Fusion.Demo
             
             if (runner.IsServer && player.PlayerId == 1)
             {
-                // SpawnDino(runner);
+                var gameManager = runner.Spawn(_gameManager, Vector3.zero, Quaternion.identity);
             }
         }
 

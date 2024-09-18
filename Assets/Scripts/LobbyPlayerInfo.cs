@@ -36,7 +36,7 @@ public class LobbyPlayerInfo : NetworkBehaviour
 
         if (HasInputAuthority)
         {
-            Global.Instance.Selecter.SetActive(true);
+            // Global.Instance.Selecter.SetActive(true);
             
             // var selectCanvas = Global.Instance.SelectCanvas;
             // selectCanvas.SetLobbyPlayerInfo(this);

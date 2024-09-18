@@ -193,6 +193,51 @@ public class NPC : NetworkBehaviour
 
    private void LateUpdate()
    {
+      if (TargetSit != null)
+      {
+         if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move"))
+         {
+            _navMeshAgent.SetDestination(TargetSit.position);
+
+            if (!_navMeshAgent.hasPath)
+            {
+               Debug.LogError(TargetSit.name);
+               Debug.LogError("경로 찾기 실패!");
+            }
+         }
+
+         if (Vector3.Distance(TargetSit.position, this.transform.position) < 2f)
+         {
+            if (Global.Instance.IngameManager.NpcReturnPosition == TargetSit)
+            {
+               _isResting = true;
+               _faceImage.gameObject.SetActive(false);
+                     
+               _resultParticleList[0].gameObject.SetActive(false);
+               _resultParticleList[1].gameObject.SetActive(false);
+               _resultParticleList[2].gameObject.SetActive(false);
+                     
+               this.gameObject.SetActive(false);
+            }
+         }
+
+         if (Vector3.Distance(TargetSit.position, this.transform.position) < 1f)
+         {
+            if (!_isStartOrder)
+            {
+               StartOrder();
+            }
+
+            // if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
+            // {
+            //    // 목표 지점에 도착한 경우
+            //    if (!_navMeshAgent.hasPath || _navMeshAgent.velocity.sqrMagnitude == 0f)
+            //    {
+            //    }
+            // }
+         }
+      }
+      
       if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Sit"))
       {
          if (HasStateAuthority)
@@ -243,42 +288,6 @@ public class NPC : NetworkBehaviour
          
          return;
       }
-      
-      if (TargetSit != null)
-      {
-         if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move"))
-         {
-            _navMeshAgent.SetDestination(TargetSit.position);
-         }
-
-         if (Vector3.Distance(TargetSit.position, this.transform.position) < 1f)
-         {
-            if (!_isStartOrder)
-            {
-               StartOrder();
-            }
-
-            if (Global.Instance.IngameManager.NpcSpawnPosition == TargetSit)
-            {
-               _isResting = true;
-               _faceImage.gameObject.SetActive(false);
-                     
-               _resultParticleList[0].gameObject.SetActive(false);
-               _resultParticleList[1].gameObject.SetActive(false);
-               _resultParticleList[2].gameObject.SetActive(false);
-                     
-               this.gameObject.SetActive(false);
-            }
-            
-            // if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
-            // {
-            //    // 목표 지점에 도착한 경우
-            //    if (!_navMeshAgent.hasPath || _navMeshAgent.velocity.sqrMagnitude == 0f)
-            //    {
-            //    }
-            // }
-         }
-      }
 
       if (!IsEnd && _isStartOrder)
       {
@@ -312,7 +321,7 @@ public class NPC : NetworkBehaviour
                SendNetworkNpcWantItems();
                
                TargetTable = null;
-               TargetSit = Global.Instance.IngameManager.NpcSpawnPosition;
+               TargetSit = Global.Instance.IngameManager.NpcReturnPosition;
             }
          }
       }
@@ -371,7 +380,7 @@ public class NPC : NetworkBehaviour
          _animator.SetTrigger("Clap");
 
          TargetTable = null;
-         TargetSit = Global.Instance.IngameManager.NpcSpawnPosition;
+         TargetSit = Global.Instance.IngameManager.NpcReturnPosition;
          return;
       }
    }

@@ -33,6 +33,8 @@ public class Global : MonoBehaviour
         }
         
         DontDestroyOnLoad(this);
+
+        Application.targetFrameRate = 60;
         
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;

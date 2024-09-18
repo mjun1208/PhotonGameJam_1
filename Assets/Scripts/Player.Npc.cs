@@ -227,6 +227,7 @@ public partial class Player
                 else
                 {
                     table.Look(false);
+                    _lookingTable = null;
                 }
             }
             else
