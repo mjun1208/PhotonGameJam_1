@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using TMPro;
@@ -74,6 +75,23 @@ public class ServerOnlyGameManager : NetworkBehaviour
     
     public void OnChangedTutorialIndex()
     {
-        TutorialManager.OnChangedTutorialIndex();
+        TutorialManager.OnChangedTutorialIndex(out bool isFinal);
+
+        if (isFinal)
+        {
+            HideTutorialUI();
+            
+            if (HasStateAuthority)
+            {
+                Wave = 1;
+            }
+        }
+    }
+
+    private async void HideTutorialUI()
+    {
+        await UniTask.Delay(3000);
+        
+        TutorialManager.HideTutorialUI();
     }
 }

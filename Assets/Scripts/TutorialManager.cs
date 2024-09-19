@@ -26,11 +26,30 @@ public class TutorialManager : MonoBehaviour
         "3초 후 1라운드가 시작됩니다!",
     };
 
-    public void OnChangedTutorialIndex()
+    public void SetTutorialIndex(int index)
+    {
+        // 직전 Index만 적용
+        if (ServerOnlyGameManager.TutorialIndex == index - 1)
+        {
+            ServerOnlyGameManager.TutorialIndex = index;
+        }
+    }
+
+    public void OnChangedTutorialIndex(out bool isFinal)
     {
         if (_tutorialTextList.Count > ServerOnlyGameManager.TutorialIndex)
         {
             _tutorialText.text = _tutorialTextList[ServerOnlyGameManager.TutorialIndex];
+            isFinal = false;
         }
+        else
+        {
+            isFinal = true;
+        }
+    }
+
+    public void HideTutorialUI()
+    {
+        _tutorialObject.SetActive(false);
     }
 }

@@ -167,6 +167,26 @@ public static class CraftRecipeManager
     {
         new CraftRecipe()
         {
+            ResultItem = InventoryItemType.Shovel,
+            Name = "삽",
+            Desc = "땅을 파는데 사용하는 도구.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 5},
+            }
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.FishRod,
+            Name = "낚시대",
+            Desc = "긴 막대에 실을 달고 미끼를 달아서 물고기를 유인하고, 걸리면 당기는 도구.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 5},
+            }
+        },
+        new CraftRecipe()
+        {
             ResultItem = InventoryItemType.BonFire,
             Name = "모닥불",
             Desc = "뜨끈뜨끈 하다.\n여기서 요리를 할 수 있을 것 같다",
