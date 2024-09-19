@@ -49,16 +49,19 @@ public partial class InventoryUI : MonoBehaviour
     {
         _craftRecipeListItems.ForEach(x=> x.gameObject.SetActive(false));
 
-        for (int i = 0; i < craftRecipes.Count; i++)
+        var craftRecipesByWave = craftRecipes
+            .Where(x => x.OpenWave <= Global.Instance.IngameManager.ServerOnlyGameManager.Wave).ToList();
+        
+        for (int i = 0; i < craftRecipesByWave.Count; i++)
         {
             if (i > _craftRecipeListItems.Count - 1)
             {
-                var newRecipeListItem =  Instantiate(_originCraftRecipeListItem, _recipeListParent);
+                var newRecipeListItem = Instantiate(_originCraftRecipeListItem, _recipeListParent);
                 _craftRecipeListItems.Add(newRecipeListItem);
             }
 
-            _craftRecipeListItems[i].SetInventoryUI(this, craftRecipes[i], OnClickRecipe);
-            _craftRecipeListItems[i].SetCraftAble(CraftAble(craftRecipes[i]));
+            _craftRecipeListItems[i].SetInventoryUI(this, craftRecipesByWave[i], OnClickRecipe);
+            _craftRecipeListItems[i].SetCraftAble(CraftAble(craftRecipesByWave[i]));
             _craftRecipeListItems[i].gameObject.SetActive(true);
         }
     }
@@ -153,6 +156,8 @@ public class CraftRecipe
     public string Desc;
     public Dictionary<InventoryItemType, int> Material;
 
+    public int OpenWave;
+
     // public bool CraftAble(InventoryUI inventoryUI)
     // {
     //     inventoryUI.GetFirstItemSlot()
@@ -173,17 +178,8 @@ public static class CraftRecipeManager
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Log, 5},
-            }
-        },
-        new CraftRecipe()
-        {
-            ResultItem = InventoryItemType.FishRod,
-            Name = "낚시대",
-            Desc = "긴 막대에 실을 달고 미끼를 달아서 물고기를 유인하고, 걸리면 당기는 도구.",
-            Material = new Dictionary<InventoryItemType, int>()
-            {
-                {InventoryItemType.Log, 5},
-            }
+            },
+            OpenWave = 0,
         },
         new CraftRecipe()
         {
@@ -193,7 +189,8 @@ public static class CraftRecipeManager
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Log, 5},
-            }
+            },
+            OpenWave = 0,
         },
         new CraftRecipe()
         {
@@ -203,7 +200,20 @@ public static class CraftRecipeManager
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Log, 1},
-            }
+            },
+            OpenWave = 0,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.FishRod,
+            Name = "낚시대",
+            Desc = "긴 막대에 실을 달고 미끼를 달아서 물고기를 유인하고, 걸리면 당기는 도구.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 5},
+            },
+            OpenWave = 3,
         },
     };
     
@@ -217,17 +227,8 @@ public static class CraftRecipeManager
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Log, 1},
-            }
-        },
-        new CraftRecipe()
-        {
-            ResultItem = InventoryItemType.BlueCornBread,
-            Name = "파란 옥수수 빵",
-            Desc = "파란 옥수수로 만든 빵이다.\n왜 이 세상의 옥수수는 파란색인걸까!!!",
-            Material = new Dictionary<InventoryItemType, int>()
-            {
-                {InventoryItemType.Log, 1},
-            }
+            },
+            OpenWave = 0,
         },
         new CraftRecipe()
         {
@@ -237,7 +238,19 @@ public static class CraftRecipeManager
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Log, 1},
-            }
+            },
+            OpenWave = 0,
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.BlueCornBread,
+            Name = "파란 옥수수 빵",
+            Desc = "파란 옥수수로 만든 빵이다.\n왜 이 세상의 옥수수는 파란색인걸까!!!",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            },
+            OpenWave = 1,
         },
     };
 

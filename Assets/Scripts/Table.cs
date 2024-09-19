@@ -50,11 +50,15 @@ public class Table : NetworkBehaviour
         {
             return;
         }
+
+        for (int i = 0; i < 7; i++)
+        {
+            var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position + new Vector3(0, 0.5f, 0), Quaternion.identity, Object.StateAuthority);
+            npc.TargetSit = TableSit1;//GetEmptySit();
+            IsTableSit1 = true;
+            npc.TargetTable = this;   
+        }
         
-        var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position + new Vector3(0, 0.5f, 0), Quaternion.identity, Object.StateAuthority);
-        npc.TargetSit = GetEmptySit();
-        IsTableSit1 = true;
-        npc.TargetTable = this;
         //
         // var npc2 = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
         // npc2.TargetSit = GetEmptySit();

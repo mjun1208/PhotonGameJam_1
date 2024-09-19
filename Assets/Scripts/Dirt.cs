@@ -105,23 +105,23 @@ public class Dirt : NetworkBehaviour
             return;
         }
 
-        if (Planted && !Grew && _growDelayTimerOn)
-        {
-            if (_growDelay > 0f)
-            {
-                _growDelay -= Time.deltaTime;
-            }
-            else
-            {
-                Grew = true;
-
-                if (!_shoot)
-                {
-                    _shoot = true;
-                    RpcSpawnMissile();
-                }
-            }
-        }
+        // if (Planted && !Grew && _growDelayTimerOn)
+        // {
+        //     if (_growDelay > 0f)
+        //     {
+        //         _growDelay -= Time.deltaTime;
+        //     }
+        //     else
+        //     {
+        //         Grew = true;
+        //
+        //         if (!_shoot)
+        //         {
+        //             _shoot = true;
+        //             RpcSpawnMissile();
+        //         }
+        //     }
+        // }
     }
 
     public void Looking(bool isLook)
