@@ -27,9 +27,9 @@ public class IngameManager : MonoBehaviour
         MapManager.UpdateMap();
     }
 
-    public Transform GetTableSit()
+    public (Table, Transform) GetTableSit()
     {
-        var tableSit = Tables.Select(x => x.GetEmptySit()).FirstOrDefault(x => x != null);
+        var tableSit = Tables.Select(x => x.GetEmptySit()).FirstOrDefault(x => x.Item1 != null && x.Item2 != null);
         return tableSit;
     }
 }

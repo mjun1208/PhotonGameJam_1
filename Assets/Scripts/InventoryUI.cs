@@ -25,10 +25,10 @@ public partial class InventoryUI : MonoBehaviour
     
     [SerializeField] private GameObject _inventoryGroup;
     [SerializeField] private GameObject _craftGroup;
-    [SerializeField] private InventoryBar _inventoryBar;
+    [SerializeField] protected InventoryBar _inventoryBar;
 
-    [SerializeField] private List<InventoryListItem> _inventoryListItems;
-    [SerializeField] private List<InventoryListItem> _inventoryBarListItems;
+    [SerializeField] public List<InventoryListItem> _inventoryListItems;
+    [SerializeField] public List<InventoryListItem> _inventoryBarListItems;
     
     private InventoryTab _inventoryTab = InventoryTab.Inventory;
 

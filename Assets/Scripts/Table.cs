@@ -12,6 +12,9 @@ public class Table : NetworkBehaviour
 
     public bool IsTableSit1;
     public bool IsTableSit2;
+
+    // public NPC TableSit1Npc;
+    // public NPC TableSit2Npc;
     
     public GameObject SizeObject;
 
@@ -29,11 +32,6 @@ public class Table : NetworkBehaviour
     {
         base.Spawned();
 
-        if (HasStateAuthority)
-        {
-            RpcSpawnNpc();
-        }
-        
         Global.Instance.IngameManager.Tables.Add(this);
 
         if (Global.Instance.IngameManager.IsTabling)
@@ -42,49 +40,47 @@ public class Table : NetworkBehaviour
         }
         
         Global.Instance.IngameManager.UpdateMap();
-    }
-    
-    public void RpcSpawnNpc()
-    {
-        if (!HasStateAuthority)
-        {
-            return;
-        }
-
-        for (int i = 0; i < 7; i++)
-        {
-            var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position + new Vector3(0, 0.5f, 0), Quaternion.identity, Object.StateAuthority);
-            npc.TargetSit = TableSit1;//GetEmptySit();
-            IsTableSit1 = true;
-            npc.TargetTable = this;   
-        }
         
-        //
-        // var npc2 = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position, Quaternion.identity, Object.StateAuthority);
-        // npc2.TargetSit = GetEmptySit();
-        // IsTableSit2 = true;
-        // npc2.TargetTable = this;
+        if (HasStateAuthority)
+        {
+            Global.Instance.IngameManager.ServerOnlyGameManager.OnEmptySitAppear();
+        }
     }
 
-    public Transform GetEmptySit()
+    public (Table, Transform) GetEmptySit()
     {
         if (!IsTableSit1)
         {
-            return TableSit1;
+            IsTableSit1 = true;
+            return (this, TableSit1);
         }
         
         if (!IsTableSit2)
         {
-            return TableSit2;
+            IsTableSit2 = true;
+            return (this, TableSit2);
         }
 
-        return null;
+        return (null, null);
     }
 
-    // public void Update()
-    // {
-    //     throw new NotImplementedException();
-    // }
+    public void SetSitEmpty(Transform sit)
+    {
+        if (sit == TableSit1)
+        {
+            IsTableSit1 = false;
+        }
+
+        if (sit == TableSit2)
+        {
+            IsTableSit2 = false;
+        }
+
+        if (HasStateAuthority)
+        {
+            Global.Instance.IngameManager.ServerOnlyGameManager.OnEmptySitAppear();
+        }
+    }
 
     public void ShowSizeObject(bool show)
     {

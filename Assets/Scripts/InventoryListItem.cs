@@ -119,4 +119,14 @@ public class InventoryListItem : MonoBehaviour
     }
 
     public bool Dragging { get; set; } = false;
+
+    public ChestInventoryItem ToChestInventoryItem()
+    {
+        return new ChestInventoryItem
+        {
+            e = this.Empty,
+            t = (int)this._inventoryItemType,
+            c = this.ItemCount,
+        };
+    }
 }

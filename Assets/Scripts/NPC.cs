@@ -215,6 +215,8 @@ public class NPC : NetworkBehaviour
                   _resultParticleList[2].gameObject.SetActive(false);
 
                   this.gameObject.SetActive(false);
+
+                  Global.Instance.IngameManager.ServerOnlyGameManager.EndNpcCount++;
                }
             }
 
@@ -318,6 +320,11 @@ public class NPC : NetworkBehaviour
 
                   SendNetworkNpcWantItems();
 
+                  if (TargetTable != null && TargetSit != null)
+                  {
+                     TargetTable.SetSitEmpty(TargetSit);
+                  }
+                  
                   TargetTable = null;
                   TargetSit = Global.Instance.IngameManager.NpcReturnPosition;
                }
@@ -378,8 +385,14 @@ public class NPC : NetworkBehaviour
          _animator.SetBool("Sit", false);
          _animator.SetTrigger("Clap");
 
+         if (TargetTable != null && TargetSit != null)
+         {
+            TargetTable.SetSitEmpty(TargetSit);
+         }
+
          TargetTable = null;
          TargetSit = Global.Instance.IngameManager.NpcReturnPosition;
+
          return;
       }
    }

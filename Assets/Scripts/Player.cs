@@ -317,6 +317,20 @@ public partial class Player : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.E)  && !_isFishing)
         {
+            if (_chestUI.gameObject.activeSelf)
+            {
+                _chestUI.gameObject.SetActive(!_chestUI.gameObject.activeSelf);
+
+                RpcOpenChestUI(_chestUI.gameObject.activeSelf);
+                
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                
+                Global.Instance.IngameActivingCursor = false;
+                
+                return;
+            }
+            
             _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
 
             RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
@@ -378,6 +392,18 @@ public partial class Player : NetworkBehaviour
             Global.Instance.IngameActivingCursor = false; 
         }
         
+        if (Input.GetKeyDown(KeyCode.Escape) && _chestUI.gameObject.activeSelf && !Global.Instance.MenuCanvas.activeSelf)
+        {
+            _chestUI.gameObject.SetActive(!_chestUI.gameObject.activeSelf);
+
+            RpcOpenInventoryUI(_chestUI.gameObject.activeSelf);
+            
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+                
+            Global.Instance.IngameActivingCursor = false;
+        }
+        
         // if (Input.GetKeyDown(KeyCode.R))
         // {
         //     _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
@@ -410,6 +436,18 @@ public partial class Player : NetworkBehaviour
                 
             Global.Instance.IngameActivingCursor = false; 
         }
+    }
+
+    public void CloseChest()
+    {
+        _chestUI.gameObject.SetActive(!_chestUI.gameObject.activeSelf);
+
+        RpcOpenChestUI(_chestUI.gameObject.activeSelf);
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        Global.Instance.IngameActivingCursor = false;
     }
     
     // Local Only
@@ -496,7 +534,35 @@ public partial class Player : NetworkBehaviour
         NpcUpdate(inputData);
         TreeUpdate(inputData);
 
-        // if (_playerType == PlayerType.Fisher)
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        {
+            if (_lookingChest)
+            {
+                if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner) && !_inventoryUI.gameObject.activeSelf)
+                {
+                    if (_lookingChest.IsOpened)
+                    {
+                        ShowNotice("다른 사람이 이용하고 있습니다", Color.red);
+                    }
+                    else
+                    {
+                        _lookingChest.RpcSetOpenUI(true);
+
+                        _chestUI.SetUpChestInventory(_lookingChest);
+                        _chestUI.gameObject.SetActive(true);
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+
+                        Cursor.visible = true;
+                        Cursor.lockState = CursorLockMode.None;
+                        Global.Instance.IngameActivingCursor = true;
+
+                        RpcOpenChestUI(true);
+                    }
+                }
+            }
+        }
+
+        // if (_playerType == PlayerType.Fisher) 
         if (_inventoryItemType == InventoryItemType.Fish || _inventoryItemType == InventoryItemType.FishRod)
         {
             FishWeaponUpdate(inputData);
@@ -561,7 +627,8 @@ public partial class Player : NetworkBehaviour
     private bool LookingWho()
     {
         bool looking = _lookingBonfire != null || _lookingLog != null ||
-                       _lookingFishWeapon != null || _lookingNpc != null || _lookingTable;
+                       _lookingFishWeapon != null || _lookingNpc != null || _lookingTable != null ||
+                       _lookingChest != null;
 
         return looking;
     }
@@ -600,6 +667,7 @@ public partial class Player : NetworkBehaviour
         {
             // GetTree();
             GetNpc();
+            GetChest();
             GetLog();
             GetBonFire();
             GetTable();
@@ -1236,7 +1304,17 @@ public partial class Player : NetworkBehaviour
             return true;
         }
 
+        if (HasInputAuthority && _chestUI.gameObject.activeSelf)
+        {
+            return true;
+        }
+        
         if (_isInventoryOpen)
+        {
+            return true;
+        }
+        
+        if (_isChestOpen)
         {
             return true;
         }
@@ -1272,7 +1350,7 @@ public partial class Player : NetworkBehaviour
 
     public void DisableInteractionText()
     {
-        if (_lookingBonfire == null && _lookingNpc == null && _lookingTable == null)
+        if (_lookingBonfire == null && _lookingNpc == null && _lookingTable == null && _lookingChest)
         {
             _interactionText.transform.parent.gameObject.SetActive(false);
         }

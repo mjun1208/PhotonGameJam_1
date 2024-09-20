@@ -5,15 +5,25 @@ public partial class Player
 {
     [SerializeField] private InventoryBar _inventoryBar;
     [SerializeField] private InventoryUI _inventoryUI;
+    [SerializeField] private ChestUI _chestUI;
     private InventoryItemType _inventoryItemType { get; set; }
     
     [Networked] private NetworkBool _isInventoryOpen { get; set; } = false;
+    [Networked] private NetworkBool _isChestOpen { get; set; } = false;
+
+    private Chest _lookingChest;
 
     // public void OnChangedEquipItem()
     // {
     //     Equip(_inventoryItemType);
     // }
     
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcOpenChestUI(bool isOpen)
+    {
+        _isChestOpen = isOpen;
+    }
+
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcOpenInventoryUI(bool isOpen)
     {
@@ -110,6 +120,54 @@ public partial class Player
             {
                 break;
             }
+        }
+    }
+    
+    private void GetChest()
+    {
+        LayerMask chestLayer = 1 << LayerMask.NameToLayer("Chest");
+        
+        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward,
+                out RaycastHit hit, InteractionRayCastDistance))
+        {
+            var chest = hit.transform.GetComponent<Chest>();
+            if (chest)
+            {
+                if (_lookingChest != null && _lookingChest != chest)
+                {
+                    _lookingChest.Look(false);
+                    _lookingChest = null;
+                }
+                
+                chest.Look(true);
+                _lookingChest = chest;
+            }
+            else
+            {
+                if (_lookingChest != null)
+                {
+                    _lookingChest.Look(false);
+                    _lookingChest = null;
+                }
+            }
+        }
+        else
+        {
+            if (_lookingChest != null)
+            {
+                _lookingChest.Look(false);
+                _lookingChest = null;
+            }
+        }
+
+        if (_lookingChest != null)
+        {
+            _interactionText.text = "클릭 - 상자 열기";
+            _interactionText.transform.parent.gameObject.SetActive(true);
+        }
+        else
+        {
+            DisableInteractionText();
         }
     }
 }
