@@ -114,6 +114,11 @@ public class Global : MonoBehaviour
             {
                 return;
             }
+            
+            if (MyPlayer != null && MyPlayer.IsChestOpen() && !MenuCanvas.activeSelf)
+            {
+                return;
+            }
 
             MenuCanvas.SetActive(!MenuCanvas.activeSelf);
 

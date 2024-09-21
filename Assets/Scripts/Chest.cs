@@ -1,9 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Fusion;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 
 [Serializable]
@@ -22,6 +21,8 @@ public struct ChestInventoryItem
 public class Chest : NetworkBehaviour
 {
     [SerializeField] private Outline _outline;
+    [SerializeField] private TMP_Text _userText;
+    [SerializeField] private GameObject _userTextObject;
 
     public List<ChestInventoryItem> ChestInventoryItems { get; set; } = new List<ChestInventoryItem>()
     {
@@ -38,12 +39,15 @@ public class Chest : NetworkBehaviour
     
     [Networked, OnChangedRender(nameof(SetChestItemList_Networked)), Capacity(500)] private string _chestItemList_Networked { get; set; } = "";
 
-    [Networked] public NetworkBool IsOpened { get; set; } = false;
+    [Networked, OnChangedRender(nameof(OnChangedOpen))] public NetworkBool IsOpened { get; set; } = false;
+    
+    [Networked, OnChangedRender(nameof(OnChangedUser))] public string UserName { get; set; } = "";
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RpcSetOpenUI(bool isOpened)
+    public void RpcSetOpenUI(bool isOpened, string name)
     {
         IsOpened = isOpened;
+        UserName = name;
     }
     
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -78,5 +82,15 @@ public class Chest : NetworkBehaviour
     public void Look(bool look)
     {
         _outline.enabled = look;
+    }
+
+    private void OnChangedOpen()
+    {
+        _userTextObject.gameObject.SetActive(IsOpened);
+    }
+
+    private void OnChangedUser()
+    {
+        _userText.text = $"{UserName}이(가) 사용중";
     }
 }

@@ -396,7 +396,7 @@ public partial class Player : NetworkBehaviour
         {
             _chestUI.gameObject.SetActive(!_chestUI.gameObject.activeSelf);
 
-            RpcOpenInventoryUI(_chestUI.gameObject.activeSelf);
+            RpcOpenChestUI(_chestUI.gameObject.activeSelf);
             
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
@@ -454,6 +454,12 @@ public partial class Player : NetworkBehaviour
     public bool IsInvenOpen()
     {
         return _inventoryUI.gameObject.activeSelf;
+    }
+    
+    // Local Only
+    public bool IsChestOpen()
+    {
+        return _chestUI.gameObject.activeSelf;
     }
 
     private void FixedUpdate()
@@ -546,7 +552,7 @@ public partial class Player : NetworkBehaviour
                     }
                     else
                     {
-                        _lookingChest.RpcSetOpenUI(true);
+                        _lookingChest.RpcSetOpenUI(true, Global.Instance.MyName);
 
                         _chestUI.SetUpChestInventory(_lookingChest);
                         _chestUI.gameObject.SetActive(true);

@@ -78,6 +78,6 @@ public class ChestUI : InventoryUI
         string jsonString = JsonConvert.SerializeObject(networkedList);
         
         Chest.RpcSaveChest(jsonString);
-        Chest.RpcSetOpenUI(false);
+        Chest.RpcSetOpenUI(false, "");
     }
 }

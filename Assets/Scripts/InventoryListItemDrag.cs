@@ -33,6 +33,19 @@ public class InventoryListItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragH
 
                 targetSlot.SetInventoryItem(InventoryListItem.InventoryUI.GetDraggingItem);
 
+                if (!InventoryListItem.Empty && !targetSlot.Empty)
+                {
+                    if (InventoryListItem.GetInventoryItemType == targetSlot.GetInventoryItemType)
+                    {
+                        targetSlot.ItemCount += InventoryListItem.ItemCount;
+                        targetSlot.SetInventoryItemType(targetSlot.GetInventoryItemType, targetSlot.ItemCount);
+
+                        InventoryListItem.SetInventoryItemType(InventoryItemType.None, 0);
+                    }
+                }
+
+                //
+                
                 if (targetSlot.InventoryBar != null)
                 {
                     targetSlot.InventoryBar.InventoryListItems[targetSlot.InventoryBarIndex]
@@ -50,8 +63,22 @@ public class InventoryListItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragH
                 if (targetSlot2 != null)
                 {
                     InventoryListItem.InventoryUI.OnDrop(eventData, targetSlot2.InventoryListItem, targetSlot2.InventoryListItem.Empty);
+                    
                     targetSlot2.InventoryListItem.SetInventoryItem(InventoryListItem.InventoryUI.GetDraggingItem);
+                    
+                    if (!InventoryListItem.Empty && !targetSlot2.InventoryListItem.Empty)
+                    {
+                        if (InventoryListItem.GetInventoryItemType == targetSlot2.InventoryListItem.GetInventoryItemType)
+                        {
+                            targetSlot2.InventoryListItem.ItemCount += InventoryListItem.ItemCount;
+                            targetSlot2.InventoryListItem.SetInventoryItemType(targetSlot2.InventoryListItem.GetInventoryItemType, targetSlot2.InventoryListItem.ItemCount);
 
+                            InventoryListItem.SetInventoryItemType(InventoryItemType.None, 0);
+                        }
+                    }
+
+                    //
+                    
                     if (targetSlot2.InventoryListItem.InventoryBar != null)
                     {
                         targetSlot2.InventoryListItem.InventoryBar.InventoryListItems[targetSlot2.InventoryListItem.InventoryBarIndex]
