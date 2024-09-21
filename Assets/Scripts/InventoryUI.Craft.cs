@@ -22,6 +22,9 @@ public partial class InventoryUI : MonoBehaviour
         _craftTabButton.color = Color.white;
         _inventoryTabButton.color = Color.gray;
         
+        _shopGroup.SetActive(false);
+        _invenGroup.SetActive(true);
+        
         _craftGroup.SetActive(true);
         _inventoryGroup.SetActive(false);
         
@@ -36,6 +39,9 @@ public partial class InventoryUI : MonoBehaviour
         
         _craftTabButton.color = Color.white;
         _inventoryTabButton.color = Color.gray;
+        
+        _shopGroup.SetActive(false);
+        _invenGroup.SetActive(true);
         
         _craftGroup.SetActive(true);
         _inventoryGroup.SetActive(false);
@@ -234,15 +240,36 @@ public static class CraftRecipeManager
             },
             OpenWave = 0,
         },
-        
         new CraftRecipe()
         {
             ResultItem = InventoryItemType.FishRod,
             Name = "낚시대",
-            Desc = "긴 막대에 실을 달고 미끼를 달아서 물고기를 유인하고, 걸리면 당기는 도구.",
+            Desc = "긴 막대에 실을 달고 미끼를 달아서 물고기를 유인하고, 걸리면 당기는 도구. 물에서 사용해보자",
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Log, 5},
+            },
+            OpenWave = 2,
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.Plate,
+            Name = "컵",
+            Desc = "물 따위의 액체를 담는 잔.\n일회용인듯 하다",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            },
+            OpenWave = 2,
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.Plate,
+            Name = "그릇",
+            Desc = "음식이나 물건 따위를 담는 도구.\n일회용인듯 하다",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
             },
             OpenWave = 3,
         },
@@ -253,8 +280,8 @@ public static class CraftRecipeManager
         new CraftRecipe()
         {
             ResultItem = InventoryItemType.CornSoup,
-            Name = "옥수수 죽",
-            Desc = "옥수수를 끓여 만든 옥수수 죽.\n간단하게 만들수 있어서 최고~",
+            Name = "구운 옥수수",
+            Desc = "구운 옥수수다.\n",
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Corn, 1},
@@ -268,9 +295,9 @@ public static class CraftRecipeManager
             Desc = "상어로 주스를 만들다니?",
             Material = new Dictionary<InventoryItemType, int>()
             {
-                {InventoryItemType.Log, 1},
+                {InventoryItemType.Fish, 1},
             },
-            OpenWave = 3,
+            OpenWave = 2,
         },
         new CraftRecipe()
         {

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -15,6 +16,25 @@ public class LobbyCanvas : MonoBehaviour
     
     private LobbyPlayerInfo _lobbyPlayerInfo;
 
+    public void OnEnable()
+    {
+        if (_host)
+        {
+            _readyButton.SetActive(false);
+            _readyCancelButton.SetActive(false);
+        }
+        else
+        {
+            _readyButton.SetActive(true);
+            _readyCancelButton.SetActive(false);
+        }
+
+        _lobbyPlayerInfo.SetReady(false);
+        
+        _mustEveryReady.SetActive(false);
+        _startButton.SetActive(false);
+    }
+
     public void SetLobbyPlayerInfo(LobbyPlayerInfo lobbyPlayerInfo, bool host)
     {
         _lobbyPlayerInfo = lobbyPlayerInfo;
@@ -24,6 +44,10 @@ public class LobbyCanvas : MonoBehaviour
         {
             _readyButton.SetActive(false);
             _readyCancelButton.SetActive(false);
+        }
+        else
+        {
+            _readyButton.SetActive(true);
         }
 
         _codeText.text = $"방 코드 : {Global.Instance.RoomName}";

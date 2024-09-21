@@ -20,6 +20,7 @@ public enum InventoryItemType
     SharkJuice = 9,
     Table = 10,
     Corn = 11,
+    Plate = 12,
 }
 
 public class InventoryListItem : MonoBehaviour

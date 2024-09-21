@@ -13,8 +13,6 @@ using UnityEngine.SceneManagement;
 
 #endregion
 
-
-
 #endregion
 
 
@@ -867,7 +865,7 @@ namespace Fusion {
         case LogType.Error:
           Debug.LogError(fullMessage, IsInMainThread ? obj : null);
 
-          if (message.ToString().Contains("Code: 104"))
+          if (message.ToString().Contains("Code: 104") && CheckErrorHelper.CheckError)
           {
             // 서버와의 연결이 끊겼을 때 처리
             Debug.Log("서버와의 연결이 끊겼습니다.");

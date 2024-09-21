@@ -36,8 +36,11 @@ public class ServerOnlyGameManager : NetworkBehaviour
     
     [SerializeField] private CinemachineVirtualCamera _endCamera;
     [SerializeField] private GameObject _endCanvas;
+    [SerializeField] private GameObject _failText;
+    [SerializeField] private GameObject _successText;
     
     [Networked, OnChangedRender(nameof(OnChangedWaveCount))] public int Wave { get; set; } = 0;
+    [Networked] public int CraftWave { get; set; } = 0;
     [Networked, OnChangedRender(nameof(OnChangedRewardCount))] public int RewardCount { get; set; } = 0;
     [Networked] public int ThisTimeNpcCount { get; set; } = 0;
     [Networked, OnChangedRender(nameof(OnChangedLeftNpcCount))] public int WaveNpcCount { get; set; } = 0;
@@ -116,7 +119,7 @@ public class ServerOnlyGameManager : NetworkBehaviour
             {
                 if (Wave > _balances.Count)
                 {
-                    End(true);
+                    RpcEndCall(true);
                     return;
                 }
                 
@@ -130,6 +133,8 @@ public class ServerOnlyGameManager : NetworkBehaviour
                 MaxRequestCount = balance.MaxNpcRequestItemCount;
                 WaveStart();
             }
+            
+            CraftWave = Wave;
         }
 
         _waveText.text = $"{Wave} 라운드";
@@ -172,9 +177,38 @@ public class ServerOnlyGameManager : NetworkBehaviour
         }
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RpcOpenUnlockUI(int wave)
+    {
+        Global.Instance.MyPlayer.OpenUnlockUI(wave);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private async void RpcNextWave()
+    {
+        if (HasStateAuthority)
+        {
+            return;
+        }
+        
+        c.gameObject.SetActive(true);
+
+        c.anchoredPosition = new Vector2(0, 56);
+        c.DOAnchorPos(new Vector2(0, -18), 0.3f);
+        
+        await UniTask.Delay(10000);
+
+        await c.DOAnchorPos(new Vector2(0, 56), 0.3f);
+        
+        c.gameObject.SetActive(false);
+    }
+
     private async void NextWave()
     {
-        Global.Instance.MyPlayer.OpenUnlockUI(Wave + 1);
+        CraftWave += 1;
+        RpcOpenUnlockUI(CraftWave);
+
+        RpcNextWave();
         
         c.gameObject.SetActive(true);
 
@@ -221,6 +255,7 @@ public class ServerOnlyGameManager : NetworkBehaviour
         {
             Wave = Math.Clamp(Wave, 0, _balances.Count),
             Success = success,
+            Gold = RewardCount,
             // WhoNpcGive
             // WhoWalk
             // WhoJump
@@ -233,6 +268,12 @@ public class ServerOnlyGameManager : NetworkBehaviour
         Global.Instance.LastGameResult = gameResult;
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcEndCall(bool isSuccess)
+    {
+        End(isSuccess);
+    }
+    
     private async void End(bool isSuccess)
     {
         MakeResult(isSuccess);
@@ -242,6 +283,9 @@ public class ServerOnlyGameManager : NetworkBehaviour
         Time.timeScale = 1f;
         
         _endCanvas.gameObject.SetActive(true);
+
+        _failText.SetActive(!isSuccess);
+        _successText.SetActive(isSuccess);
         
         await UniTask.Delay(2000);
 
@@ -404,5 +448,11 @@ public class ServerOnlyGameManager : NetworkBehaviour
         }
 
         ThisTimeNpcCount--;
+    }
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RpcRemoveReward(int count)
+    {
+        RewardCount -= count;
     }
 }

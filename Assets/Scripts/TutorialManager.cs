@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using TMPro;
 using UnityEngine;
@@ -46,13 +48,20 @@ public class TutorialManager : MonoBehaviour
 
             if (_tutorialTextList.Count - 1 == ServerOnlyGameManager.TutorialIndex)
             {
-                ServerOnlyGameManager.TutorialIndex++;
+                GoNextWaveByTutorial();
             }
         }
         else
         {
+            _tutorialText.text = _tutorialTextList.Last();
             isFinal = true;
         }
+    }
+
+    public async void GoNextWaveByTutorial()
+    {
+        await UniTask.NextFrame();
+        ServerOnlyGameManager.TutorialIndex++;
     }
 
     public void HideTutorialUI()

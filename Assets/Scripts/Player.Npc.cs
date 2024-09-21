@@ -12,6 +12,7 @@ public partial class Player
     
     private NPC _lookingNpc = null;
     private Table _lookingTable = null;
+    private Shop _lookingShop = null;
 
     private void NpcUpdate(NetworkInputData inputData)
     {
@@ -26,6 +27,30 @@ public partial class Player
                         ShowNotice("건네줄 수 있는 아이템이 없습니다.", Color.red);
                     }
 
+                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                }
+            }
+        }
+        
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        {
+            if (HasInputAuthority && CanClick)
+            {
+                if (_lookingShop != null)
+                {
+                    _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+                    RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
+
+                    if (_inventoryUI.gameObject.activeSelf)
+                    {
+                        Cursor.visible = true;
+                        Cursor.lockState = CursorLockMode.None;
+                        _inventoryUI.OnClickShop();
+
+                        Global.Instance.IngameActivingCursor = true;
+                    }
+                    
                     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                 }
             }
@@ -251,6 +276,52 @@ public partial class Player
         if (_lookingTable != null)
         {
             _interactionText.text = "클릭 - 보상 받기";
+            _interactionText.transform.parent.gameObject.SetActive(true);
+        }
+        else
+        {
+            DisableInteractionText();
+        }
+    }
+    
+    private void GetShop()
+    {
+        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward,
+                out RaycastHit hit, InteractionRayCastDistance))
+        {
+            var shop = hit.transform.GetComponent<Shop>();
+            if (shop)
+            {
+                if (_lookingShop != null && _lookingShop != shop)
+                {
+                    _lookingShop.Look(false);
+                    _lookingShop = null;
+                }
+
+                shop.Look(true);
+                _lookingShop = shop;
+            }
+            else
+            {
+                if (_lookingShop != null)
+                {
+                    _lookingShop.Look(false);
+                    _lookingShop = null;
+                }
+            }
+        }
+        else
+        {
+            if (_lookingShop != null)
+            {
+                _lookingShop.Look(false);
+                _lookingShop = null;
+            }
+        }
+
+        if (_lookingShop != null)
+        {
+            _interactionText.text = "클릭 - 상점";
             _interactionText.transform.parent.gameObject.SetActive(true);
         }
         else

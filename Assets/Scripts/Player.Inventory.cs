@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public partial class Player
     
     [Networked] private NetworkBool _isInventoryOpen { get; set; } = false;
     [Networked] private NetworkBool _isChestOpen { get; set; } = false;
-    [Networked] private NetworkBool _isUnlockOpen { get; set; } = false;
+    [Networked] private NetworkBool IsUnlockOpen { get; set; } = false;
 
     private Chest _lookingChest;
 
@@ -23,7 +24,7 @@ public partial class Player
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcOpenUnlockUI(bool isOpen)
     {
-        _isUnlockOpen = isOpen;
+        IsUnlockOpen = isOpen;
     }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -179,7 +180,7 @@ public partial class Player
         }
     }
 
-    public void OpenUnlockUI(int wave)
+    public async void OpenUnlockUI(int wave)
     {
         if (!CraftRecipeManager.HasNewRecipes(wave))
         {
@@ -193,6 +194,8 @@ public partial class Player
         Cursor.lockState = CursorLockMode.None;
         
         Global.Instance.IngameActivingCursor = true;
+
+        await UniTask.NextFrame();
 
         RpcOpenUnlockUI(true);
     }

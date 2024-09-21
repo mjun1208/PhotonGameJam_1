@@ -12,22 +12,24 @@ public class UnlockUI : MonoBehaviour
 
     public void SetNewRecipe(int wave)
     {
-        _newRecipeListItems.ForEach(x=> x.gameObject.SetActive(false));
-        
+        for (int i = 0; i < _newRecipeListItems.Count; i++)
+        {
+            Destroy(_newRecipeListItems[i]);
+        }
+
+        _newRecipeListItems.Clear();
+
         var newRecipeList = CraftRecipeManager.CraftRecipes.Where(x => x.OpenWave == wave).ToList();
 
         if (newRecipeList.Any())
         {
-            for (int i = 0; i < newRecipeList.Count; i++)
+            foreach (var craftRecipe in newRecipeList)
             {
-                if (i >= newRecipeList.Count - 1)
-                {
-                    var newRecipeListItem = Instantiate(_origin, _unlockItmemParent);
-                    _newRecipeListItems.Add(newRecipeListItem);
-                }
-
-                _newRecipeListItems[i].SetInfo(newRecipeList[i], false);
-                _newRecipeListItems[i].gameObject.SetActive(true);
+                var newRecipeListItem = Instantiate(_origin, _unlockItmemParent);
+                newRecipeListItem.SetInfo(craftRecipe, false); 
+                newRecipeListItem .gameObject.SetActive(true);       
+                
+                _newRecipeListItems.Add(newRecipeListItem);
             }
         }
         
@@ -37,16 +39,13 @@ public class UnlockUI : MonoBehaviour
 
         if (newCookList.Any())
         {
-            for (int i = 0; i < newCookList.Count; i++)
+            foreach (var craftRecipe in newCookList)
             {
-                if (i >= newCookList.Count - 1)
-                {
-                    var newRecipeListItem = Instantiate(_origin, _unlockItmemParent);
-                    _newRecipeListItems.Add(newRecipeListItem);
-                }
-
-                _newRecipeListItems[i].SetInfo(newCookList[i], true);
-                _newRecipeListItems[i].gameObject.SetActive(true);
+                var newRecipeListItem = Instantiate(_origin, _unlockItmemParent);
+                newRecipeListItem.SetInfo(craftRecipe, false); 
+                newRecipeListItem .gameObject.SetActive(true);       
+                
+                _newRecipeListItems.Add(newRecipeListItem);
             }
         }
     }

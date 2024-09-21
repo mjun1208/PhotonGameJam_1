@@ -12,6 +12,7 @@ public partial class InventoryUI : MonoBehaviour
     {
         Inventory,
         Craft,
+        Shop,
     }
 
     [SerializeField] private Image _inventoryTabButton;
@@ -62,6 +63,9 @@ public partial class InventoryUI : MonoBehaviour
         
         _inventoryTabButton.color = Color.white;
         _craftTabButton.color = Color.gray;
+        
+        _shopGroup.SetActive(false);
+        _invenGroup.SetActive(true);
         
         _inventoryGroup.SetActive(true);
         _craftGroup.SetActive(false);

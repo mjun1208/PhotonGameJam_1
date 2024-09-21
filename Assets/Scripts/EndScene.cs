@@ -1,6 +1,8 @@
 using System;
+using Cinemachine;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,9 +16,15 @@ public class EndScene : MonoBehaviour
     [SerializeField] private TMP_Text  _waveText;
     [SerializeField] private GameObject _confirmButton;
     
+    [SerializeField] private GameObject _tutorialText;
+    
     private void Start()
     {
+        CheckErrorHelper.CheckError = false;
+        
         End();
+
+        CinemachineBrain.SoloCamera = null;
         
         Global.Instance.IngameActivingCursor = false;
         Cursor.visible = true;
@@ -46,7 +54,13 @@ public class EndScene : MonoBehaviour
 
         _waveText.text = $"라운드 : {Global.Instance.LastGameResult.Wave}";
         _waveText.gameObject.SetActive(true);
-        
+
+        if (Global.Instance.LastGameResult.Wave == 0)
+        {
+            await UniTask.Delay(1000);
+            _tutorialText.gameObject.SetActive(true);
+        }
+            
         await UniTask.Delay(1000);
         
         _confirmButton.gameObject.SetActive(true);
@@ -54,6 +68,13 @@ public class EndScene : MonoBehaviour
     
     public void SceneChange()
     {
+        if (Global.Instance.PrefabSpawner != null)
+        {
+            Global.Instance.PrefabSpawner.GetComponent<NetworkRunner>().Shutdown();
+        }
+        
+        CheckErrorHelper.CheckError = true;
+        
         SceneManager.LoadScene("Title");
     }
 }

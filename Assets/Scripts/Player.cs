@@ -95,7 +95,7 @@ public partial class Player : NetworkBehaviour
 
 
     private DateTime _lastClickTime;
-    private float _localInputDelay = 0.1f;
+    private float _localInputDelay = 0.3f;
 
     private bool CanClick => (DateTime.UtcNow - _lastClickTime).TotalSeconds > _localInputDelay;
 
@@ -375,6 +375,8 @@ public partial class Player : NetworkBehaviour
         {
             _lastClickTime = DateTime.UtcNow;
         }
+        
+        Debug.Log(CanClick);
 
         if (Input.GetMouseButtonDown(0) && _lookingBonfire != null && !_inventoryUI.gameObject.activeSelf)
         {
@@ -654,15 +656,15 @@ public partial class Player : NetworkBehaviour
                     if (_inventoryUI.AddItem(InventoryItemType.Corn, 1))
                     {
                         _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
-                        
-                        // var networkObject = _harvestTargetDirt.GetComponent<NetworkObject>();
-                        // RpcGetLogInputToState(networkObject);
+                    
                         _harvestTargetDirt.gameObject.SetActive(false);
-                        _harvestTargetDirt.DespawnGOGO();
+                        
+                        var networkObject = _harvestTargetDirt.GetComponent<NetworkObject>();
+                        RpcGetLogInputToState(networkObject);
                         
                         _harvestTargetDirt = null;
                         
-                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
                         
                         // Tutorial
                         Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(6);
@@ -673,12 +675,10 @@ public partial class Player : NetworkBehaviour
 
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
-            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner))
+            if (HasInputAuthority && _mouse0delay.ExpiredOrNotRunning(Runner) && CanClick)
             {
-                if (_plantTargetDirt != null)
+                if (_plantTargetDirt != null && CanClick)
                 {
-                    _inventoryUI.RemoveItem(InventoryItemType.SeedBag_Corn, 1);
-                    
                     RpcDoSomething(_plantTargetDirt);
                     RpcTriggerFeedingAnimeInput();
                     
@@ -687,6 +687,10 @@ public partial class Player : NetworkBehaviour
                     
                     // Tutorial
                     Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(5);
+                    
+                    _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
+                    
+                    _inventoryUI.RemoveItem(InventoryItemType.SeedBag_Corn, 1);
                 }
             }
 
@@ -731,7 +735,7 @@ public partial class Player : NetworkBehaviour
     {
         bool looking = _lookingBonfire != null || _lookingLog != null ||
                        _lookingFishWeapon != null || _lookingNpc != null || _lookingTable != null ||
-                       _lookingChest != null;
+                       _lookingChest != null || _lookingShop != null;
 
         return looking;
     }
@@ -771,6 +775,7 @@ public partial class Player : NetworkBehaviour
         {
             // GetTree();
             GetNpc();
+            GetShop();
             GetChest();
             GetLog();
             GetBonFire();
@@ -936,6 +941,14 @@ public partial class Player : NetworkBehaviour
                         _plantTargetDirt.Looking(true);
                     }
                 }
+                else
+                {
+                    if (_plantTargetDirt != null)
+                    {
+                        _plantTargetDirt.Looking(false);
+                        _plantTargetDirt = null;
+                    }
+                }
             }
         }
         else
@@ -958,20 +971,23 @@ public partial class Player : NetworkBehaviour
                 InteractionRayCastDistance, dirtMask))
         {
             var dirt = hit.transform.GetComponent<Dirt>();
-            if (dirt != null && dirt != _harvestTargetDirt)
+            if (dirt != null && dirt.Grew)
             {
-                if (dirt != null && dirt.Grew)
+                if (_harvestTargetDirt != null && _harvestTargetDirt != dirt)
                 {
-                    dirt.Looking(true);
-                    _harvestTargetDirt = dirt;
+                    _harvestTargetDirt.Looking(false);
+                    _harvestTargetDirt = null;
                 }
-                else
+
+                dirt.Looking(true);
+                _harvestTargetDirt = dirt;
+            }
+            else
+            {
+                if (_harvestTargetDirt != null)
                 {
-                    if (_harvestTargetDirt != null)
-                    {
-                        _harvestTargetDirt.Looking(false);
-                        _harvestTargetDirt = null;
-                    }
+                    _harvestTargetDirt.Looking(false);
+                    _harvestTargetDirt = null;
                 }
             }
         }
@@ -1469,7 +1485,7 @@ public partial class Player : NetworkBehaviour
             return true;
         }
         
-        if (_isUnlockOpen)
+        if (IsUnlockOpen)
         {
             return true;
         }
@@ -1507,7 +1523,7 @@ public partial class Player : NetworkBehaviour
     {
         if (_lookingBonfire == null && _lookingNpc == null && 
             _lookingTable == null && _lookingChest == null &&
-            _harvestTargetDirt == null)
+            _harvestTargetDirt == null && _lookingShop == null)
         {
             _interactionText.transform.parent.gameObject.SetActive(false);
         }
