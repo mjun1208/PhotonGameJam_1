@@ -18,8 +18,9 @@ public class InventoryBar : MonoBehaviour
         
         // TestCow
         _inventoryListItems[0].SetInventoryItemType(InventoryItemType.Axe, 1);
-        _inventoryListItems[1].SetInventoryItemType(InventoryItemType.BonFire, 300);
+        _inventoryListItems[1].SetInventoryItemType(InventoryItemType.SeedBag_Corn, 5);
         _inventoryListItems[2].SetInventoryItemType(InventoryItemType.Table, 300);
+        _inventoryListItems[3].SetInventoryItemType(InventoryItemType.CornSoup, 300);
         // _inventoryListItems.ForEach(x=> x.SetInventoryItemType((InventoryItemType)_inventoryListItems.IndexOf(x), 1));
 
         SelectItem(0);

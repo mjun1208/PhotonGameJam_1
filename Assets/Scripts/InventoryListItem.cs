@@ -9,7 +9,7 @@ public enum InventoryItemType
 {
     None = -1,
     Shovel = 0,
-    SeedBag = 1,
+    SeedBag_Corn = 1,
     FishRod = 2,
     Fish = 3,
     Axe = 4,
@@ -19,6 +19,7 @@ public enum InventoryItemType
     BlueCornBread = 8,
     SharkJuice = 9,
     Table = 10,
+    Corn = 11,
 }
 
 public class InventoryListItem : MonoBehaviour

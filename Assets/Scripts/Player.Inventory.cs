@@ -6,10 +6,12 @@ public partial class Player
     [SerializeField] private InventoryBar _inventoryBar;
     [SerializeField] private InventoryUI _inventoryUI;
     [SerializeField] private ChestUI _chestUI;
+    [SerializeField] private UnlockUI _unlockUI;
     private InventoryItemType _inventoryItemType { get; set; }
     
     [Networked] private NetworkBool _isInventoryOpen { get; set; } = false;
     [Networked] private NetworkBool _isChestOpen { get; set; } = false;
+    [Networked] private NetworkBool _isUnlockOpen { get; set; } = false;
 
     private Chest _lookingChest;
 
@@ -17,6 +19,12 @@ public partial class Player
     // {
     //     Equip(_inventoryItemType);
     // }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RpcOpenUnlockUI(bool isOpen)
+    {
+        _isUnlockOpen = isOpen;
+    }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RpcOpenChestUI(bool isOpen)
@@ -83,7 +91,7 @@ public partial class Player
                 _shovel.SetActive(true);
                 break;
             }
-            case InventoryItemType.SeedBag:
+            case InventoryItemType.SeedBag_Corn:
             {
                 _seedBag.SetActive(true);
                 break;
@@ -169,5 +177,23 @@ public partial class Player
         {
             DisableInteractionText();
         }
+    }
+
+    public void OpenUnlockUI(int wave)
+    {
+        if (!CraftRecipeManager.HasNewRecipes(wave))
+        {
+            return;
+        }
+        
+        _unlockUI.gameObject.SetActive(true);
+        _unlockUI.SetNewRecipe(wave);
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        
+        Global.Instance.IngameActivingCursor = true;
+
+        RpcOpenUnlockUI(true);
     }
 }

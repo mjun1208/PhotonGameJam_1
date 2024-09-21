@@ -7,8 +7,9 @@ using UnityEngine;
 public class IngameManager : MonoBehaviour
 {
     public List<Table> Tables;
-    public List<NPC> Npcs;
+    // public List<NPC> Npcs;
     public NPC Npc;
+    public NPC Npc2;
     public MapManager MapManager;
     public Transform NpcSpawnPosition;
     public Transform NpcReturnPosition;

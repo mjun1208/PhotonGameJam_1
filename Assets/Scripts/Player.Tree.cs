@@ -45,6 +45,9 @@ public partial class Player
                         _lookingLog = null;
                         
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                        
+                        // Tutorial
+                        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
                     }
                 }
             }
@@ -118,6 +121,9 @@ public partial class Player
         if (HasStateAuthority)
         {
             var spawnedlog = Runner.Spawn(_log, hitPosition, Quaternion.LookRotation(lookPos), Object.StateAuthority);
+            
+            // Tutorial
+            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(1);
         }
         
         targetTree.Hit();

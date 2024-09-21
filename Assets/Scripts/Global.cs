@@ -3,6 +3,19 @@ using Photon.Voice.Fusion.Demo;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+public class GameResult
+{
+    public int Wave;
+    public bool Success;
+    public string WhoNpcGive;
+    public string WhoWalk;
+    public string WhoJump;
+    public string WhoTreeCut;
+    public string WhoCraft;
+    public string WhoCook;
+    public string WhoFishing;
+}
+
 public class Global : MonoBehaviour
 {
     public static Global Instance
@@ -61,6 +74,8 @@ public class Global : MonoBehaviour
     public bool IngameActivingCursor = true;
 
     public Player MyPlayer = null;
+
+    public GameResult LastGameResult = null;
 
     public void SetBasicSpawner(BasicSpawner basicSpawner)
     {

@@ -90,7 +90,6 @@ public partial class Player : NetworkBehaviour
     private bool _fishCatchComplete = false;
 
     private Dirt _plantTargetDirt = null;
-    private bool _plantAble = false;
     
     private bool _isEquipWeapon = false;
 
@@ -317,16 +316,36 @@ public partial class Player : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.E)  && !_isFishing)
         {
+            if (_unlockUI.gameObject.activeSelf)
+            {
+                _unlockUI.gameObject.SetActive(!_unlockUI.gameObject.activeSelf);
+
+                RpcOpenUnlockUI(_unlockUI.gameObject.activeSelf);
+                
+                if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+                {
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+
+                    Global.Instance.IngameActivingCursor = false;
+                }
+
+                return;
+            }
+
             if (_chestUI.gameObject.activeSelf)
             {
                 _chestUI.gameObject.SetActive(!_chestUI.gameObject.activeSelf);
 
                 RpcOpenChestUI(_chestUI.gameObject.activeSelf);
                 
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-                
-                Global.Instance.IngameActivingCursor = false;
+                if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+                {
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+
+                    Global.Instance.IngameActivingCursor = false;
+                }
                 
                 return;
             }
@@ -373,37 +392,60 @@ public partial class Player : NetworkBehaviour
             }
             else
             {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-                
-                Global.Instance.IngameActivingCursor = false; 
+                if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+                {
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+
+                    Global.Instance.IngameActivingCursor = false;
+                }
             }
         }
         
-        if (Input.GetKeyDown(KeyCode.Escape) && _inventoryUI.gameObject.activeSelf && !Global.Instance.MenuCanvas.activeSelf)
+        if (Input.GetKeyDown(KeyCode.Escape) && _unlockUI.gameObject.activeSelf && !Global.Instance.MenuCanvas.activeSelf)
         {
-            _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+            _unlockUI.gameObject.SetActive(!_unlockUI.gameObject.activeSelf);
 
-            RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
+            RpcOpenUnlockUI(_unlockUI.gameObject.activeSelf);
             
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-                
-            Global.Instance.IngameActivingCursor = false; 
+            if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                Global.Instance.IngameActivingCursor = false;
+            }
         }
-        
+
         if (Input.GetKeyDown(KeyCode.Escape) && _chestUI.gameObject.activeSelf && !Global.Instance.MenuCanvas.activeSelf)
         {
             _chestUI.gameObject.SetActive(!_chestUI.gameObject.activeSelf);
 
             RpcOpenChestUI(_chestUI.gameObject.activeSelf);
             
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-                
-            Global.Instance.IngameActivingCursor = false;
+            if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                Global.Instance.IngameActivingCursor = false;
+            }
         }
-        
+
+        if (Input.GetKeyDown(KeyCode.Escape) && _inventoryUI.gameObject.activeSelf && !Global.Instance.MenuCanvas.activeSelf)
+        {
+            _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
+
+            RpcOpenInventoryUI(_inventoryUI.gameObject.activeSelf);
+            
+            if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                Global.Instance.IngameActivingCursor = false;
+            }
+        }
         // if (Input.GetKeyDown(KeyCode.R))
         // {
         //     _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
@@ -431,10 +473,13 @@ public partial class Player : NetworkBehaviour
         }
         else
         {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-                
-            Global.Instance.IngameActivingCursor = false; 
+            if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                Global.Instance.IngameActivingCursor = false;
+            }
         }
     }
 
@@ -444,10 +489,31 @@ public partial class Player : NetworkBehaviour
 
         RpcOpenChestUI(_chestUI.gameObject.activeSelf);
 
+        if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
+            Global.Instance.IngameActivingCursor = false;
+        }
+    }
+    
+    public void CloseUnlock()
+    {
+        _unlockUI.gameObject.SetActive(!_unlockUI.gameObject.activeSelf);
+
+        RpcOpenUnlockUI(_unlockUI.gameObject.activeSelf);
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        Global.Instance.IngameActivingCursor = false;
+        if (!_unlockUI.gameObject.activeSelf && !_chestUI.gameObject.activeSelf && !_inventoryUI.gameObject.activeSelf)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
+            Global.Instance.IngameActivingCursor = false;
+        }
     }
     
     // Local Only
@@ -578,6 +644,32 @@ public partial class Player : NetworkBehaviour
         {
             return;
         }
+        
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        {
+            if (HasInputAuthority && CanClick)
+            {
+                if (_harvestTargetDirt != null)
+                {
+                    if (_inventoryUI.AddItem(InventoryItemType.Corn, 1))
+                    {
+                        _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
+                        
+                        // var networkObject = _harvestTargetDirt.GetComponent<NetworkObject>();
+                        // RpcGetLogInputToState(networkObject);
+                        _harvestTargetDirt.gameObject.SetActive(false);
+                        _harvestTargetDirt.DespawnGOGO();
+                        
+                        _harvestTargetDirt = null;
+                        
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                        
+                        // Tutorial
+                        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(6);
+                    }
+                }
+            }
+        }
 
         if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
         {
@@ -585,11 +677,16 @@ public partial class Player : NetworkBehaviour
             {
                 if (_plantTargetDirt != null)
                 {
+                    _inventoryUI.RemoveItem(InventoryItemType.SeedBag_Corn, 1);
+                    
                     RpcDoSomething(_plantTargetDirt);
                     RpcTriggerFeedingAnimeInput();
                     
                     _plantTargetDirt.Looking(false);
                     _plantTargetDirt = null;
+                    
+                    // Tutorial
+                    Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(5);
                 }
             }
 
@@ -643,9 +740,10 @@ public partial class Player : NetworkBehaviour
     {
         base.Render();
         SetAnimation();
+        DisableInteractionText();
 
         // if (_playerType == PlayerType.Farmer)
-        if (_inventoryItemType == InventoryItemType.SeedBag)
+        if (_inventoryItemType == InventoryItemType.SeedBag_Corn)
         {
             GetPlantTarget();
         }
@@ -677,6 +775,7 @@ public partial class Player : NetworkBehaviour
             GetLog();
             GetBonFire();
             GetTable();
+            GetHarvestTarget();
         }
 
         ShowSpeakingIcon();
@@ -820,8 +919,6 @@ public partial class Player : NetworkBehaviour
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
                 InteractionRayCastDistance, dirtMask) && !_isDigging)
         {
-            _plantAble = true;
-
             if (HasInputAuthority)
             {
                 var dirt = hit.transform.GetComponent<Dirt>();
@@ -843,13 +940,59 @@ public partial class Player : NetworkBehaviour
         }
         else
         {
-            _plantAble = false;
-
             if (_plantTargetDirt != null)
             {
                 _plantTargetDirt.Looking(false);
                 _plantTargetDirt = null;
             }
+        }
+    }
+
+    private Dirt _harvestTargetDirt = null;
+    
+    private void GetHarvestTarget()
+    {
+        LayerMask dirtMask = 1 << LayerMask.NameToLayer("Dirt");
+        
+        if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
+                InteractionRayCastDistance, dirtMask))
+        {
+            var dirt = hit.transform.GetComponent<Dirt>();
+            if (dirt != null && dirt != _harvestTargetDirt)
+            {
+                if (dirt != null && dirt.Grew)
+                {
+                    dirt.Looking(true);
+                    _harvestTargetDirt = dirt;
+                }
+                else
+                {
+                    if (_harvestTargetDirt != null)
+                    {
+                        _harvestTargetDirt.Looking(false);
+                        _harvestTargetDirt = null;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (_harvestTargetDirt != null)
+            {
+                _harvestTargetDirt.Looking(false);
+                _harvestTargetDirt = null;
+            }
+        }
+        
+        
+        if (_harvestTargetDirt != null)
+        {
+            _interactionText.text = "클릭 - 수확 하기";
+            _interactionText.transform.parent.gameObject.SetActive(true);
+        }
+        else
+        {
+            DisableInteractionText();
         }
     }
 
@@ -878,7 +1021,7 @@ public partial class Player : NetworkBehaviour
         int layer = groundMask | dirtMask | waterMask;
         
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
-                InteractionRayCastDistance) && !_plantAble)
+                InteractionRayCastDistance))
         {
             if (1 << hit.transform.gameObject.layer == dirtMask.value)
             {
@@ -1078,10 +1221,6 @@ public partial class Player : NetworkBehaviour
     public void RpcTriggerFeedingAnime()
     {
         _animator.SetTrigger("Feed");
-
-        SetToolFalse();
-
-        _seedBag.SetActive(true);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -1315,12 +1454,22 @@ public partial class Player : NetworkBehaviour
             return true;
         }
         
+        if (HasInputAuthority && _unlockUI.gameObject.activeSelf)
+        {
+            return true;
+        }
+        
         if (_isInventoryOpen)
         {
             return true;
         }
         
         if (_isChestOpen)
+        {
+            return true;
+        }
+        
+        if (_isUnlockOpen)
         {
             return true;
         }
@@ -1356,7 +1505,9 @@ public partial class Player : NetworkBehaviour
 
     public void DisableInteractionText()
     {
-        if (_lookingBonfire == null && _lookingNpc == null && _lookingTable == null && _lookingChest)
+        if (_lookingBonfire == null && _lookingNpc == null && 
+            _lookingTable == null && _lookingChest == null &&
+            _harvestTargetDirt == null)
         {
             _interactionText.transform.parent.gameObject.SetActive(false);
         }

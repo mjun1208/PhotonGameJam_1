@@ -45,6 +45,14 @@ public class Table : NetworkBehaviour
         {
             Global.Instance.IngameManager.ServerOnlyGameManager.OnEmptySitAppear();
         }
+        
+        if (HasStateAuthority)
+        {
+            if (Global.Instance.IngameManager.ServerOnlyGameManager.TutorialIndex == 9)
+            {
+                Global.Instance.IngameManager.ServerOnlyGameManager.SpawnTutorialNpc();
+            }
+        }
     }
 
     public (Table, Transform) GetEmptySit()

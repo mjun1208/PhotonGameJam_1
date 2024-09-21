@@ -43,6 +43,9 @@ public partial class InventoryUI : MonoBehaviour
         SetRecipes(CraftRecipeManager.CraftRecipes);
 
         OnClickRecipe(CraftRecipeManager.CraftRecipes[0]);
+        
+        // Tutorial
+        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(3);
     }
 
     private void SetRecipes(List<CraftRecipe> craftRecipes)
@@ -54,7 +57,7 @@ public partial class InventoryUI : MonoBehaviour
         
         for (int i = 0; i < craftRecipesByWave.Count; i++)
         {
-            if (i > _craftRecipeListItems.Count - 1)
+            if (i >= _craftRecipeListItems.Count - 1)
             {
                 var newRecipeListItem = Instantiate(_originCraftRecipeListItem, _recipeListParent);
                 _craftRecipeListItems.Add(newRecipeListItem);
@@ -134,6 +137,31 @@ public partial class InventoryUI : MonoBehaviour
         _craftEnd.Show(_craftRecipe);
         
         UpdateRecipes();
+
+        if (_craftRecipe.ResultItem == InventoryItemType.Shovel)
+        {
+            // Tutorial
+            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(4);
+        }
+        
+        if (_craftRecipe.ResultItem == InventoryItemType.BonFire)
+        {
+            // Tutorial
+            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(7);
+        }
+        
+        if (_craftRecipe.ResultItem == InventoryItemType.CornSoup)
+        {
+            // Tutorial
+            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(8);
+        }
+        
+        if (_craftRecipe.ResultItem == InventoryItemType.Table)
+        {
+            // Tutorial
+            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(9);
+        }
+        
         // _player.ShowNotice("제작 완료", Color.green);
     }
 
@@ -180,7 +208,7 @@ public static class CraftRecipeManager
             Desc = "땅을 파는데 사용하는 도구.",
             Material = new Dictionary<InventoryItemType, int>()
             {
-                {InventoryItemType.Log, 5},
+                {InventoryItemType.Log, 1},
             },
             OpenWave = 0,
         },
@@ -202,7 +230,7 @@ public static class CraftRecipeManager
             Desc = "손님 맞을 준비 OK?",
             Material = new Dictionary<InventoryItemType, int>()
             {
-                {InventoryItemType.Log, 1},
+                {InventoryItemType.Log, 5},
             },
             OpenWave = 0,
         },
@@ -229,7 +257,7 @@ public static class CraftRecipeManager
             Desc = "옥수수를 끓여 만든 옥수수 죽.\n간단하게 만들수 있어서 최고~",
             Material = new Dictionary<InventoryItemType, int>()
             {
-                {InventoryItemType.Log, 1},
+                {InventoryItemType.Corn, 1},
             },
             OpenWave = 0,
         },
@@ -242,7 +270,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 1},
             },
-            OpenWave = 0,
+            OpenWave = 3,
         },
         new CraftRecipe()
         {
@@ -253,7 +281,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 1},
             },
-            OpenWave = 1,
+            OpenWave = 3,
         },
     };
 
@@ -267,5 +295,22 @@ public static class CraftRecipeManager
         }
         
         return find;
+    }
+
+    public static CraftRecipe GetRandomCookRecipe()
+    {
+        var list = CookRecipes.Where(x => x.OpenWave <= Global.Instance.IngameManager.ServerOnlyGameManager.Wave).ToList();
+
+        int randomIndex = Random.Range(0, list.Count);
+        
+        return list[randomIndex];
+    }
+    
+    public static bool HasNewRecipes(int wave)
+    {
+        var newCraftRecipe = CraftRecipes.Where(x => x.OpenWave == wave).Any();
+        var newCookRecipe = CookRecipes.Where(x => x.OpenWave == wave).Any();
+
+        return newCraftRecipe || newCookRecipe;
     }
 }

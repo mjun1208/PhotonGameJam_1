@@ -105,23 +105,27 @@ public class Dirt : NetworkBehaviour
             return;
         }
 
-        // if (Planted && !Grew && _growDelayTimerOn)
-        // {
-        //     if (_growDelay > 0f)
-        //     {
-        //         _growDelay -= Time.deltaTime;
-        //     }
-        //     else
-        //     {
-        //         Grew = true;
-        //
-        //         if (!_shoot)
-        //         {
-        //             _shoot = true;
-        //             RpcSpawnMissile();
-        //         }
-        //     }
-        // }
+        if (Planted && !Grew && _growDelayTimerOn)
+        {
+            if (_growDelay > 0f)
+            {
+                _growDelay -= Time.deltaTime;
+            }
+            else
+            {
+                Grew = true;
+                // if (!_shoot)
+                // {
+                //     _shoot = true;
+                //     RpcSpawnMissile();
+                // }
+            }
+        }
+    }
+
+    public void DespawnGOGO()
+    {
+        Runner.Despawn(this.GetComponent<NetworkObject>());
     }
 
     public void Looking(bool isLook)
@@ -135,7 +139,7 @@ public class Dirt : NetworkBehaviour
 
         if (HasStateAuthority)
         {
-            _growDelay = 5f;
+            _growDelay = 6f;
             _growDelayTimerOn = true;
         }
     }    

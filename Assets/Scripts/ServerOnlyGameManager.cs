@@ -2,17 +2,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cinemachine;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public class Balance
 {
     public int Wave;
     public int LimitTime;
     public int NpcCount;
+    public int LimitFailCount;
+    public int MaxNpcRequestItemCount;
 }
 
 public class ServerOnlyGameManager : NetworkBehaviour
@@ -24,11 +29,23 @@ public class ServerOnlyGameManager : NetworkBehaviour
     
     [SerializeField] private TMP_Text _leftNpcText;
     [SerializeField] private TMP_Text _endNpcText;
+    [SerializeField] private DOTweenAnimation _leftNpcTextDOTween;
+    [SerializeField] private DOTweenAnimation _endNpcTextTextDOTween;
+    
+    [SerializeField] private RectTransform c;
+    
+    [SerializeField] private CinemachineVirtualCamera _endCamera;
+    [SerializeField] private GameObject _endCanvas;
     
     [Networked, OnChangedRender(nameof(OnChangedWaveCount))] public int Wave { get; set; } = 0;
     [Networked, OnChangedRender(nameof(OnChangedRewardCount))] public int RewardCount { get; set; } = 0;
-    [Networked, OnChangedRender(nameof(OnChangedLeftNpcCount))] public int ThisTimeNpcCount { get; set; } = 0;
+    [Networked] public int ThisTimeNpcCount { get; set; } = 0;
+    [Networked, OnChangedRender(nameof(OnChangedLeftNpcCount))] public int WaveNpcCount { get; set; } = 0;
     [Networked, OnChangedRender(nameof(OnChangedEndNpcCount))] public int EndNpcCount { get; set; } = 0;
+    [Networked, OnChangedRender(nameof(OnChangedFailCount))] public int WantFailCount { get; set; } = 1;
+    [Networked, OnChangedRender(nameof(OnChangedFailCount))] public int NpcFailCount { get; set; } = 0;
+
+    public int MaxRequestCount = 1;
     
     private int _serverOnlyThisTimeNpcCount { get; set; } = 0;
 
@@ -38,29 +55,29 @@ public class ServerOnlyGameManager : NetworkBehaviour
 
     private List<Balance> _balances = new List<Balance>()
     {
-        new Balance() {Wave = 1, NpcCount = 3, LimitTime = 120,}, // 옥수수죽
-        new Balance() {Wave = 2, NpcCount = 5, LimitTime = 120,}, // 낚시 오픈? 생선
-        new Balance() {Wave = 3, NpcCount = 8, LimitTime = 120,}, // 도넛, 커피
-        new Balance() {Wave = 4, NpcCount = 11, LimitTime = 120,},
-        new Balance() {Wave = 5, NpcCount = 15, LimitTime = 120,},
+        new Balance() {Wave = 1, NpcCount = 3, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 옥수수죽
+        new Balance() {Wave = 2, NpcCount = 5, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 낚시 오픈? 생선
+        new Balance() {Wave = 3, NpcCount = 8, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 도넛, 커피
+        new Balance() {Wave = 4, NpcCount = 11, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,},
+        new Balance() {Wave = 5, NpcCount = 15, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,},
         
-        new Balance() {Wave = 6, NpcCount = 20, LimitTime = 150,}, // 햄버거, 콜라
-        new Balance() {Wave = 7, NpcCount = 22, LimitTime = 150,},
-        new Balance() {Wave = 8, NpcCount = 24, LimitTime = 150,},
-        new Balance() {Wave = 9, NpcCount = 26, LimitTime = 150,}, // 케이크
-        new Balance() {Wave = 10, NpcCount = 28, LimitTime = 150,},
+        new Balance() {Wave = 6, NpcCount = 20, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 햄버거, 콜라
+        new Balance() {Wave = 7, NpcCount = 22, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,},
+        new Balance() {Wave = 8, NpcCount = 24, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,},
+        new Balance() {Wave = 9, NpcCount = 26, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 케이크
+        new Balance() {Wave = 10, NpcCount = 28, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,},
         
-        new Balance() {Wave = 11, NpcCount = 30, LimitTime = 180,},
-        new Balance() {Wave = 12, NpcCount = 33, LimitTime = 180,}, // 블라블라 1 와인?
-        new Balance() {Wave = 13, NpcCount = 36, LimitTime = 180,},
-        new Balance() {Wave = 14, NpcCount = 39, LimitTime = 180,},
-        new Balance() {Wave = 15, NpcCount = 45, LimitTime = 180,}, // 블라블라 2 
+        new Balance() {Wave = 11, NpcCount = 30, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,},
+        new Balance() {Wave = 12, NpcCount = 33, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 블라블라 1 와인?
+        new Balance() {Wave = 13, NpcCount = 36, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,},
+        new Balance() {Wave = 14, NpcCount = 39, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,},
+        new Balance() {Wave = 15, NpcCount = 45, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 블라블라 2 
         
-        new Balance() {Wave = 16, NpcCount = 50, LimitTime = 200,}, // 라멘
-        new Balance() {Wave = 17, NpcCount = 55, LimitTime = 200,}, 
-        new Balance() {Wave = 18, NpcCount = 60, LimitTime = 200,},
-        new Balance() {Wave = 19, NpcCount = 65, LimitTime = 200,},
-        new Balance() {Wave = 20, NpcCount = 77, LimitTime = 200,},
+        // new Balance() {Wave = 16, NpcCount = 50, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,}, // 라멘
+        // new Balance() {Wave = 17, NpcCount = 55, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,}, 
+        // new Balance() {Wave = 18, NpcCount = 60, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,},
+        // new Balance() {Wave = 19, NpcCount = 65, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,},
+        // new Balance() {Wave = 20, NpcCount = 77, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,},
     };
 
     private Balance GetBalance(int wave)
@@ -78,10 +95,17 @@ public class ServerOnlyGameManager : NetworkBehaviour
         {
             Wave = 0;
             RewardCount = 0;
+            TutorialIndex = 0;
+            ThisTimeNpcCount = 0;
+            NpcFailCount = 0;
+            WantFailCount = 1;
         }
         
         OnChangedWaveCount();
         OnChangedRewardCount();
+        OnChangedTutorialIndex();
+        OnChangedFailCount();
+        OnChangedLeftNpcCount();
     }
 
     public void OnChangedWaveCount()
@@ -90,11 +114,20 @@ public class ServerOnlyGameManager : NetworkBehaviour
         {
             if (Wave != 0)
             {
+                if (Wave > _balances.Count)
+                {
+                    End(true);
+                    return;
+                }
+                
                 var balance = GetBalance(Wave);
                 ThisTimeNpcCount = balance.NpcCount;
+                WaveNpcCount = balance.NpcCount;
                 _serverOnlyThisTimeNpcCount = balance.NpcCount;
                 EndNpcCount = 0;
-                
+                NpcFailCount = 0;
+                WantFailCount = balance.LimitFailCount;
+                MaxRequestCount = balance.MaxNpcRequestItemCount;
                 WaveStart();
             }
         }
@@ -113,20 +146,106 @@ public class ServerOnlyGameManager : NetworkBehaviour
 
     public void OnChangedLeftNpcCount()
     {
-        _leftNpcText.text = $"남은 손님 : {ThisTimeNpcCount}";
+        _leftNpcText.text = $"남은 손님 : {WaveNpcCount - EndNpcCount}";
+        _leftNpcTextDOTween.DORewind();
+        _leftNpcTextDOTween.DOPlay();
     }
 
     public void OnChangedEndNpcCount()
     {
-        _endNpcText.text = $"끝 : {EndNpcCount}";
+        OnChangedLeftNpcCount();
+        // _endNpcText.text = $"끝 : {EndNpcCount}";
 
         if (HasStateAuthority)
         {
             if (EndNpcCount == _serverOnlyThisTimeNpcCount)
             {
-                Wave++;
+                if (Wave == 0)
+                {
+                    Wave = 1;
+                }
+                else
+                {
+                    NextWave();
+                }
             }
         }
+    }
+
+    private async void NextWave()
+    {
+        Global.Instance.MyPlayer.OpenUnlockUI(Wave + 1);
+        
+        c.gameObject.SetActive(true);
+
+        c.anchoredPosition = new Vector2(0, 56);
+        c.DOAnchorPos(new Vector2(0, -18), 0.3f);
+        
+        await UniTask.Delay(10000);
+
+        await c.DOAnchorPos(new Vector2(0, 56), 0.3f);
+        
+        c.gameObject.SetActive(false);
+        
+        Wave++;
+    }
+
+    public void HideCow()
+    {
+        c.gameObject.SetActive(false);
+    }
+
+    public void OnChangedFailCount()
+    {
+        _endNpcText.text = $"실패 : {NpcFailCount} / {WantFailCount}";
+        _endNpcTextTextDOTween.DORewind();
+        _endNpcTextTextDOTween.DOPlay();
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcSetCameraToFailMan(NPC lastFailNpc)
+    {
+        _endCamera.m_Follow = lastFailNpc.transform;
+        _endCamera.m_LookAt = lastFailNpc.transform;
+
+        Time.timeScale = 0.5f;
+        
+        CinemachineBrain.SoloCamera = _endCamera;
+        
+        End(false);
+    }
+
+    private void MakeResult(bool success)
+    {
+        var gameResult = new GameResult()
+        {
+            Wave = Math.Clamp(Wave, 0, _balances.Count),
+            Success = success,
+            // WhoNpcGive
+            // WhoWalk
+            // WhoJump
+            // WhoTreeCut
+            // WhoCraft
+            // WhoCook
+            // WhoFishing
+        };
+        
+        Global.Instance.LastGameResult = gameResult;
+    }
+
+    private async void End(bool isSuccess)
+    {
+        MakeResult(isSuccess);
+        
+        await UniTask.Delay(1000);
+
+        Time.timeScale = 1f;
+        
+        _endCanvas.gameObject.SetActive(true);
+        
+        await UniTask.Delay(2000);
+
+        SceneManager.LoadScene("EndScene");
     }
 
     private void Update()
@@ -176,24 +295,59 @@ public class ServerOnlyGameManager : NetworkBehaviour
         TutorialManager.HideTutorialUI();
     }
 
-    public void WaveStart()
+    public async void WaveStart()
     {
         if (!HasStateAuthority)
         {
             return;
         }
 
-        int npcCount = ThisTimeNpcCount;
-
-        for (int i = 1; i <= npcCount; i++)
+        while (ThisTimeNpcCount > 0)
         {
-            var emptySit = Global.Instance.IngameManager.GetTableSit();
-
-            if (emptySit.Item1 != null && emptySit.Item2 != null)
+            if (ThisTimeNpcCount > 0)
             {
-                SpawnNpc(emptySit.Item1, emptySit.Item2);
-            } 
+                var emptySit = Global.Instance.IngameManager.GetTableSit();
+
+                if (emptySit.Item1 != null && emptySit.Item2 != null)
+                {
+                    SpawnNpc(emptySit.Item1, emptySit.Item2);
+                }
+            }
+            
+            if (ThisTimeNpcCount > 0)
+            {
+                var emptySit = Global.Instance.IngameManager.GetTableSit();
+
+                if (emptySit.Item1 != null && emptySit.Item2 != null)
+                {
+                    SpawnNpc(emptySit.Item1, emptySit.Item2);
+                }
+            }
+            
+            if (ThisTimeNpcCount > 0)
+            {
+                var emptySit = Global.Instance.IngameManager.GetTableSit();
+
+                if (emptySit.Item1 != null && emptySit.Item2 != null)
+                {
+                    SpawnNpc(emptySit.Item1, emptySit.Item2);
+                }
+            }
+
+            await UniTask.Delay(2000);
         }
+
+        // int npcCount = ThisTimeNpcCount;
+        //
+        // for (int i = 1; i <= npcCount; i++)
+        // {
+        //     var emptySit = Global.Instance.IngameManager.GetTableSit();
+        //
+        //     if (emptySit.Item1 != null && emptySit.Item2 != null)
+        //     {
+        //         SpawnNpc(emptySit.Item1, emptySit.Item2);
+        //     } 
+        // }
     }
 
     public void OnEmptySitAppear()
@@ -203,9 +357,29 @@ public class ServerOnlyGameManager : NetworkBehaviour
             return;
         }
         
-        WaveStart();
+        // WaveStart();
     }
 
+    private bool _isSpawnedTutorialNpc = false;
+    
+    public void SpawnTutorialNpc()
+    {
+        if (_isSpawnedTutorialNpc)
+        {
+            return;
+        }
+
+        _isSpawnedTutorialNpc = true;
+            
+        // 튜토리얼용 Npc 소환!
+        var emptySit = Global.Instance.IngameManager.GetTableSit();
+
+        if (emptySit.Item1 != null && emptySit.Item2 != null)
+        {
+            Global.Instance.IngameManager.ServerOnlyGameManager.SpawnNpc(emptySit.Item1, emptySit.Item2);
+        }
+    }
+    
     public void SpawnNpc(Table table, Transform sit)
     {
         if (!HasStateAuthority)
@@ -213,9 +387,21 @@ public class ServerOnlyGameManager : NetworkBehaviour
             return;
         }
 
-        var npc = Runner.Spawn(Global.Instance.IngameManager.Npc, Global.Instance.IngameManager.NpcSpawnPosition.position + new Vector3(0, 0.5f, 0), Quaternion.identity, Object.StateAuthority);
+        var aaaNpc = Global.Instance.IngameManager.Npc;
+        
+        if (Random.Range(0, 2) == 1)
+        {
+            aaaNpc = Global.Instance.IngameManager.Npc2;
+        }
+        
+        var npc = Runner.Spawn(aaaNpc, Global.Instance.IngameManager.NpcSpawnPosition.position + new Vector3(0, 0.5f, 0), Quaternion.identity, Object.StateAuthority);
         npc.TargetSit = sit;
         npc.TargetTable = table;
+
+        if (Wave == 0)
+        {
+            npc.IsTutorial = true;
+        }
 
         ThisTimeNpcCount--;
     }

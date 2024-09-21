@@ -8,6 +8,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
 using UnityEngine.Rendering.UI;
 
 public class NPC : NetworkBehaviour
@@ -25,6 +26,7 @@ public class NPC : NetworkBehaviour
    [SerializeField] private Image _faceImage;
    [SerializeField] private List<Sprite> _faceImageList;
    [SerializeField] private List<ParticleSystem> _resultParticleList;
+   [SerializeField] private NavMeshObstacle _navMeshObstacle;
 
    private List<NpcWantItem> _npcWantItems = new List<NpcWantItem>();
 
@@ -48,6 +50,8 @@ public class NPC : NetworkBehaviour
    
    public Transform TargetSit { get; set; }
    public Table TargetTable { get; set; }
+
+   public bool IsTutorial = false;
    // [Networked] private 
    
    public override void Spawned()
@@ -62,7 +66,7 @@ public class NPC : NetworkBehaviour
       SetColor();
 
       _faceImage.gameObject.SetActive(false);
-      Global.Instance.IngameManager.Npcs.Add(this);
+      // Global.Instance.IngameManager.Npcs.Add(this);
    }
 
    public void SetColor()
@@ -88,6 +92,9 @@ public class NPC : NetworkBehaviour
       this.transform.rotation = TargetSit.transform.rotation;
       
       _timerObject.gameObject.SetActive(true);
+      
+      // Tutorial
+      Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(10);
    }
 
    public void StartOrder_Networked()
@@ -159,16 +166,32 @@ public class NPC : NetworkBehaviour
       
       _npcWantItems.Clear();
 
-      for (int i = 0; i < 4; i++)
+      int randomCount = Random.Range(1, Global.Instance.IngameManager.ServerOnlyGameManager.MaxRequestCount + 1);
+
+      // int randomCount = 1;
+      
+      for (int i = 0; i < randomCount; i++)
       {
-         // Test
+         var randomRecipe = CraftRecipeManager.GetRandomCookRecipe();
+         
          var wantItem = Instantiate(_originWantItem, _wantItemParent);
          wantItem.gameObject.SetActive(true);
-         var wantItemRecipe = CraftRecipeManager.GetRecipe(InventoryItemType.BonFire);
+         var wantItemRecipe = randomRecipe;
          wantItem.SetInfo(wantItemRecipe);
-
+         
          _npcWantItems.Add(wantItem);
       }
+      
+      // for (int i = 0; i < 4; i++)
+      // {
+      //    // Test
+      //    var wantItem = Instantiate(_originWantItem, _wantItemParent);
+      //    wantItem.gameObject.SetActive(true);
+      //    var wantItemRecipe = CraftRecipeManager.GetRecipe(InventoryItemType.BonFire);
+      //    wantItem.SetInfo(wantItemRecipe);
+      //
+      //    _npcWantItems.Add(wantItem);
+      // }
 
       SendNetworkNpcWantItems();
    }
@@ -198,7 +221,7 @@ public class NPC : NetworkBehaviour
       {
          if (TargetSit != null)
          {
-            if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move"))
+            if (_animator.GetCurrentAnimatorStateInfo(0).IsTag("Move") && !_chair.activeSelf && _navMeshAgent.enabled)
             {
                _navMeshAgent.SetDestination(TargetSit.position);
             }
@@ -216,7 +239,12 @@ public class NPC : NetworkBehaviour
 
                   this.gameObject.SetActive(false);
 
-                  Global.Instance.IngameManager.ServerOnlyGameManager.EndNpcCount++;
+                  if (!IsTutorial)
+                  {
+                     Global.Instance.IngameManager.ServerOnlyGameManager.EndNpcCount += 1;
+                  }
+
+                  Runner.Despawn(this.transform.GetComponent<NetworkObject>());
                }
             }
 
@@ -226,14 +254,6 @@ public class NPC : NetworkBehaviour
                {
                   StartOrder();
                }
-
-               // if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
-               // {
-               //    // 목표 지점에 도착한 경우
-               //    if (!_navMeshAgent.hasPath || _navMeshAgent.velocity.sqrMagnitude == 0f)
-               //    {
-               //    }
-               // }
             }
          }
 
@@ -257,6 +277,8 @@ public class NPC : NetworkBehaviour
          if (!_chair.activeSelf)
          {
             _chair.SetActive(true);
+            _navMeshObstacle.enabled = true;
+            _navMeshAgent.enabled = false;
          }
       }
       else
@@ -264,6 +286,8 @@ public class NPC : NetworkBehaviour
          if (_chair.activeSelf)
          {
             _chair.SetActive(false);
+            _navMeshObstacle.enabled = false;
+            _navMeshAgent.enabled = true;
          }
       }
       
@@ -310,6 +334,15 @@ public class NPC : NetworkBehaviour
                   _resultParticleList[2].gameObject.SetActive(true);
                   _resultParticleList[2].Play();
                   IsFail = true;
+
+                  if (Global.Instance.IngameManager.ServerOnlyGameManager.NpcFailCount + 1 ==
+                      Global.Instance.IngameManager.ServerOnlyGameManager.WantFailCount)
+                  {
+                     Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetCameraToFailMan(this);
+                  }
+
+                  Global.Instance.IngameManager.ServerOnlyGameManager.NpcFailCount++;
+                  
                   _animator.SetBool("Sit", false);
 
                   var wantItems = _npcWantItems.Where(x => !x.IsSuccess && !x.IsFail);
@@ -367,6 +400,9 @@ public class NPC : NetworkBehaviour
       wantItem.SetSuccess();
 
       SendNetworkNpcWantItems();
+      
+      // Tutorial 
+      Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(11);
 
       // 끝!
       if (!_npcWantItems.Exists(x => !x.IsSuccess && !x.IsFail))
