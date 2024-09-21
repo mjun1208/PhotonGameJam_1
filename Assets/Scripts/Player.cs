@@ -655,7 +655,7 @@ public partial class Player : NetworkBehaviour
                 {
                     if (_inventoryUI.AddItem(InventoryItemType.Corn, 1))
                     {
-                        _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
+                        // _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
                     
                         _harvestTargetDirt.gameObject.SetActive(false);
                         
