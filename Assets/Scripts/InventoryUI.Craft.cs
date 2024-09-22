@@ -156,7 +156,7 @@ public partial class InventoryUI : MonoBehaviour
             Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(7);
         }
         
-        if (_craftRecipe.ResultItem == InventoryItemType.CornSoup)
+        if (_craftRecipe.ResultItem == InventoryItemType.CookedCorn)
         {
             // Tutorial
             Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(8);
@@ -271,7 +271,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 1},
             },
-            OpenWave = 2,
+            OpenWave = 3,
         },
         new CraftRecipe()
         {
@@ -282,7 +282,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 1},
             },
-            OpenWave = 3,
+            OpenWave = 5,
         },
         
         new CraftRecipe()
@@ -296,7 +296,6 @@ public static class CraftRecipeManager
             },
             OpenWave = 5,
         },
-        
         new CraftRecipe()
         {
             ResultItem = InventoryItemType.Axe_2,
@@ -314,9 +313,9 @@ public static class CraftRecipeManager
     {
         new CraftRecipe()
         {
-            ResultItem = InventoryItemType.CornSoup,
+            ResultItem = InventoryItemType.CookedCorn,
             Name = "구운 옥수수",
-            Desc = "구운 옥수수다.\n",
+            Desc = "여름 제철의 옥수수를 구웠다.\n여름이였다.",
             Material = new Dictionary<InventoryItemType, int>()
             {
                 {InventoryItemType.Corn, 1},
@@ -325,25 +324,124 @@ public static class CraftRecipeManager
         },
         new CraftRecipe()
         {
-            ResultItem = InventoryItemType.SharkJuice,
-            Name = "상어 주스",
-            Desc = "상어로 주스를 만들다니?",
+            ResultItem = InventoryItemType.CookedChicken,
+            Name = "구운 치킨",
+            Desc = "닭을 구워버렸다.\n",
             Material = new Dictionary<InventoryItemType, int>()
             {
-                {InventoryItemType.Fish, 1},
+                {InventoryItemType.Chicken, 1},
             },
             OpenWave = 2,
         },
         new CraftRecipe()
         {
-            ResultItem = InventoryItemType.BlueCornBread,
-            Name = "파란 옥수수 빵",
-            Desc = "파란 옥수수로 만든 빵이다.\n왜 이 세상의 옥수수는 파란색인걸까!!!",
+            ResultItem = InventoryItemType.FishWater,
+            Name = "물고기 즙",
+            Desc = "물고기를 짜낸 즙.\n우엑.",
             Material = new Dictionary<InventoryItemType, int>()
             {
-                {InventoryItemType.Log, 1},
+                {InventoryItemType.Fish, 1},
+                {InventoryItemType.Cup, 1},
             },
             OpenWave = 3,
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.AppleCarrotJuice,
+            Name = "캐플",
+            Desc = "당근과 사과를 합친 주스.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Carrot, 1},
+                {InventoryItemType.Apple, 1},
+            },
+            OpenWave = 4,
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.CornPie,
+            Name = "옥수수 파이",
+            Desc = "옥수수로 만든 파이.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Corn, 2},
+                {InventoryItemType.Plate, 1},
+            },
+            OpenWave = 5,
+        },
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.PigAndChicken,
+            Name = "삼겹살 닭꼬치",
+            Desc = "",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Pig, 1},
+                {InventoryItemType.Chicken, 2},
+                {InventoryItemType.Plate, 1},
+            },
+            OpenWave = 6,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.TurtleAndFish,
+            Name = "바다거북 스프",
+            Desc = "\"죄송합니다. 이거 정말로 바다거북 수프인가요\"\n\"네, 틀림없는 바다거북 수프 맞습니다\"",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Turtle, 1},
+                {InventoryItemType.Fish, 2},
+                {InventoryItemType.Plate, 1},
+            },
+            OpenWave = 8,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.VeganSet,
+            Name = "야채샐러드",
+            Desc = "채식을 하는 당신을 위한 메뉴.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Carrot, 1},
+                {InventoryItemType.Apple, 1},
+                {InventoryItemType.Corn, 1},
+                {InventoryItemType.Log, 1},
+                {InventoryItemType.Plate, 1},
+            },
+            OpenWave = 10,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.BergurSet,
+            Name = "햄버거 세트",
+            Desc = "항상 보장된 맛.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Cow, 1},
+                {InventoryItemType.Corn, 3},
+                {InventoryItemType.Cola, 1},
+                {InventoryItemType.Plate, 1},
+            },
+            OpenWave = 12,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.SharkRamen,
+            Name = "샥스핀 라멘",
+            Desc = "고급스러워 보인다.\n콜라는 덤입니다.",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Fish_Shark, 1},
+                {InventoryItemType.Corn, 3},
+                {InventoryItemType.Pig, 1},
+                {InventoryItemType.Cola, 1},
+                {InventoryItemType.Plate, 1},
+            },
+            OpenWave = 14,
         },
     };
 

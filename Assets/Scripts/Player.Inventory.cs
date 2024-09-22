@@ -93,6 +93,8 @@ public partial class Player
                 break;
             }
             case InventoryItemType.SeedBag_Corn:
+            case InventoryItemType.SeedBag_Carrot:
+            case InventoryItemType.SeedBag_Cola:
             {
                 _seedBag.SetActive(true);
                 break;

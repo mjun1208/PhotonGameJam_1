@@ -677,7 +677,7 @@ public partial class Player : NetworkBehaviour
             {
                 if (_plantTargetDirt != null && CanClick)
                 {
-                    RpcDoSomething(_plantTargetDirt);
+                    RpcDoSomething(_plantTargetDirt, _inventoryItemType);
                     RpcTriggerFeedingAnimeInput();
                     
                     _plantTargetDirt.Looking(false);
@@ -688,7 +688,7 @@ public partial class Player : NetworkBehaviour
                     
                     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
                     
-                    _inventoryUI.RemoveItem(InventoryItemType.SeedBag_Corn, 1);
+                    _inventoryUI.RemoveItem(_inventoryItemType, 1);
                 }
             }
 
@@ -1194,9 +1194,10 @@ public partial class Player : NetworkBehaviour
     
     // RPC 함수 정의
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RpcDoSomething(Dirt dirt)
+    public void RpcDoSomething(Dirt dirt, InventoryItemType itemType)
     {
         dirt.Planted = true;
+        dirt.InvenType = itemType;
     }
     
     public void DoDig()

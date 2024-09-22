@@ -58,23 +58,23 @@ public partial class ServerOnlyGameManager : NetworkBehaviour
 
     private List<Balance> _balances = new List<Balance>()
     {
-        new Balance() {Wave = 1, NpcCount = 3, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 옥수수죽
-        new Balance() {Wave = 2, NpcCount = 5, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 낚시 오픈? 생선
-        new Balance() {Wave = 3, NpcCount = 8, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 도넛, 커피
-        new Balance() {Wave = 4, NpcCount = 11, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,},
-        new Balance() {Wave = 5, NpcCount = 15, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,},
+        new Balance() {Wave = 1, NpcCount = 3, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 구운 옥수수
+        new Balance() {Wave = 2, NpcCount = 5, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 구운 치킨
+        new Balance() {Wave = 3, NpcCount = 8, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 낚시, 컵, 상어
+        new Balance() {Wave = 4, NpcCount = 11, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // (당근, 사과) 주스
+        new Balance() {Wave = 5, NpcCount = 15, LimitTime = 120, LimitFailCount = 3, MaxNpcRequestItemCount = 2,}, // 좋은 도끼, 그릇, 옥수수 파이 (옥수수 +)
         
-        new Balance() {Wave = 6, NpcCount = 20, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 햄버거, 콜라
-        new Balance() {Wave = 7, NpcCount = 22, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,},
-        new Balance() {Wave = 8, NpcCount = 24, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,},
-        new Balance() {Wave = 9, NpcCount = 26, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 케이크
-        new Balance() {Wave = 10, NpcCount = 28, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,},
+        new Balance() {Wave = 6, NpcCount = 20, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 돼지
+        new Balance() {Wave = 7, NpcCount = 22, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // (거북이 탕)
+        new Balance() {Wave = 8, NpcCount = 24, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 옥수수 케이크 / 옥수수 + 
+        new Balance() {Wave = 9, NpcCount = 26, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 소로 하는거
+        new Balance() {Wave = 10, NpcCount = 28, LimitTime = 150, LimitFailCount = 3, MaxNpcRequestItemCount = 3,}, // 더 좋은 도끼 / 당근 + 사과 + 옥수수 + 나무
         
-        new Balance() {Wave = 11, NpcCount = 30, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,},
-        new Balance() {Wave = 12, NpcCount = 33, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 블라블라 1 와인?
-        new Balance() {Wave = 13, NpcCount = 36, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,},
-        new Balance() {Wave = 14, NpcCount = 39, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,},
-        new Balance() {Wave = 15, NpcCount = 45, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 블라블라 2 
+        new Balance() {Wave = 11, NpcCount = 30, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 
+        new Balance() {Wave = 12, NpcCount = 33, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 햄버거 세트 (돼지 + 빵 + 콜라) // 콜라 씨앗
+        new Balance() {Wave = 13, NpcCount = 36, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 
+        new Balance() {Wave = 14, NpcCount = 39, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 옥수수 라멘 (3 옥수수 + 닭 + )
+        new Balance() {Wave = 15, NpcCount = 45, LimitTime = 180, LimitFailCount = 3, MaxNpcRequestItemCount = 4,}, // 
         
         // new Balance() {Wave = 16, NpcCount = 50, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,}, // 라멘
         // new Balance() {Wave = 17, NpcCount = 55, LimitTime = 200, LimitFailCount = 3, MaxNpcRequestItemCount = 5,}, 

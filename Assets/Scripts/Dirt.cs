@@ -21,6 +21,9 @@ public class Dirt : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnChangePlated))] 
     public NetworkBool Planted { get; set; }
     
+    [Networked] 
+    public InventoryItemType InvenType { get; set; }
+    
     [Networked, OnChangedRender(nameof(OnChangeGrew))] 
     public NetworkBool Grew { get; set; }
 
