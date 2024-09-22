@@ -209,6 +209,17 @@ public static class CraftRecipeManager
     {
         new CraftRecipe()
         {
+            ResultItem = InventoryItemType.Axe,
+            Name = "도끼",
+            Desc = "이걸 사용하면!!\n나무를 자르거나,\n동물의 고기를 얻을 수 있다",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 1},
+            },
+            OpenWave = 0,
+        },
+        new CraftRecipe()
+        {
             ResultItem = InventoryItemType.Shovel,
             Name = "삽",
             Desc = "땅을 파는데 사용하는 도구.",
@@ -272,6 +283,30 @@ public static class CraftRecipeManager
                 {InventoryItemType.Log, 1},
             },
             OpenWave = 3,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.Axe_1,
+            Name = "좋은 도끼",
+            Desc = "더 강력하다!",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 10},
+            },
+            OpenWave = 0,
+        },
+        
+        new CraftRecipe()
+        {
+            ResultItem = InventoryItemType.Axe_2,
+            Name = "더 좋은 도끼!!",
+            Desc = "소가 두방에 죽음!!",
+            Material = new Dictionary<InventoryItemType, int>()
+            {
+                {InventoryItemType.Log, 15},
+            },
+            OpenWave = 0,
         },
     };
     

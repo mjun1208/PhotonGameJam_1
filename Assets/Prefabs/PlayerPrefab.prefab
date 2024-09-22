@@ -5232,7 +5232,7 @@ MonoBehaviour:
   _fishingFIFIFIFX: {fileID: 1823711575972399166}
   _fishCatchCanvas: {fileID: 8955466906497955849}
   _HitCanvas: {fileID: 2450016018877913070}
-  _spawnFish: {fileID: 1434932663762337264, guid: 4f1a5072508a6e54a8116f9060009786, type: 3}
+  _spawnFish: {fileID: 3097133000904980142, guid: 4f1a5072508a6e54a8116f9060009786, type: 3}
   _nameText: {fileID: 8333592754285839341}
   _equipFx: {fileID: 3423104158581102944}
   _noticeText: {fileID: 6220790493726900979}
@@ -5296,6 +5296,7 @@ MonoBehaviour:
   _table_Ghost: {fileID: 280679979545757132}
   _log: {fileID: 7079993046450573593, guid: f020dc69781743842a09cfe0cbbbab04, type: 3}
   _logFx: {fileID: 613490626776560955, guid: 494ddfa4d4713e447abb58870d24f85c, type: 3}
+  _meatFx: {fileID: 8031699067492803896, guid: 9c9b72b339e1fde4ea4f9b7a86ef7546, type: 3}
   _bonfire: {fileID: 2145477252377627660, guid: a4e413354146f7746922d7915c57e6c0, type: 3}
   _bonFire_Ghost: {fileID: 740022439862312621}
   _interactionText: {fileID: 287081511419226653}
@@ -25832,6 +25833,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6540325035318866374}
     m_Modifications:
+    - target: {fileID: 9187771706327622707, guid: 2458e86c1503e8b48b936a82c453e21b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8806b21d3c7013349a95b5e52d6bfbed, type: 2}
     - target: {fileID: 9187771706329561843, guid: 2458e86c1503e8b48b936a82c453e21b, type: 3}
       propertyPath: m_Name
       value: VillagerAxe
@@ -25918,9 +25923,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 8840096593412329727}
   _axeColl: {fileID: 2586488454346015759}
+  _renderer: {fileID: 2167510711254719638}
+  _setMaterial:
+  - {fileID: 2100000, guid: 8f772b3b80bbe084eb02b378f58b4551, type: 2}
+  - {fileID: 2100000, guid: 8806b21d3c7013349a95b5e52d6bfbed, type: 2}
+  - {fileID: 2100000, guid: cf7023e75df684c4e98633980d90f500, type: 2}
 --- !u!4 &2167510711252819574 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9187771706330048211, guid: 2458e86c1503e8b48b936a82c453e21b, type: 3}
+  m_PrefabInstance: {fileID: 7031542001761515685}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2167510711254719638 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 9187771706327622707, guid: 2458e86c1503e8b48b936a82c453e21b, type: 3}
   m_PrefabInstance: {fileID: 7031542001761515685}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7054831455906122334

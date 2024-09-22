@@ -6,6 +6,7 @@ public partial class Player
 {
     [SerializeField] private Log _log;
     [SerializeField] private GameObject _logFx;
+    [SerializeField] private GameObject _meatFx;
     [SerializeField] private BonFire _bonfire;
     [SerializeField] private GameObject _bonFire_Ghost;
     [SerializeField] private TMP_Text _interactionText;
@@ -16,7 +17,7 @@ public partial class Player
 
     private void TreeUpdate(NetworkInputData inputData)
     {
-        if (_inventoryItemType == InventoryItemType.Axe && !LookingWho())
+        if ((_inventoryItemType is InventoryItemType.Axe or InventoryItemType.Axe_1 or InventoryItemType.Axe_2) && !LookingWho())
         {
             if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
@@ -48,6 +49,29 @@ public partial class Player
                         
                         // Tutorial
                         Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
+                    }
+                }
+            }
+        }
+        
+        if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
+        {
+            if (HasInputAuthority && CanClick)
+            {
+                if (_lookingInteractItem != null)
+                {
+                    var getItem = _lookingInteractItem.GetItem();
+                    
+                    if (_inventoryUI.AddItem(getItem.Item1, getItem.Item2))
+                    {
+                        _lookingInteractItem.gameObject.SetActive(false);
+
+                        var networkObject = _lookingInteractItem.GetComponent<NetworkObject>();
+                        RpcGetLogInputToState(networkObject);
+                        
+                        _lookingInteractItem = null;
+                        
+                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
                     }
                 }
             }
@@ -120,14 +144,55 @@ public partial class Player
         
         if (HasStateAuthority)
         {
-            var spawnedlog = Runner.Spawn(_log, hitPosition, Quaternion.LookRotation(lookPos), Object.StateAuthority);
+            int count = 1;
             
+            if (_inventoryItemType == InventoryItemType.Axe)
+            {
+                count = 1;
+            }
+            if (_inventoryItemType == InventoryItemType.Axe_1)
+            {
+                count = 3;
+            }
+            if (_inventoryItemType == InventoryItemType.Axe_2)
+            {
+                count = 5;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                var spawnedlog = Runner.Spawn(_log, hitPosition, Quaternion.LookRotation(lookPos), Object.StateAuthority);   
+            }
+
             // Tutorial
             Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(1);
         }
         
         targetTree.Hit();
         Instantiate(_logFx, hitPosition, Quaternion.LookRotation(lookPos));
+    }
+    
+    public void SpawnMeat(Vector3 hitPosition, Vector3 dir, Animal targetAnimal)
+    {
+        var lookPos = hitPosition + dir;
+        
+        int count = 1;
+            
+        if (_inventoryItemType == InventoryItemType.Axe)
+        {
+            count = 1;
+        }
+        if (_inventoryItemType == InventoryItemType.Axe_1)
+        {
+            count = 2;
+        }
+        if (_inventoryItemType == InventoryItemType.Axe_2)
+        {
+            count = 3;
+        }
+        
+        targetAnimal.Hit(count);
+        Instantiate(_meatFx, hitPosition, Quaternion.LookRotation(lookPos));
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

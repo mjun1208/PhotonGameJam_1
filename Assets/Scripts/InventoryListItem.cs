@@ -8,19 +8,30 @@ using UnityEngine.UI;
 public enum InventoryItemType
 {
     None = -1,
+    
     Shovel = 0,
     SeedBag_Corn = 1,
     FishRod = 2,
     Fish = 3,
     Axe = 4,
+    
     BonFire = 5,
     Log = 6,
     CornSoup = 7,
     BlueCornBread = 8,
     SharkJuice = 9,
+    
     Table = 10,
     Corn = 11,
     Plate = 12,
+    Cup = 13,
+    Chicken = 14,
+    
+    Pig = 15,
+    Cow = 16,
+    Egg = 17,
+    Axe_1 = 18,
+    Axe_2 = 19,
 }
 
 public class InventoryListItem : MonoBehaviour

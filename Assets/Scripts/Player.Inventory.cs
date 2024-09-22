@@ -109,8 +109,11 @@ public partial class Player
                 break;
             }
             case InventoryItemType.Axe:
+            case InventoryItemType.Axe_1:
+            case InventoryItemType.Axe_2:
             {
-                _axe.gameObject.SetActive(true);   
+                _axe.gameObject.SetActive(true);
+                _axe.SetMaterial(_inventoryItemType);
                 break;
             }
             case InventoryItemType.BonFire:
@@ -135,7 +138,7 @@ public partial class Player
     private void GetChest()
     {
         LayerMask chestLayer = 1 << LayerMask.NameToLayer("Chest");
-        
+
         if (Physics.Raycast(_playerCameraRootTransform.transform.position, _playerCameraRootTransform.transform.forward,
                 out RaycastHit hit, InteractionRayCastDistance))
         {
@@ -199,4 +202,43 @@ public partial class Player
 
         RpcOpenUnlockUI(true);
     }
+    
+    private InteractItem _lookingInteractItem;
+    
+    private void GetInteractItem()
+    {
+        if (Physics.SphereCast(_playerCameraRootTransform.transform.position, 0.35f, _playerCameraRootTransform.transform.forward, out RaycastHit hit,
+                InteractionRayCastDistance))
+        {
+            var interactItem = hit.transform.GetComponent<InteractItem>();
+            if (interactItem)
+            {
+                if (_lookingInteractItem != null && _lookingInteractItem != interactItem)
+                {
+                    _lookingInteractItem.Look(false);
+                    _lookingInteractItem = null;
+                }
+                
+                interactItem.Look(true);
+                _lookingInteractItem = interactItem;
+            }
+            else
+            {
+                if (_lookingInteractItem != null)
+                {
+                    _lookingInteractItem.Look(false);
+                    _lookingInteractItem = null;
+                }
+            }
+        }
+        else
+        {
+            if (_lookingInteractItem != null)
+            {
+                _lookingInteractItem.Look(false);
+                _lookingInteractItem = null;
+            }
+        }
+    }
+
 }

@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 1608498923481640645}
   - component: {fileID: 4198165936385413806}
   - component: {fileID: 7187251459573047652}
-  - component: {fileID: 1434932663762337264}
   - component: {fileID: 5429967866310012436}
   - component: {fileID: 491182252126149440}
   - component: {fileID: 4685648233875054345}
   - component: {fileID: 7748359823917921452}
-  m_Layer: 14
+  - component: {fileID: 3097133000904980142}
+  m_Layer: 0
   m_Name: SharkV1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,20 +107,6 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
---- !u!114 &1434932663762337264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6528959241494291010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e989e953f2179974797e337ad7f6b66e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _outline: {fileID: 7187251459573047652}
-  _rigidbody: {fileID: 4685648233875054345}
 --- !u!114 &5429967866310012436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,8 +124,8 @@ MonoBehaviour:
   Flags: 131073
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 1434932663762337264}
   - {fileID: 491182252126149440}
+  - {fileID: 3097133000904980142}
 --- !u!114 &491182252126149440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,3 +191,20 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -4108424097152807243, guid: ca38d4485fce19f4aa0d3d7bdd8b6cf2, type: 3}
+--- !u!114 &3097133000904980142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6528959241494291010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c4925dfec6404548a7053c7e6fcdacf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _outlines:
+  - {fileID: 7187251459573047652}
+  _type: 3
+  _getCount: 3
+  _rigidbody: {fileID: 4685648233875054345}

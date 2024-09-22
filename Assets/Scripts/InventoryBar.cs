@@ -21,6 +21,10 @@ public class InventoryBar : MonoBehaviour
         _inventoryListItems[1].SetInventoryItemType(InventoryItemType.SeedBag_Corn, 5);
         _inventoryListItems[2].SetInventoryItemType(InventoryItemType.Table, 300);
         _inventoryListItems[3].SetInventoryItemType(InventoryItemType.CornSoup, 300);
+        _inventoryListItems[4].SetInventoryItemType(InventoryItemType.FishRod, 1);
+        
+        _inventoryListItems[5].SetInventoryItemType(InventoryItemType.Axe_1, 1);
+        _inventoryListItems[6].SetInventoryItemType(InventoryItemType.Axe_2, 1);
         // _inventoryListItems.ForEach(x=> x.SetInventoryItemType((InventoryItemType)_inventoryListItems.IndexOf(x), 1));
 
         SelectItem(0);

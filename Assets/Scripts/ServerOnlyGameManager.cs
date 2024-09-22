@@ -20,7 +20,7 @@ public class Balance
     public int MaxNpcRequestItemCount;
 }
 
-public class ServerOnlyGameManager : NetworkBehaviour
+public partial class ServerOnlyGameManager : NetworkBehaviour
 {
     [SerializeField] private TMP_Text _waveText;
     [SerializeField] private TMP_Text _rewardText;
@@ -102,6 +102,9 @@ public class ServerOnlyGameManager : NetworkBehaviour
             ThisTimeNpcCount = 0;
             NpcFailCount = 0;
             WantFailCount = 1;
+            
+            // 시작 시 오브젝트들을 소환
+            StartCoroutine(InitialSpawn());
         }
         
         OnChangedWaveCount();

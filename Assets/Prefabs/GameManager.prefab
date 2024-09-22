@@ -847,6 +847,7 @@ Transform:
   - {fileID: 651725069938421399}
   - {fileID: 95281074314212206}
   - {fileID: 1367941128596600453}
+  - {fileID: 7521821370560904520}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6723549518833329496
@@ -861,6 +862,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40471318dd5cc6141a99eb0852f013f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectsToSpawn:
+  - {fileID: 6560403410168807810, guid: aea8a349eb410c14c8f41dbad44047c8, type: 3}
+  - {fileID: 8359832541183277827, guid: f9158490e6a9f764a8a68949f4cad087, type: 3}
+  - {fileID: 3762797283112864827, guid: 9ca4c247a30651842883c2519a06742c, type: 3}
+  spawnLimits: 140000000a0000000a000000
+  spawnRadius: 20
+  centerPoint: {fileID: 7521821370560904520}
+  maxAttempts: 30
   _waveText: {fileID: 5083995540827492504}
   _rewardText: {fileID: 5549308517865466986}
   _waveTextDOTween: {fileID: 4839179333987498102}
@@ -875,6 +884,7 @@ MonoBehaviour:
   _failText: {fileID: 8107243849435595316}
   _successText: {fileID: 7328676224456992087}
   _Wave: 0
+  _CraftWave: 0
   _RewardCount: 0
   _ThisTimeNpcCount: 1
   _WaveNpcCount: 0
@@ -1757,6 +1767,37 @@ MonoBehaviour:
   optionalRotationMode: 0
   optionalScrambleMode: 0
   optionalString: 
+--- !u!1 &7281140112312456151
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7521821370560904520}
+  m_Layer: 0
+  m_Name: AnimalSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7521821370560904520
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7281140112312456151}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4949463106467080155}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7328676224456992087
 GameObject:
   m_ObjectHideFlags: 0

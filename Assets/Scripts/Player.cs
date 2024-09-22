@@ -39,7 +39,7 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private ParticleSystem _fishingFIFIFIFX;
     [SerializeField] private FishCatchCanvas _fishCatchCanvas;
     [SerializeField] private HitCanvas _HitCanvas;
-    [SerializeField] private FishWeapon _spawnFish;
+    [SerializeField] private InteractItem_Fish _spawnFish;
     [SerializeField] private TMP_Text _nameText;
     [SerializeField] private ParticleSystem _equipFx;
     [SerializeField] private TMP_Text _noticeText;
@@ -376,8 +376,6 @@ public partial class Player : NetworkBehaviour
             _lastClickTime = DateTime.UtcNow;
         }
         
-        Debug.Log(CanClick);
-
         if (Input.GetMouseButtonDown(0) && _lookingBonfire != null && !_inventoryUI.gameObject.activeSelf)
         {
             _inventoryUI.gameObject.SetActive(!_inventoryUI.gameObject.activeSelf);
@@ -735,7 +733,7 @@ public partial class Player : NetworkBehaviour
     {
         bool looking = _lookingBonfire != null || _lookingLog != null ||
                        _lookingFishWeapon != null || _lookingNpc != null || _lookingTable != null ||
-                       _lookingChest != null || _lookingShop != null;
+                       _lookingChest != null || _lookingShop != null || _lookingInteractItem != null;
 
         return looking;
     }
@@ -778,6 +776,7 @@ public partial class Player : NetworkBehaviour
             GetShop();
             GetChest();
             GetLog();
+            GetInteractItem();
             GetBonFire();
             GetTable();
             GetHarvestTarget();
