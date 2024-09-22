@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Fusion;
 using TMPro;
 using UnityEngine;
@@ -157,10 +158,16 @@ public partial class Player
             // _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
             
             // Tutorial
-            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
-            
+            WaitAndTutorial();
+
             _pickUpSound.Play();
         }
+    }
+
+    private async void WaitAndTutorial()
+    {
+        await UniTask.NextFrame();
+        Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(2);
     }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -226,7 +233,7 @@ public partial class Player
             }
 
             // Tutorial
-            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(1);
+            Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(1);
             
             // appleSpawn
             float rangeX = 3f; // x축 범위

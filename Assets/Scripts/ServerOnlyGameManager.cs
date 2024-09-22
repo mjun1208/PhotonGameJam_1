@@ -50,6 +50,8 @@ public partial class ServerOnlyGameManager : NetworkBehaviour
 
     public int MaxRequestCount = 1;
     
+    public DateTime StartTime = DateTime.Now;
+    
     private int _serverOnlyThisTimeNpcCount { get; set; } = 0;
 
     public TutorialManager TutorialManager;
@@ -102,7 +104,8 @@ public partial class ServerOnlyGameManager : NetworkBehaviour
             ThisTimeNpcCount = 0;
             NpcFailCount = 0;
             WantFailCount = 1;
-            
+            StartTime = DateTime.Now;
+
             // 시작 시 오브젝트들을 소환
             StartCoroutine(InitialSpawn());
         }
@@ -259,6 +262,7 @@ public partial class ServerOnlyGameManager : NetworkBehaviour
             Wave = Math.Clamp(Wave, 0, _balances.Count),
             Success = success,
             Gold = RewardCount,
+            StartTime = StartTime,
             // WhoNpcGive
             // WhoWalk
             // WhoJump
@@ -295,20 +299,13 @@ public partial class ServerOnlyGameManager : NetworkBehaviour
         SceneManager.LoadScene("EndScene");
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            NextWave();
-        }
-    }
-    
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RpcSetTutorialIndex(int index)
     {
         if (HasStateAuthority)
         {
-            if (TutorialIndex < index)
+            // 직전 Index만 적용
+            if (TutorialIndex == index - 1)
             {
                 TutorialIndex = index;
             }

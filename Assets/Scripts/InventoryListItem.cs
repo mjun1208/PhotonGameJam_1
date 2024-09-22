@@ -146,6 +146,8 @@ public class InventoryListItem : MonoBehaviour
             {
                 _drag.gameObject.SetActive(false);
             }
+            
+            _inventoryItemType = InventoryItemType.None;
         }
     }
 

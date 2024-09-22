@@ -63,7 +63,7 @@ public class ChestUI : InventoryUI
 
         for (int i = 0; i < _inventoryUI._inventoryListItems.Count; i++)
         {
-            _inventoryUI._inventoryListItems[i].SetInventoryUI(this);
+            // _inventoryUI._inventoryListItems[i].SetInventoryUI(this);
             _inventoryUI._inventoryListItems[i].SetInventoryItemType(_inventoryListItems[i].GetInventoryItemType, _inventoryListItems[i].ItemCount);
             
             if (_inventoryUI._inventoryListItems[i].Empty)
@@ -72,6 +72,18 @@ public class ChestUI : InventoryUI
             }
         }
 
+        for (int i = 0; i < _inventoryUI._inventoryBarListItems.Count; i++)
+        {
+            // _inventoryUI._inventoryBarListItems[i].SetInventoryUI(this);
+            _inventoryUI._inventoryBarListItems[i].SetInventoryItemType(_inventoryBarListItems[i].GetInventoryItemType, _inventoryBarListItems[i].ItemCount);
+            
+            if (_inventoryUI._inventoryBarListItems[i].Empty)
+            {
+                _inventoryUI._inventoryBarListItems[i].SetEmpty();
+            }
+        }
+
+        
         var saveChestList = _chestListItems.Select(x => x.ToChestInventoryItem());
         
         var networkedList = saveChestList;

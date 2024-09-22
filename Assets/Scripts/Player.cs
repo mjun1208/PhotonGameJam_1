@@ -684,7 +684,7 @@ public partial class Player : NetworkBehaviour
                         _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
                         
                         // Tutorial
-                        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(6);
+                        Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(6);
                         
                         _pickUpSound.Play();
                     }
@@ -705,7 +705,7 @@ public partial class Player : NetworkBehaviour
                     _plantTargetDirt = null;
                     
                     // Tutorial
-                    Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(5);
+                    Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(5);
                     
                     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
                     

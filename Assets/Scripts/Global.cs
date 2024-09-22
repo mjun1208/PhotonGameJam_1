@@ -8,6 +8,7 @@ public class GameResult
     public int Wave;
     public bool Success;
     public int Gold;
+    public DateTime StartTime;
     public string WhoNpcGive;
     public string WhoWalk;
     public string WhoJump;

@@ -26,15 +26,15 @@ public class Chest : NetworkBehaviour
 
     public List<ChestInventoryItem> ChestInventoryItems { get; set; } = new List<ChestInventoryItem>()
     {
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
-        new ChestInventoryItem() { e = true },
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
+        new ChestInventoryItem() { e = true, t = -1},
     };
     
     [Networked, OnChangedRender(nameof(SetChestItemList_Networked)), Capacity(500)] private string _chestItemList_Networked { get; set; } = "";

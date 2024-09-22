@@ -51,7 +51,7 @@ public partial class InventoryUI : MonoBehaviour
         OnClickRecipe(CraftRecipeManager.CraftRecipes[0]);
         
         // Tutorial
-        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(3);
+        Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(3);
     }
 
     private void SetRecipes(List<CraftRecipe> craftRecipes)
@@ -147,25 +147,25 @@ public partial class InventoryUI : MonoBehaviour
         if (_craftRecipe.ResultItem == InventoryItemType.Shovel)
         {
             // Tutorial
-            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(4);
+            Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(4);
         }
         
         if (_craftRecipe.ResultItem == InventoryItemType.BonFire)
         {
             // Tutorial
-            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(7);
+            Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(7);
         }
         
         if (_craftRecipe.ResultItem == InventoryItemType.CookedCorn)
         {
             // Tutorial
-            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(8);
+            Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(8);
         }
         
         if (_craftRecipe.ResultItem == InventoryItemType.Table)
         {
             // Tutorial
-            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(9);
+            Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(9);
         }
         
         // _player.ShowNotice("제작 완료", Color.green);

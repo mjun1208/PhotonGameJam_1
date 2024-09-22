@@ -1,3 +1,4 @@
+using System;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -18,6 +19,8 @@ public class EndScene : MonoBehaviour
     [SerializeField] private GameObject _tutorialText;
     [SerializeField] private GameObject _rewardText;
     [SerializeField] private TMP_Text _rewardCountText;
+    
+    [SerializeField] private TMP_Text _timeText;
     
     private void Start()
     {
@@ -72,6 +75,12 @@ public class EndScene : MonoBehaviour
                 startValue = x;
                 _rewardCountText.text = x.ToString(); // 현재 값을 텍스트에 설정
             }, Global.Instance.LastGameResult.Gold, 0.5f);
+            
+            await UniTask.Delay(1000);
+
+            _timeText.gameObject.SetActive(true);
+            var timeSpan = DateTime.Now - Global.Instance.LastGameResult.StartTime;
+            _timeText.text = $"걸린시간 : {(int)timeSpan.TotalMinutes}분";
         }
             
         await UniTask.Delay(1000);

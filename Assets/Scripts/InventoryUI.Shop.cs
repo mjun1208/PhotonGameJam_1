@@ -31,9 +31,6 @@ public partial class InventoryUI
         UpdateShopList();
 
         OnClickSellListItem(ShopManager.SellList[0]);
-        
-        // Tutorial
-        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(3);
     }
     
     private void SetShopItems(List<SellItem> sellItems)

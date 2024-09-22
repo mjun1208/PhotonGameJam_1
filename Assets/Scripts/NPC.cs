@@ -94,7 +94,7 @@ public class NPC : NetworkBehaviour
       _timerObject.gameObject.SetActive(true);
       
       // Tutorial
-      Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(10);
+      Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(10);
    }
 
    public void StartOrder_Networked()
@@ -402,7 +402,7 @@ public class NPC : NetworkBehaviour
       SendNetworkNpcWantItems();
       
       // Tutorial 
-      Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(11);
+      Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(11);
 
       // 끝!
       if (!_npcWantItems.Exists(x => !x.IsSuccess && !x.IsFail))

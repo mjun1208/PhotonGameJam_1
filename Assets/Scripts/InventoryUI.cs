@@ -132,10 +132,7 @@ public partial class InventoryUI : MonoBehaviour
             _draggingItem.gameObject.SetActive(true);
         }
 
-        if (_draggingItem.GetInventoryItemType != inventoryItemType)
-        {
-            _draggingItem.SetInventoryItem(_dragSlot);
-        }
+        _draggingItem.SetInventoryItem(_dragSlot);
 
         _dragging = true;
 
@@ -252,7 +249,15 @@ public partial class InventoryUI : MonoBehaviour
         var slot = GetFirstItemSlot(inventoryItemType);
         if (slot != null)
         {
-            slot.ItemCount += count;
+            if (slot.Empty)
+            {
+                slot.ItemCount = count;
+            }
+            else
+            {
+                slot.ItemCount += count;
+            }
+
             slot.SetInventoryItemType(inventoryItemType, slot.ItemCount);
             if (slot.InventoryBar != null)
             {
