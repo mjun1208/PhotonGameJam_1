@@ -21,9 +21,9 @@ public partial class Player
         {
             if (inputData.buttons.IsSet(NetworkInputData.MOUSEBUTTON0))
             {
-                if (HasStateAuthority)
+                if (HasInputAuthority && CanClick)
                 {
-                    RpcTriggerRig();
+                    RpcTriggerRiga();
                 }
 
                 _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
@@ -36,20 +36,23 @@ public partial class Player
             {
                 if (_lookingLog != null)
                 {
-                    if (_inventoryUI.AddItem(InventoryItemType.Log, 1))
-                    {
-                        _lookingLog.gameObject.SetActive(false);
-
-                        var networkObject = _lookingLog.GetComponent<NetworkObject>();
-                        RpcGetLogInputToState(networkObject);
-                        
-                        _lookingLog = null;
-                        
-                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                        
-                        // Tutorial
-                        Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
-                    }
+                    // var networkObject = _lookingLog.GetComponent<NetworkObject>();
+                    RpcGetLog(_lookingLog);
+                    
+                    // if (_inventoryUI.AddItem(InventoryItemType.Log, 1))
+                    // {
+                    //     _lookingLog.gameObject.SetActive(false);
+                    //
+                    //     var networkObject = _lookingLog.GetComponent<NetworkObject>();
+                    //     RpcGetLogInputToState(networkObject);
+                    //     
+                    //     _lookingLog = null;
+                    //     
+                    //     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    //     
+                    //     // Tutorial
+                    //     Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
+                    // }
                 }
             }
         }
@@ -60,19 +63,19 @@ public partial class Player
             {
                 if (_lookingInteractItem != null)
                 {
-                    var getItem = _lookingInteractItem.GetItem();
-                    
-                    if (_inventoryUI.AddItem(getItem.Item1, getItem.Item2))
-                    {
-                        _lookingInteractItem.gameObject.SetActive(false);
-
-                        var networkObject = _lookingInteractItem.GetComponent<NetworkObject>();
-                        RpcGetLogInputToState(networkObject);
-                        
-                        _lookingInteractItem = null;
-                        
-                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
-                    }
+                    // var getItem = _lookingInteractItem.GetItem();
+                    RpcGetItem(_lookingInteractItem);
+                    // if (_inventoryUI.AddItem(getItem.Item1, getItem.Item2))
+                    // {
+                    //     _lookingInteractItem.gameObject.SetActive(false);
+                    //
+                    //     var networkObject = _lookingInteractItem.GetComponent<NetworkObject>();
+                    //     RpcGetLogInputToState(networkObject);
+                    //     
+                    //     _lookingInteractItem = null;
+                    //     
+                    //     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+                    // }
                 }
             }
         }
@@ -103,10 +106,61 @@ public partial class Player
     }
     
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RpcGetItem(InteractItem interactItem)
+    {
+        if (interactItem != null)
+        {
+            var type = interactItem.GetItem();
+            
+            Global.Instance.MyPlayer.Runner.Despawn(interactItem.GetComponent<NetworkObject>());
+
+            RpcGetItemToClient(type.Item1, type.Item2);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    private void RpcGetItemToClient(InventoryItemType type, int count)
+    {
+        if (_inventoryUI.AddItem(type, count))
+        {
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RpcGetLog(Log log)
+    {
+        if (log != null)
+        {
+            Global.Instance.MyPlayer.Runner.Despawn(log.GetComponent<NetworkObject>());
+
+            RpcGetLogToClient();
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    private void RpcGetLogToClient()
+    {
+        if (_inventoryUI.AddItem(InventoryItemType.Log, 1))
+        {
+            // _lookingLog.gameObject.SetActive(false);
+            // 
+            // var networkObject = _lookingLog.GetComponent<NetworkObject>();
+            // RpcGetLogInputToState(networkObject);
+            
+            _lookingLog = null;
+            
+            // _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
+            
+            // Tutorial
+            Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
+        }
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RpcGetLogInputToState(NetworkObject log)
     {
         Debug.Log(log.Id);
-        Runner.Despawn(log);
+        Global.Instance.MyPlayer.Runner.Despawn(log);
     }
     
     private void BonFireRender()
@@ -195,6 +249,12 @@ public partial class Player
         Instantiate(_meatFx, hitPosition, Quaternion.LookRotation(lookPos));
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RpcTriggerRiga()
+    {
+        RpcTriggerRig();
+    }
+    
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcTriggerRig()
     {

@@ -1,4 +1,3 @@
-using System;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -17,6 +16,8 @@ public class EndScene : MonoBehaviour
     [SerializeField] private GameObject _confirmButton;
     
     [SerializeField] private GameObject _tutorialText;
+    [SerializeField] private GameObject _rewardText;
+    [SerializeField] private TMP_Text _rewardCountText;
     
     private void Start()
     {
@@ -59,6 +60,18 @@ public class EndScene : MonoBehaviour
         {
             await UniTask.Delay(1000);
             _tutorialText.gameObject.SetActive(true);
+        }
+        else
+        {
+            await UniTask.Delay(1000);
+            _rewardText.gameObject.SetActive(true);
+
+            int startValue = 0;
+            await DOTween.To(() => startValue, x =>
+            {
+                startValue = x;
+                _rewardCountText.text = x.ToString(); // 현재 값을 텍스트에 설정
+            }, Global.Instance.LastGameResult.Gold, 0.5f);
         }
             
         await UniTask.Delay(1000);

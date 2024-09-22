@@ -264,7 +264,7 @@ public static class CraftRecipeManager
         },
         new CraftRecipe()
         {
-            ResultItem = InventoryItemType.Plate,
+            ResultItem = InventoryItemType.Cup,
             Name = "컵",
             Desc = "물 따위의 액체를 담는 잔.\n일회용인듯 하다",
             Material = new Dictionary<InventoryItemType, int>()
@@ -294,7 +294,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 10},
             },
-            OpenWave = 0,
+            OpenWave = 5,
         },
         
         new CraftRecipe()
@@ -306,7 +306,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 15},
             },
-            OpenWave = 0,
+            OpenWave = 10,
         },
     };
     

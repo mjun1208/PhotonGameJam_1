@@ -867,7 +867,7 @@ MonoBehaviour:
   - {fileID: 8359832541183277827, guid: f9158490e6a9f764a8a68949f4cad087, type: 3}
   - {fileID: 3762797283112864827, guid: 9ca4c247a30651842883c2519a06742c, type: 3}
   spawnLimits: 140000000a0000000a000000
-  spawnRadius: 20
+  spawnRadius: 16
   centerPoint: {fileID: 7521821370560904520}
   maxAttempts: 30
   _waveText: {fileID: 5083995540827492504}
@@ -1792,7 +1792,7 @@ Transform:
   m_GameObject: {fileID: 7281140112312456151}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.82, y: -0.931, z: 49.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

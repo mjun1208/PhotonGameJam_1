@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3554621549271226326}
   - component: {fileID: 5535589309570005682}
   - component: {fileID: 7418746467757554100}
+  - component: {fileID: -4247907959706954924}
   m_Layer: 0
   m_Name: egg_white
   m_TagString: Untagged
@@ -104,6 +105,7 @@ MonoBehaviour:
   - {fileID: 3554621549271226326}
   _type: 17
   _getCount: 1
+  SpawnDelay: 0
 --- !u!114 &356186544150502864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,6 +124,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 5157869705555599603}
+  - {fileID: -4247907959706954924}
 --- !u!114 &3554621549271226326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,3 +192,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-4247907959706954924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6331119515538388292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0

@@ -37,8 +37,7 @@ public class Animal : NetworkBehaviour
             if (Hp <= 0)
             {
                 // 죽
-                var spawnedMeat = Runner.Spawn(SpawnMeat, this.transform.position + Vector3.up * 1f, Quaternion.identity, Object.StateAuthority);
-
+                var spawnedMeat = Global.Instance.MyPlayer.Runner.Spawn(SpawnMeat, this.transform.position + Vector3.up * 1f, Quaternion.identity, Object.StateAuthority);
                 Runner.Despawn(this.GetComponent<NetworkObject>());
             }
         }
@@ -46,11 +45,14 @@ public class Animal : NetworkBehaviour
     
     //
     private float wanderRadius = 10f; // 랜덤 이동 반경
+    private float newMove = 5f; // 랜덤 이동 시간
     private float restDuration = 2f; // 쉬는 시간
     private float fleeRadius = 15f; // 도망가는 반경
     private float fleeDuration = 3f; // 도망 후 대기 시간
     private float movementRadius = 20f; // 캐릭터가 이동할 수 있는 제한된 반경
     private Vector3 centerPoint; // 이동 제한의 중심점
+    
+    private float moveTime; // 움직인시간
 
     public float normalSpeed = 3.5f; // 일반 이동 속도
     public float fleeSpeed = 7f; // 도망갈 때 속도
@@ -77,12 +79,14 @@ public class Animal : NetworkBehaviour
             {
                 if (!isResting)
                 {
+                    moveTime = 0f;
                     Vector3 newDestination = RandomNavSphereWithinRadius(centerPoint, wanderRadius, movementRadius);
                     agent.SetDestination(newDestination);
 
                     // 목표 지점에 도달할 때까지 기다림
-                    while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
+                    while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance || newMove < moveTime)
                     {
+                        moveTime += Time.deltaTime;
                         yield return null;
                     }
 

@@ -211,7 +211,7 @@ public partial class Player
                 InteractionRayCastDistance))
         {
             var interactItem = hit.transform.GetComponent<InteractItem>();
-            if (interactItem)
+            if (interactItem != null && !interactItem.SpawnDelay)
             {
                 if (_lookingInteractItem != null && _lookingInteractItem != interactItem)
                 {
