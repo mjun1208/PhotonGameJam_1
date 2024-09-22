@@ -5232,7 +5232,9 @@ MonoBehaviour:
   _fishingFIFIFIFX: {fileID: 1823711575972399166}
   _fishCatchCanvas: {fileID: 8955466906497955849}
   _HitCanvas: {fileID: 2450016018877913070}
-  _spawnFish: {fileID: 3097133000904980142, guid: 4f1a5072508a6e54a8116f9060009786, type: 3}
+  _spawnFish: {fileID: 6203286518394465818, guid: 2db23c8e372860d41b717e5c304dc8c5, type: 3}
+  _spawnFish_turtle: {fileID: 101697207171307022, guid: baf8e3a28580eb0419035dfbe90e5ef9, type: 3}
+  _spawnFish_shark: {fileID: 3097133000904980142, guid: 4f1a5072508a6e54a8116f9060009786, type: 3}
   _nameText: {fileID: 8333592754285839341}
   _equipFx: {fileID: 3423104158581102944}
   _noticeText: {fileID: 6220790493726900979}

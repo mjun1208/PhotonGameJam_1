@@ -40,6 +40,8 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private FishCatchCanvas _fishCatchCanvas;
     [SerializeField] private HitCanvas _HitCanvas;
     [SerializeField] private InteractItem_Fish _spawnFish;
+    [SerializeField] private InteractItem_Fish _spawnFish_turtle;
+    [SerializeField] private InteractItem_Fish _spawnFish_shark;
     [SerializeField] private TMP_Text _nameText;
     [SerializeField] private ParticleSystem _equipFx;
     [SerializeField] private TMP_Text _noticeText;
@@ -570,8 +572,22 @@ public partial class Player : NetworkBehaviour
                     
                     if (HasStateAuthority)
                     {
-                        var spawnedFish = Runner.Spawn(_spawnFish, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.StateAuthority);
-                        spawnedFish.Fished();
+                        var randomValue = Random.Range(0, 3);
+                        if (randomValue == 0)
+                        {
+                            var spawnedFish = Runner.Spawn(_spawnFish, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.StateAuthority);
+                            spawnedFish.Fished();   
+                        }
+                        if (randomValue == 1)
+                        {
+                            var spawnedFish = Runner.Spawn(_spawnFish_turtle, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.StateAuthority);
+                            spawnedFish.Fished();
+                        }
+                        if (randomValue == 2)
+                        {
+                            var spawnedFish = Runner.Spawn(_spawnFish_shark, _fishingFIFIFIFX.transform.position, Quaternion.LookRotation(Vector3.up), Object.StateAuthority);
+                            spawnedFish.Fished();
+                        }
                     }
                 }
             }
