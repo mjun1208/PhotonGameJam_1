@@ -35,8 +35,18 @@ public class Dirt : NetworkBehaviour
 
     private bool _shoot = false;
 
+    public bool IsSpawned = false;
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        base.Despawned(runner, hasState);
+        IsSpawned = false;
+    }
+
     public override void Spawned()
     {
+        IsSpawned = true;
+        
         base.Spawned();
         if (Planted)
         {

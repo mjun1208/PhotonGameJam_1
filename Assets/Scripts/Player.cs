@@ -669,25 +669,28 @@ public partial class Player : NetworkBehaviour
             {
                 if (_harvestTargetDirt != null)
                 {
-                    var type = _harvestTargetDirt.InvenType == InventoryItemType.SeedBag_Corn ? InventoryItemType.Corn : InventoryItemType.Cola;
-                    if (_inventoryUI.AddItem(type, 1))
-                    {
-                        // _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
+                    _harvestTargetDirt.Looking(false);
+                    RpcGetHarvest(_harvestTargetDirt);
+                    _harvestTargetDirt = null;
                     
-                        _harvestTargetDirt.gameObject.SetActive(false);
-                        
-                        var networkObject = _harvestTargetDirt.GetComponent<NetworkObject>();
-                        RpcGetLogInputToState(networkObject);
-                        
-                        _harvestTargetDirt = null;
-                        
-                        _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
-                        
-                        // Tutorial
-                        Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(6);
-                        
-                        _pickUpSound.Play();
-                    }
+                    // if (_inventoryUI.AddItem(type, 1))
+                    // {
+                    //     // _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
+                    //
+                    //     _harvestTargetDirt.gameObject.SetActive(false);
+                    //     
+                    //     var networkObject = _harvestTargetDirt.GetComponent<NetworkObject>();
+                    //     RpcGetLogInputToState(networkObject);
+                    //     
+                    //     _harvestTargetDirt = null;
+                    //     
+                    //     _mouse0delay = TickTimer.CreateFromSeconds(Runner, 1f);
+                    //     
+                    //     // Tutorial
+                    //     Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(6);
+                    //     
+                    //     _pickUpSound.Play();
+                    // }
                 }
             }
         }
@@ -748,6 +751,38 @@ public partial class Player : NetworkBehaviour
                 }
             }
         }
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RpcGetHarvest(Dirt dirt)
+    {
+        if (dirt != null)
+        {
+            var type = dirt.InvenType == InventoryItemType.SeedBag_Corn ? InventoryItemType.Corn : InventoryItemType.Cola;
+            
+            var networkObject = dirt.GetComponent<NetworkObject>();
+            Global.Instance.MyPlayer.Runner.Despawn(networkObject);
+
+            RpcGetHarvestToClient(type);
+        }
+    }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    private void RpcGetHarvestToClient(InventoryItemType type)
+    {
+        if (_inventoryUI.AddItem(type, 1))
+        {
+            // Tutorial
+            WaitAndTutorial6();
+
+            _pickUpSound.Play();
+        }
+    }
+    
+    private async void WaitAndTutorial6()
+    {
+        await UniTask.NextFrame();
+        Global.Instance.IngameManager.ServerOnlyGameManager.RpcSetTutorialIndex(6);
     }
 
     private bool LookingWho()
@@ -991,7 +1026,7 @@ public partial class Player : NetworkBehaviour
                 InteractionRayCastDistance, dirtMask))
         {
             var dirt = hit.transform.GetComponent<Dirt>();
-            if (dirt != null && dirt.Grew)
+            if (dirt != null && dirt.IsSpawned && dirt.Grew)
             {
                 if (_harvestTargetDirt != null && _harvestTargetDirt != dirt)
                 {

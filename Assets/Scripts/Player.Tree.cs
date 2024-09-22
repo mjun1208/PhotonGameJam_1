@@ -152,9 +152,7 @@ public partial class Player
             // 
             // var networkObject = _lookingLog.GetComponent<NetworkObject>();
             // RpcGetLogInputToState(networkObject);
-            
-            _lookingLog = null;
-            
+
             // _mouse0delay = TickTimer.CreateFromSeconds(Runner, 0.5f);
             
             // Tutorial
