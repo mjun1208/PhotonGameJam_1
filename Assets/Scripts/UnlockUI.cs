@@ -14,7 +14,7 @@ public class UnlockUI : MonoBehaviour
     {
         for (int i = 0; i < _newRecipeListItems.Count; i++)
         {
-            Destroy(_newRecipeListItems[i]);
+            Destroy(_newRecipeListItems[i].gameObject);
         }
 
         _newRecipeListItems.Clear();
@@ -26,15 +26,15 @@ public class UnlockUI : MonoBehaviour
             foreach (var craftRecipe in newRecipeList)
             {
                 var newRecipeListItem = Instantiate(_origin, _unlockItmemParent);
-                newRecipeListItem.SetInfo(craftRecipe, false); 
-                newRecipeListItem .gameObject.SetActive(true);       
-                
+                newRecipeListItem.SetInfo(craftRecipe, false);
+                newRecipeListItem.gameObject.SetActive(true);
+
                 _newRecipeListItems.Add(newRecipeListItem);
             }
         }
-        
+
         // 
-        
+
         var newCookList = CraftRecipeManager.CookRecipes.Where(x => x.OpenWave == wave).ToList();
 
         if (newCookList.Any())
@@ -42,9 +42,9 @@ public class UnlockUI : MonoBehaviour
             foreach (var craftRecipe in newCookList)
             {
                 var newRecipeListItem = Instantiate(_origin, _unlockItmemParent);
-                newRecipeListItem.SetInfo(craftRecipe, false); 
-                newRecipeListItem .gameObject.SetActive(true);       
-                
+                newRecipeListItem.SetInfo(craftRecipe, true);
+                newRecipeListItem.gameObject.SetActive(true);
+
                 _newRecipeListItems.Add(newRecipeListItem);
             }
         }

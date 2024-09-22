@@ -205,6 +205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _outlines:
   - {fileID: 7187251459573047652}
-  _type: 3
+  _type: 14
   _getCount: 3
+  SpawnDelay: 0
   _rigidbody: {fileID: 4685648233875054345}

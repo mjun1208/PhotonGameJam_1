@@ -297,14 +297,9 @@ public partial class ServerOnlyGameManager : NetworkBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            RpcSetTutorialIndex(TutorialIndex + 1);
-        }
-
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Wave++;
+            NextWave();
         }
     }
     

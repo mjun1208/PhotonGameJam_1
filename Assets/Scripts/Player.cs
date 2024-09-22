@@ -651,7 +651,8 @@ public partial class Player : NetworkBehaviour
             {
                 if (_harvestTargetDirt != null)
                 {
-                    if (_inventoryUI.AddItem(InventoryItemType.Corn, 1))
+                    var type = _harvestTargetDirt.InvenType == InventoryItemType.SeedBag_Corn ? InventoryItemType.Corn : InventoryItemType.Cola;
+                    if (_inventoryUI.AddItem(type, 1))
                     {
                         // _inventoryUI.AddItem(InventoryItemType.SeedBag_Corn, 3);
                     
@@ -745,7 +746,7 @@ public partial class Player : NetworkBehaviour
         DisableInteractionText();
 
         // if (_playerType == PlayerType.Farmer)
-        if (_inventoryItemType == InventoryItemType.SeedBag_Corn)
+        if (_inventoryItemType is InventoryItemType.SeedBag_Corn or InventoryItemType.SeedBag_Carrot or InventoryItemType.SeedBag_Cola)
         {
             GetPlantTarget();
         }

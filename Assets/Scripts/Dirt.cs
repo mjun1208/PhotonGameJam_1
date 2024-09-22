@@ -9,10 +9,13 @@ public class Dirt : NetworkBehaviour
     [SerializeField] private Outline _outline;
     [SerializeField] private GameObject plant;
     [SerializeField] private GameObject plant2;
+    [SerializeField] private GameObject plant3;
     [SerializeField] private GameObject FX;
     [SerializeField] private GameObject FX_grow;
     
     [SerializeField] private GameObject DestoryFx;
+    
+    [SerializeField] private InteractItem_Fish Carrot;
     
     [SerializeField] private Missile missile;
     
@@ -43,7 +46,15 @@ public class Dirt : NetworkBehaviour
         if (Grew)
         {
             plant.SetActive(false);
-            plant2.SetActive(true);
+
+            if (InvenType == InventoryItemType.SeedBag_Corn)
+            {
+                plant2.SetActive(true);
+            }
+            if (InvenType == InventoryItemType.SeedBag_Cola)
+            {
+                plant3.SetActive(true);
+            }
         }
 
         var fx = GameObject.Instantiate(FX, this.transform);
@@ -117,6 +128,11 @@ public class Dirt : NetworkBehaviour
             else
             {
                 Grew = true;
+                
+                if (InvenType == InventoryItemType.SeedBag_Carrot)
+                {
+                    SpawnCarrot();
+                }
                 // if (!_shoot)
                 // {
                 //     _shoot = true;
@@ -124,6 +140,14 @@ public class Dirt : NetworkBehaviour
                 // }
             }
         }
+    }
+
+    public async void SpawnCarrot()
+    {
+        var carrot = Global.Instance.MyPlayer.Runner.Spawn(Carrot, this.transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        carrot.Fished();
+        await UniTask.NextFrame();
+        Runner.Despawn(this.GetComponent<NetworkObject>());
     }
 
     public void DespawnGOGO()
@@ -150,7 +174,16 @@ public class Dirt : NetworkBehaviour
     private void OnChangeGrew()
     {
         plant.SetActive(false);
-        plant2.SetActive(true);
+        
+        if (InvenType == InventoryItemType.SeedBag_Corn)
+        {
+            plant2.SetActive(true);
+        }
+        if (InvenType == InventoryItemType.SeedBag_Cola)
+        {
+            plant3.SetActive(true);
+        }
+
         FX_grow.SetActive(true);
     }
 }

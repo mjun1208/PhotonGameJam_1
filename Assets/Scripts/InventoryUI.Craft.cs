@@ -59,7 +59,7 @@ public partial class InventoryUI : MonoBehaviour
         _craftRecipeListItems.ForEach(x=> x.gameObject.SetActive(false));
 
         var craftRecipesByWave = craftRecipes
-            .Where(x => x.OpenWave <= Global.Instance.IngameManager.ServerOnlyGameManager.Wave).ToList();
+            .Where(x => x.OpenWave <= Global.Instance.IngameManager.ServerOnlyGameManager.CraftWave).ToList();
         
         for (int i = 0; i < craftRecipesByWave.Count; i++)
         {
@@ -260,7 +260,7 @@ public static class CraftRecipeManager
             {
                 {InventoryItemType.Log, 5},
             },
-            OpenWave = 2,
+            OpenWave = 3,
         },
         new CraftRecipe()
         {

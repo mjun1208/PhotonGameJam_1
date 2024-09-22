@@ -7,6 +7,9 @@ public class Tree : MonoBehaviour
     [SerializeField] private Outline _outline;
     private Vector3 _originPos;
     private Quaternion _originRot;
+    
+    public GameObject Apple;
+    public Transform AppleSpawnPoint;
 
     private void Start()
     {

@@ -37,8 +37,10 @@ public partial class Player
                 if (_lookingLog != null)
                 {
                     // var networkObject = _lookingLog.GetComponent<NetworkObject>();
+                    _lookingLog.Look(false);
                     RpcGetLog(_lookingLog);
-                    
+                    _lookingLog = null;
+
                     // if (_inventoryUI.AddItem(InventoryItemType.Log, 1))
                     // {
                     //     _lookingLog.gameObject.SetActive(false);
@@ -64,7 +66,9 @@ public partial class Player
                 if (_lookingInteractItem != null)
                 {
                     // var getItem = _lookingInteractItem.GetItem();
+                    _lookingInteractItem.Look(false);
                     RpcGetItem(_lookingInteractItem);
+                    _lookingInteractItem = null;
                     // if (_inventoryUI.AddItem(getItem.Item1, getItem.Item2))
                     // {
                     //     _lookingInteractItem.gameObject.SetActive(false);
@@ -220,6 +224,16 @@ public partial class Player
 
             // Tutorial
             Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(1);
+            
+            // appleSpawn
+            float rangeX = 3f; // x축 범위
+            float rangeZ = 3f; // z축 범위
+
+            float randomX = Random.Range(targetTree.AppleSpawnPoint.position.x - rangeX, targetTree.AppleSpawnPoint.position.x + rangeX);
+            float randomZ = Random.Range(targetTree.AppleSpawnPoint.position.z - rangeZ, targetTree.AppleSpawnPoint.position.z + rangeZ);
+            
+            Runner.Spawn(targetTree.Apple, new Vector3(randomX, targetTree.AppleSpawnPoint.position.y, randomZ), 
+                Quaternion.LookRotation(lookPos), Object.StateAuthority);   
         }
         
         targetTree.Hit();

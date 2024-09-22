@@ -121,7 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _outlines:
   - {fileID: 8752668904171567698}
-  _type: 15
+  _type: 13
   _getCount: 1
   SpawnDelay: 0
 --- !u!114 &3699404762847282010
