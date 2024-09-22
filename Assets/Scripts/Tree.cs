@@ -11,6 +11,8 @@ public class Tree : MonoBehaviour
     public GameObject Apple;
     public Transform AppleSpawnPoint;
 
+    [SerializeField] private AudioSource _source;
+
     private void Start()
     {
         _originPos = this.transform.position;
@@ -28,5 +30,7 @@ public class Tree : MonoBehaviour
         {
             this.transform.rotation = _originRot;
         });
+        
+        _source.Play();
     }
 }

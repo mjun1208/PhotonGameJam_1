@@ -74,6 +74,23 @@ public partial class InventoryUI : MonoBehaviour
 
         _dragging = false;
     }
+    
+    protected virtual void OnDisable()
+    {
+        if (_dragging)
+        {
+            _dragSlot.SetInventoryItem(_dragSlot);
+            _dragSlot.Dragging = false;
+            _dragging = false;
+            
+            _draggingItem.gameObject.SetActive(false);
+        }
+        
+        if (_craftEnd != null)
+        {
+            _craftEnd.gameObject.SetActive(false);
+        }
+    }
 
     private void Update()
     {

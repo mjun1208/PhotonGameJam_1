@@ -68,7 +68,7 @@ public class InventoryListItemDrag : MonoBehaviour, IBeginDragHandler, IEndDragH
                     
                     if (!InventoryListItem.Empty && !targetSlot2.InventoryListItem.Empty)
                     {
-                        if (InventoryListItem.GetInventoryItemType == targetSlot2.InventoryListItem.GetInventoryItemType)
+                        if (InventoryListItem.GetInventoryItemType == targetSlot2.InventoryListItem.GetInventoryItemType && InventoryListItem != targetSlot2.InventoryListItem)
                         {
                             targetSlot2.InventoryListItem.ItemCount += InventoryListItem.ItemCount;
                             targetSlot2.InventoryListItem.SetInventoryItemType(targetSlot2.InventoryListItem.GetInventoryItemType, targetSlot2.InventoryListItem.ItemCount);

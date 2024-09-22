@@ -127,6 +127,7 @@ public partial class Player
     {
         if (_inventoryUI.AddItem(type, count))
         {
+            _pickUpSound.Play();
         }
     }
 
@@ -157,6 +158,8 @@ public partial class Player
             
             // Tutorial
             Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(2);
+            
+            _pickUpSound.Play();
         }
     }
     

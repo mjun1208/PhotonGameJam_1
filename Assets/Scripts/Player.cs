@@ -62,6 +62,8 @@ public partial class Player : NetworkBehaviour
     [SerializeField] private GameObject _fishWeapon2222;
     [SerializeField] private Axe _axe;
     
+    [SerializeField] private AudioSource _pickUpSound;
+    
     private const float Gravity = 9.81f; // 중력 가속도
 
     private int _hp = 1000;
@@ -683,6 +685,8 @@ public partial class Player : NetworkBehaviour
                         
                         // Tutorial
                         Global.Instance.IngameManager.ServerOnlyGameManager.TutorialManager.SetTutorialIndex(6);
+                        
+                        _pickUpSound.Play();
                     }
                 }
             }

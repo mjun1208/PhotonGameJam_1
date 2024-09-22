@@ -211,7 +211,7 @@ public class NPC : NetworkBehaviour
    public void StartTimer()
    {
       _timerImage.fillAmount = 1f;
-      _timerTime = 60f;
+      _timerTime = 80f;
       _waitTime = 0f;
    }
 

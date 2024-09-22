@@ -171,14 +171,6 @@ public partial class InventoryUI : MonoBehaviour
         // _player.ShowNotice("제작 완료", Color.green);
     }
 
-    protected virtual void OnDisable()
-    {
-        if (_craftEnd != null)
-        {
-            _craftEnd.gameObject.SetActive(false);
-        }
-    }
-
     public void OnClickRecipe(CraftRecipe craftRecipe)
     {
         _craftRecipe = craftRecipe;
