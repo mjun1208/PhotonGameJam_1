@@ -601,18 +601,27 @@ public partial class Player : NetworkBehaviour
         }
 
         _networkedMoveDirection = inputData.direction;
-        
-        if (inputData.direction.sqrMagnitude > 0 || inputData.jump)
+
+        if (_simpleKCC.Position.y < -30)
         {
-            Move(inputData);
-            _forward = inputData.direction;
+            _simpleKCC.Move(Vector3.zero);
+            _simpleKCC.SetPosition(Vector3.zero);
+            this.transform.position = Vector3.zero;
         }
         else
         {
-            // 중력 적용
-            if (!_simpleKCC.IsGrounded)
+            if (inputData.direction.sqrMagnitude > 0 || inputData.jump)
             {
-                _simpleKCC.Move(Vector3.down * Gravity * Runner.DeltaTime);
+                Move(inputData);
+                _forward = inputData.direction;
+            }
+            else
+            {
+                // 중력 적용
+                if (!_simpleKCC.IsGrounded)
+                {
+                    _simpleKCC.Move(Vector3.down * Gravity * Runner.DeltaTime);
+                }
             }
         }
 
