@@ -23,7 +23,7 @@ public class TutorialManager : MonoBehaviour
         "삽을 이용하여 땅을 파고 옥수수를 심으세요!", // Player - RpcDoSomething 5
         "옥수수가 자라면 수확하세요!", // Player - FixedUpdateNetwork 6
         "모닥불을 제작하세요!", // InventoryUI.Craft - Craft 7
-        "모닥불을 설치하여 옥수수 죽을 만드세요!", // InventoryUI.Craft - Craft 8
+        "모닥불을 설치하여 구운옥수수를 만드세요!", // InventoryUI.Craft - Craft 8
         "테이블을 제작하세요!", // InventoryUI.Craft - Craft 9
         "테이블을 설치하여 손님을 받으세요! (기다리면 손님이 옴)", // Npc - StartOrder 10
         "손님이 원하는 아이템을 건네세요!", // Npc - ReceiveItem 11
